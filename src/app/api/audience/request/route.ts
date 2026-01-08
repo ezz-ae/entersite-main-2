@@ -5,13 +5,43 @@ import { getAdminDb } from '@/server/firebase-admin';
 import { requireTenantScope, UnauthorizedError, ForbiddenError } from '@/server/auth';
 
 const payloadSchema = z.object({
-  listType: z.enum(['imported', 'pilot']).default('imported'),
+  listType: z.enum(['imported', 'pilot']),
   goal: z.string().min(1),
   region: z.string().min(1),
   budget: z.number().nonnegative().optional(),
   notes: z.string().optional(),
   tenantId: z.string().optional(),
 });
+
+export async function GET(req: NextRequest) {
+  try {
+    const { tenantId } = await requireTenantScope(req);
+    const db = getAdminDb();
+    const snapshot = await db
+      .collection('tenants')
+      .doc(tenantId)
+      .collection('audience_requests')
+      .orderBy('createdAt', 'desc')
+      .limit(1)
+      .get();
+
+    if (snapshot.empty) {
+      return NextResponse.json({ request: null });
+    }
+
+    const doc = snapshot.docs[0];
+    return NextResponse.json({ request: { id: doc.id, ...doc.data() } });
+  } catch (error) {
+    console.error('[audience/request] get error', error);
+    if (error instanceof UnauthorizedError) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+    if (error instanceof ForbiddenError) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
+    return NextResponse.json({ error: 'Failed to load request' }, { status: 500 });
+  }
+}
 
 export async function POST(req: NextRequest) {
   try {
@@ -40,7 +70,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ success: true, request: { id: requestRef.id, ...requestData } });
   } catch (error) {
-    console.error('[audience/build] error', error);
+    console.error('[audience/request] post error', error);
     if (error instanceof z.ZodError) {
       return NextResponse.json({ error: 'Invalid payload', details: error.errors }, { status: 400 });
     }
