@@ -8,6 +8,7 @@ const payloadSchema = z.object({
   tenantId: z.string().optional(),
   notificationEmail: z.string().email().optional().nullable(),
   crmWebhookUrl: z.string().url().optional().nullable(),
+  crmProvider: z.enum(['hubspot', 'custom']).optional().nullable(),
 });
 
 export async function GET(req: NextRequest) {
@@ -24,7 +25,11 @@ export async function GET(req: NextRequest) {
       .doc('leads')
       .get();
 
-    return NextResponse.json({ settings: docSnap.exists ? docSnap.data() : null });
+    const settings = docSnap.exists ? docSnap.data() : null;
+    return NextResponse.json({
+      settings,
+      hubspotAvailable: Boolean(process.env.HUBSPOT_ACCESS_TOKEN),
+    });
   } catch (error) {
     console.error('[leads/settings] error', error);
     if (error instanceof UnauthorizedError) {
@@ -52,6 +57,7 @@ export async function POST(req: NextRequest) {
         {
           notificationEmail: payload.notificationEmail || null,
           crmWebhookUrl: payload.crmWebhookUrl || null,
+          crmProvider: payload.crmProvider || null,
           updatedAt: FieldValue.serverTimestamp(),
         },
         { merge: true }

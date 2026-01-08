@@ -78,6 +78,8 @@ export default function LeadCrmPage() {
   const [notificationEmail, setNotificationEmail] = useState('');
   const [crmWebhookUrl, setCrmWebhookUrl] = useState('');
   const [settingsMessage, setSettingsMessage] = useState<string | null>(null);
+  const [crmProvider, setCrmProvider] = useState<'hubspot' | 'custom'>('hubspot');
+  const [hubspotAvailable, setHubspotAvailable] = useState(false);
 
   const loadLeads = useCallback(async () => {
     if (!user) return;
@@ -116,6 +118,11 @@ export default function LeadCrmPage() {
         const data = await res.json();
         setNotificationEmail(data.settings?.notificationEmail || '');
         setCrmWebhookUrl(data.settings?.crmWebhookUrl || '');
+        const provider =
+          data.settings?.crmProvider ||
+          (data.settings?.crmWebhookUrl ? 'custom' : 'hubspot');
+        setCrmProvider(provider);
+        setHubspotAvailable(Boolean(data.hubspotAvailable));
       }
     } catch (fetchError) {
       console.error('Failed to load lead settings', fetchError);
@@ -178,7 +185,8 @@ export default function LeadCrmPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           notificationEmail: notificationEmail || null,
-          crmWebhookUrl: crmWebhookUrl || null,
+          crmWebhookUrl: crmProvider === 'custom' ? crmWebhookUrl || null : null,
+          crmProvider,
         }),
       });
       if (res.ok) {
@@ -410,16 +418,65 @@ export default function LeadCrmPage() {
                     />
                 </div>
                 <div className="space-y-2">
-                    <h4 className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">CRM Connection Link (Optional)</h4>
-                    <p className="text-sm text-zinc-400">Paste your CRM connection link to auto-send new leads.</p>
-                    <Input
-                        placeholder="https://connect.your-crm.com/lead"
-                        className="bg-black/40 border-white/10 h-12 rounded-xl"
-                        value={crmWebhookUrl}
-                        onChange={(e) => setCrmWebhookUrl(e.target.value)}
+                    <h4 className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">CRM Destination</h4>
+                    <p className="text-sm text-zinc-400">Default is HubSpot. Choose where new leads sync.</p>
+                    <div className="grid grid-cols-2 gap-3">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className={cn(
+                          "h-12 rounded-xl border-white/10 bg-black/40 text-sm font-semibold",
+                          crmProvider === 'hubspot'
+                            ? "border-blue-500/60 bg-blue-500/10 text-blue-300"
+                            : "text-zinc-400"
+                        )}
+                        onClick={() => setCrmProvider('hubspot')}
                         disabled={settingsLoading}
-                    />
+                      >
+                        HubSpot
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className={cn(
+                          "h-12 rounded-xl border-white/10 bg-black/40 text-sm font-semibold",
+                          crmProvider === 'custom'
+                            ? "border-blue-500/60 bg-blue-500/10 text-blue-300"
+                            : "text-zinc-400"
+                        )}
+                        onClick={() => setCrmProvider('custom')}
+                        disabled={settingsLoading}
+                      >
+                        Custom Webhook
+                      </Button>
+                    </div>
+                    {crmProvider === 'hubspot' ? (
+                      <p className={cn(
+                        "text-xs font-semibold",
+                        hubspotAvailable ? "text-emerald-400" : "text-amber-400"
+                      )}>
+                        {hubspotAvailable
+                          ? "HubSpot is connected. New leads sync automatically."
+                          : "HubSpot is not connected yet. Add HUBSPOT_ACCESS_TOKEN or switch to Custom."
+                        }
+                      </p>
+                    ) : (
+                      <p className="text-xs text-zinc-500">Use any CRM that accepts a webhook link.</p>
+                    )}
                 </div>
+                {crmProvider === 'custom' && (
+                  <div className="space-y-2">
+                      <h4 className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">CRM Connection Link</h4>
+                      <p className="text-sm text-zinc-400">Paste your CRM connection link to auto-send new leads.</p>
+                      <Input
+                          placeholder="https://connect.your-crm.com/lead"
+                          className="bg-black/40 border-white/10 h-12 rounded-xl"
+                          value={crmWebhookUrl}
+                          onChange={(e) => setCrmWebhookUrl(e.target.value)}
+                          disabled={settingsLoading}
+                      />
+                  </div>
+                )}
                 <Button
                     className="w-full h-12 rounded-xl bg-white text-black font-bold"
                     onClick={handleSaveSettings}
@@ -432,7 +489,7 @@ export default function LeadCrmPage() {
                 )}
                 <Separator className="bg-white/5" />
                 <p className="text-xs text-zinc-500">
-                    Want a direct HubSpot or Salesforce connector? Share your request and we will set it up.
+                    Need a different CRM? Share your request and we will wire it up.
                 </p>
              </Card>
           </div>

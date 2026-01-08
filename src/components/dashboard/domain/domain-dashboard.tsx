@@ -28,7 +28,10 @@ interface DnsRecord {
 
 export function DomainDashboard() {
   const [domain, setDomain] = useState('');
+  const [purchaseDomain, setPurchaseDomain] = useState('');
+  const [purchaseProvider, setPurchaseProvider] = useState<'namecheap' | 'vercel'>('namecheap');
   const [isVerifying, setIsVerifying] = useState(false);
+  const [isPurchasing, setIsPurchasing] = useState(false);
   const [verificationRecords, setVerificationRecords] = useState<DnsRecord[]>([]);
   const { toast } = useToast();
   const [sites, setSites] = useState<any[]>([]);
@@ -85,6 +88,39 @@ export function DomainDashboard() {
       toast({ title: "Error", description: "An unexpected error occurred.", variant: 'destructive' });
     } finally {
       setIsVerifying(false);
+    }
+  };
+
+  const handlePurchase = async () => {
+    setIsPurchasing(true);
+    try {
+      const res = await authorizedFetch('/api/domains/request', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          domain: purchaseDomain,
+          provider: purchaseProvider,
+          siteId: selectedSiteId || undefined,
+        }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        toast({
+          title: 'Request sent',
+          description: 'We will purchase the domain and connect it to your site.',
+        });
+        setPurchaseDomain('');
+      } else {
+        toast({
+          title: 'Request failed',
+          description: data.error || data.message || 'Could not submit the request.',
+          variant: 'destructive',
+        });
+      }
+    } catch (error) {
+      toast({ title: 'Error', description: 'An unexpected error occurred.', variant: 'destructive' });
+    } finally {
+      setIsPurchasing(false);
     }
   };
 
@@ -205,6 +241,82 @@ export function DomainDashboard() {
                         </div>
                      </motion.div>
                  )}
+              </CardContent>
+           </Card>
+
+           {/* Section 3: Buy a Domain */}
+           <Card className="bg-zinc-900/50 border-white/5 backdrop-blur-xl rounded-[2.5rem] overflow-hidden">
+              <CardHeader className="p-8 pb-4">
+                 <CardTitle className="text-2xl font-bold flex items-center gap-3">
+                    <ShieldCheck className="h-6 w-6 text-emerald-500" />
+                    Buy a Domain
+                 </CardTitle>
+                 <CardDescription>We will purchase it through Namecheap or Vercel and connect it for you.</CardDescription>
+              </CardHeader>
+              <CardContent className="p-8 pt-0 space-y-6">
+                 <div className="space-y-2">
+                    <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Choose Provider</p>
+                    <div className="grid grid-cols-2 gap-3">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className={cn(
+                          "h-12 rounded-xl border-white/10 bg-black/40 text-sm font-semibold",
+                          purchaseProvider === 'namecheap'
+                            ? "border-blue-500/60 bg-blue-500/10 text-blue-300"
+                            : "text-zinc-400"
+                        )}
+                        onClick={() => setPurchaseProvider('namecheap')}
+                        disabled={isPurchasing}
+                      >
+                        Namecheap
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className={cn(
+                          "h-12 rounded-xl border-white/10 bg-black/40 text-sm font-semibold",
+                          purchaseProvider === 'vercel'
+                            ? "border-blue-500/60 bg-blue-500/10 text-blue-300"
+                            : "text-zinc-400"
+                        )}
+                        onClick={() => setPurchaseProvider('vercel')}
+                        disabled={isPurchasing}
+                      >
+                        Vercel
+                      </Button>
+                    </div>
+                 </div>
+                 <div className="space-y-2">
+                    <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Choose Site</p>
+                    <select
+                        className="w-full h-12 bg-black/40 border border-white/10 rounded-2xl px-4 text-sm text-zinc-300 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                        value={selectedSiteId}
+                        onChange={(e) => setSelectedSiteId(e.target.value)}
+                    >
+                        {sites.map((site) => (
+                          <option key={site.id} value={site.id}>
+                            {site.title || site.name || site.id}
+                          </option>
+                        ))}
+                    </select>
+                 </div>
+                 <div className="space-y-2">
+                    <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Domain Name</p>
+                    <Input 
+                        placeholder="e.g. dubaihomefinder.com" 
+                        className="bg-black/40 border-white/10 h-14 text-lg rounded-2xl text-white"
+                        value={purchaseDomain}
+                        onChange={(e) => setPurchaseDomain(e.target.value)}
+                    />
+                 </div>
+                 <Button 
+                    onClick={handlePurchase}
+                    disabled={!purchaseDomain || isPurchasing || !selectedSiteId}
+                    className="h-14 px-8 bg-white text-black font-bold rounded-2xl w-full"
+                 >
+                    {isPurchasing ? <Loader2 className="h-5 w-5 animate-spin" /> : "Request Purchase"}
+                 </Button>
               </CardContent>
            </Card>
         </div>

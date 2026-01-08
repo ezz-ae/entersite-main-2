@@ -7,6 +7,7 @@ import { getAdminDb } from '@/server/firebase-admin';
 
 const RESEND_API_KEY = process.env.RESEND_API_KEY;
 const FROM_EMAIL = process.env.FROM_EMAIL;
+const HUBSPOT_ACCESS_TOKEN = process.env.HUBSPOT_ACCESS_TOKEN;
 
 const payloadSchema = z.object({
   name: z.string().optional(),
@@ -25,6 +26,85 @@ const payloadSchema = z.object({
 });
 
 type LeadPayload = z.infer<typeof payloadSchema>;
+
+const splitName = (name?: string) => {
+  if (!name) {
+    return {};
+  }
+  const parts = name.trim().split(/\s+/).filter(Boolean);
+  if (!parts.length) {
+    return {};
+  }
+  if (parts.length === 1) {
+    return { firstname: parts[0] };
+  }
+  return {
+    firstname: parts[0],
+    lastname: parts.slice(1).join(' '),
+  };
+};
+
+const buildHubspotProperties = (payload: LeadPayload) => {
+  const properties: Record<string, string> = {};
+  if (payload.email) {
+    properties.email = payload.email;
+  }
+  if (payload.phone) {
+    properties.phone = payload.phone;
+  }
+  const { firstname, lastname } = splitName(payload.name);
+  if (firstname) {
+    properties.firstname = firstname;
+  }
+  if (lastname) {
+    properties.lastname = lastname;
+  }
+  return properties;
+};
+
+async function syncHubspotContact(token: string, payload: LeadPayload) {
+  const properties = buildHubspotProperties(payload);
+  if (!Object.keys(properties).length) {
+    return { skipped: true };
+  }
+
+  const res = await fetch('https://api.hubapi.com/crm/v3/objects/contacts', {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ properties }),
+  });
+
+  if (res.ok) {
+    return { success: true };
+  }
+
+  if (res.status === 409 && payload.email) {
+    const updateRes = await fetch(
+      `https://api.hubapi.com/crm/v3/objects/contacts/${encodeURIComponent(payload.email)}?idProperty=email`,
+      {
+        method: 'PATCH',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ properties }),
+      }
+    );
+    if (updateRes.ok) {
+      return { success: true, updated: true };
+    }
+    const updateError = await updateRes.text();
+    console.error('[leads] hubspot update failed', updateRes.status, updateError);
+    return { success: false };
+  }
+
+  const errorBody = await res.text();
+  console.error('[leads] hubspot create failed', res.status, errorBody);
+  return { success: false };
+}
 
 async function resolveTenant(db: Firestore, payload: LeadPayload) {
   if (payload.tenantId) {
@@ -85,6 +165,9 @@ export async function POST(req: NextRequest) {
 
     const notificationEmail = settings?.notificationEmail as string | undefined;
     const crmWebhookUrl = settings?.crmWebhookUrl as string | undefined;
+    const crmProvider =
+      (settings?.crmProvider as string | undefined) ||
+      (crmWebhookUrl ? 'custom' : 'hubspot');
 
     if (notificationEmail && RESEND_API_KEY && FROM_EMAIL) {
       const resend = new Resend(RESEND_API_KEY);
@@ -106,7 +189,15 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    if (crmWebhookUrl) {
+    if (crmProvider === 'hubspot' && HUBSPOT_ACCESS_TOKEN) {
+      try {
+        await syncHubspotContact(HUBSPOT_ACCESS_TOKEN, payload);
+      } catch (error) {
+        console.error('[leads] hubspot sync failed', error);
+      }
+    }
+
+    if (crmProvider === 'custom' && crmWebhookUrl) {
       try {
         await fetch(crmWebhookUrl, {
           method: 'POST',

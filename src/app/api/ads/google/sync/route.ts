@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { Resend } from 'resend';
 import { requireAuth, UnauthorizedError, ForbiddenError } from '@/server/auth';
 import { getAdminDb } from '@/server/firebase-admin';
 import { updateMarketingTotals } from '@/server/marketing-analytics';
@@ -19,6 +20,10 @@ const requestSchema = z.object({
     })
     .optional(),
 });
+
+const RESEND_API_KEY = process.env.RESEND_API_KEY;
+const FROM_EMAIL = process.env.FROM_EMAIL;
+const ADS_NOTIFICATION_EMAIL = process.env.ADS_NOTIFICATION_EMAIL || 'google@entrestate.com';
 
 /**
  * Google Ads Execution Layer
@@ -85,6 +90,33 @@ export async function POST(req: NextRequest) {
               }
               return totals;
             });
+
+            if (RESEND_API_KEY && FROM_EMAIL && ADS_NOTIFICATION_EMAIL) {
+              try {
+                const resend = new Resend(RESEND_API_KEY);
+                await resend.emails.send({
+                  from: `Entrestate <${FROM_EMAIL}>`,
+                  to: ADS_NOTIFICATION_EMAIL,
+                  subject: `Google Ads setup requested - ${body.name}`,
+                  html: `
+                    <div style="font-family: sans-serif; line-height: 1.6; color: #111;">
+                      <h2 style="margin: 0 0 12px;">New Google Ads Setup Request</h2>
+                      <p><strong>Tenant:</strong> ${tenantId}</p>
+                      <p><strong>Requested by:</strong> ${user.email || 'Unknown'}</p>
+                      <p><strong>Campaign:</strong> ${body.name}</p>
+                      <p><strong>Goal:</strong> ${body.goal || 'Lead Generation'}</p>
+                      <p><strong>Daily Budget:</strong> ${body.budget}</p>
+                      <p><strong>Duration:</strong> ${body.duration} days</p>
+                      <p><strong>Location:</strong> ${body.location}</p>
+                      ${body.landingPage ? `<p><strong>Landing Page:</strong> ${body.landingPage}</p>` : ''}
+                      ${body.notes ? `<p><strong>Notes:</strong> ${body.notes}</p>` : ''}
+                    </div>
+                  `,
+                });
+              } catch (emailError) {
+                console.error('[google/sync] notification email failed', emailError);
+              }
+            }
         } catch (logError) {
             console.error('[google/sync] failed to persist campaign', logError);
         }
