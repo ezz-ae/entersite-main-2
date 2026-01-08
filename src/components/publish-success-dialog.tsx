@@ -9,9 +9,11 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { CheckCircle2, Copy, ExternalLink, Globe, Share2, Twitter, Linkedin, Rocket, ShieldCheck, Zap } from "lucide-react";
+import { CheckCircle2, Copy, ExternalLink, Globe, Share2, ShieldCheck, Zap } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { publishSite } from "@/lib/publish-service";
+import { AuthError } from "@/lib/auth-fetch";
+import Link from "next/link";
 import type { SitePage } from '@/lib/types';
 import confetti from 'canvas-confetti';
 
@@ -60,8 +62,10 @@ export function PublishSuccessDialog({
       } catch (error) {
           console.error("Failed to publish", error);
           toast({
-              title: "Error",
-              description: "Failed to publish site. Please try again.",
+              title: error instanceof AuthError ? "Sign in required" : "Error",
+              description: error instanceof AuthError
+                ? "Please sign in to publish your site."
+                : "Failed to publish site. Please try again.",
               variant: "destructive"
           });
       } finally {
@@ -95,8 +99,8 @@ export function PublishSuccessDialog({
                     <Globe className="absolute inset-0 m-auto h-12 w-12 text-blue-500 animate-pulse" />
                 </div>
                 <div>
-                    <h3 className="text-3xl font-black italic uppercase tracking-tighter">Broadcasting Build...</h3>
-                    <p className="text-zinc-500 text-lg font-light mt-2">Deploying to Edge Node: Dubai-North-1</p>
+                    <h3 className="text-3xl font-black italic uppercase tracking-tighter">Getting Your Link Ready...</h3>
+                    <p className="text-zinc-500 text-lg font-light mt-2">This takes a few seconds</p>
                 </div>
             </div>
         ) : (
@@ -107,9 +111,9 @@ export function PublishSuccessDialog({
                     </div>
                     
                     <DialogHeader>
-                        <DialogTitle className="text-5xl font-black tracking-tighter text-center italic uppercase leading-none">System Live.</DialogTitle>
+                        <DialogTitle className="text-5xl font-black tracking-tighter text-center italic uppercase leading-none">Your Link Is Live.</DialogTitle>
                         <DialogDescription className="text-center text-xl font-light mt-4 max-w-sm mx-auto text-zinc-400 leading-relaxed">
-                            Your real estate infrastructure is now active on the global edge network.
+                            Share this link with clients and start collecting leads.
                         </DialogDescription>
                     </DialogHeader>
                 </div>
@@ -124,19 +128,27 @@ export function PublishSuccessDialog({
                             Copy URL
                         </Button>
                     </div>
+                    <p className="text-xs text-zinc-500">
+                        Want your own domain? Connect it in <Link href="/dashboard/domain" className="text-white underline">Domains</Link>.
+                    </p>
 
                     <div className="grid grid-cols-2 gap-4">
                         <Button 
                             variant="outline" 
                             className="w-full h-16 rounded-2xl text-lg font-bold border-white/10 bg-white/5 hover:bg-white/10" 
-                            onClick={() => window.open(`${window.location.origin}/p/${siteId}`, '_blank')}
+                            onClick={() => window.open(publishedUrl || `${window.location.origin}/p/${siteId}`, '_blank')}
+                            disabled={!publishedUrl && !siteId}
                         >
                             <ExternalLink className="mr-2 h-5 w-5" />
-                            Launch Site
+                            Open Site
                         </Button>
-                        <Button className="w-full h-16 rounded-2xl text-lg font-bold bg-blue-600 hover:bg-blue-700 shadow-xl shadow-blue-900/40">
+                        <Button
+                          className="w-full h-16 rounded-2xl text-lg font-bold bg-blue-600 hover:bg-blue-700 shadow-xl shadow-blue-900/40"
+                          onClick={handleCopy}
+                          disabled={!publishedUrl}
+                        >
                             <Share2 className="mr-2 h-5 w-5" />
-                            Share
+                            Copy Link
                         </Button>
                     </div>
 
@@ -146,12 +158,12 @@ export function PublishSuccessDialog({
                                 <Zap className="h-5 w-5 text-orange-500" />
                             </div>
                             <div>
-                                <h4 className="text-sm font-bold text-white mb-1 uppercase tracking-widest">Next Step: Launch Google Ads</h4>
+                                <h4 className="text-sm font-bold text-white mb-1 uppercase tracking-widest">Next Step: Promote Your Listing</h4>
                                 <p className="text-xs text-zinc-500 font-medium leading-relaxed">
-                                    This project is ready for traffic. Start a launch campaign for <span className="text-white font-bold">$20</span> and appear on page 1 of search results instantly.
+                                    This project is ready for traffic. Start a launch campaign with a small daily budget to get more views.
                                 </p>
-                                <Button size="sm" className="mt-4 h-9 rounded-lg bg-white text-black font-bold text-xs px-6">
-                                    Setup Ads Strategy
+                                <Button size="sm" className="mt-4 h-9 rounded-lg bg-white text-black font-bold text-xs px-6" asChild>
+                                    <Link href="/dashboard/google-ads">Start Ad Plan</Link>
                                 </Button>
                             </div>
                         </div>
@@ -162,7 +174,7 @@ export function PublishSuccessDialog({
                             <ShieldCheck className="h-4 w-4 text-blue-500" /> SSL SECURED
                         </div>
                         <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-600">
-                            <Globe className="h-4 w-4 text-blue-500" /> EDGE OPTIMIZED
+                            <Globe className="h-4 w-4 text-blue-500" /> FAST WORLDWIDE
                         </div>
                     </div>
                 </div>
@@ -172,7 +184,7 @@ export function PublishSuccessDialog({
                         className="text-zinc-500 font-bold uppercase tracking-widest text-[10px] hover:text-white transition-colors"
                         onClick={() => onOpenChange(false)}
                     >
-                        Return to Editor Studio
+                        Back to Editor
                     </button>
                 </div>
             </div>

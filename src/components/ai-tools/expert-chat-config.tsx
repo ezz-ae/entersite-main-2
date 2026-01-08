@@ -87,7 +87,7 @@ export function ExpertChatConfig() {
         </div>
         <div className="flex gap-2">
            <Badge variant="outline" className="bg-blue-500/10 text-blue-500 border-blue-500/20 px-3 py-1">
-             <BrainCircuit className="h-3 w-3 mr-1.5" /> Market Knowledge: 3,750 Projects
+             <BrainCircuit className="h-3 w-3 mr-1.5" /> Market Knowledge: Your Listings
            </Badge>
            {isConnected && (
              <Badge variant="outline" className="bg-green-500/10 text-green-500 border-green-500/20 px-3 py-1">
@@ -180,7 +180,7 @@ export function ExpertChatConfig() {
           {/* 3. Integrations */}
           <Card className="bg-zinc-900/50 border-white/5 backdrop-blur-xl">
             <CardHeader>
-              <CardTitle className="text-lg">Deploy Anywhere</CardTitle>
+              <CardTitle className="text-lg">Use Anywhere</CardTitle>
               <CardDescription>Connect your agent to your communication channels.</CardDescription>
             </CardHeader>
             <CardContent>
@@ -207,7 +207,7 @@ export function ExpertChatConfig() {
                             isConnected ? "bg-red-500/10 text-red-400 hover:bg-red-500/20" : "bg-white text-black hover:bg-zinc-200"
                         )}
                     >
-                        {isConnecting ? <Loader2 className="h-4 w-4 animate-spin" /> : isConnected ? "Disconnect" : "Authorize Agent"}
+                        {isConnecting ? <Loader2 className="h-4 w-4 animate-spin" /> : isConnected ? "Disconnect" : "Connect Instagram"}
                     </Button>
                   </div>
 
@@ -225,7 +225,7 @@ export function ExpertChatConfig() {
                          </div>
                          <Button variant="outline" className="w-full h-10 border-white/10 bg-white/5 font-bold text-xs uppercase tracking-widest gap-2" onClick={copyToClipboard}>
                             {copied ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
-                            {copied ? "Copied" : "Copy Snippet"}
+                            {copied ? "Copied" : "Copy Widget Code"}
                          </Button>
                     </div>
                   </div>
@@ -248,7 +248,7 @@ export function ExpertChatConfig() {
                   <div className="flex-1 p-4 space-y-4 overflow-y-auto">
                      <div className="flex justify-start">
                         <div className="max-w-[85%] bg-zinc-800 rounded-2xl rounded-tl-none p-3 text-[11px] text-zinc-200">
-                           Hi! I'm {agentName}. I know all about 3,750+ UAE projects. How can I help you today?
+                           Hi! I'm {agentName}. I know your listings and FAQs. How can I help you today?
                         </div>
                      </div>
                      <div className="flex justify-end">

@@ -22,7 +22,7 @@ export async function POST(req: NextRequest) {
         const lowerCaseMessage = message.toLowerCase();
 
         if (lowerCaseMessage.includes('marina horizon')) {
-            aiResponse = `Marina Horizon is a stunning waterfront development in Dubai Marina with residences starting from AED 2.75M. It offers amazing skyline views and hotel-grade amenities. Would you like to know more about the available units or its 8.2% projected ROI?`;
+            aiResponse = `Marina Horizon is a waterfront development in Dubai Marina with residences starting from AED 2.75M. It offers skyline views and resort-style amenities. Would you like to know more about the available units or expected returns?`;
         } else if (lowerCaseMessage.includes('terrace gardens')) {
             aiResponse = `Terrace Gardens offers beautiful duplex garden homes in a community-focused environment, with prices starting at AED 1.4M. It features unique amenities like a maker studio and community farming plots. Are you interested in the 2-4 bedroom options?`;
         } else if (lowerCaseMessage.includes('hello') || lowerCaseMessage.includes('hi')) {

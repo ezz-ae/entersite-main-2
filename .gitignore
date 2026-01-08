@@ -40,6 +40,7 @@ yarn-error.log*
 
 # Secrets
 service-account-key.json
+*-firebase-adminsdk-*.json
 
 # secrets
 src/config/service-account.json
@@ -49,3 +50,4 @@ src/config/service-account.json
 # secrets
 src/config/service-account.json
 src/config/service-account.json
+.env*.local

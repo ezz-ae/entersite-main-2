@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Bot, Sparkles, Send, Instagram, MessageSquare, ChevronRight, Zap } from 'lucide-react';
+import { Bot, Sparkles, Send, Instagram, Zap } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 
@@ -15,8 +15,8 @@ interface ChatAgentBlockProps {
 
 export function ChatAgentBlock({
   headline = "Speak to our Market Expert",
-  subtext = "Get instant answers about ROIs, floor plans, and availability.",
-  agentName = "Creek AI Expert",
+  subtext = "Get instant answers about floor plans, pricing, and availability.",
+  agentName = "Creek Market Expert",
   placeholder = "Ask anything about this project...",
   theme = 'glass'
 }: ChatAgentBlockProps) {
@@ -30,7 +30,7 @@ export function ChatAgentBlock({
                 {/* Content Side */}
                 <div className="lg:col-span-2 space-y-6">
                     <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-500 text-xs font-bold uppercase tracking-widest">
-                        <Sparkles className="h-3 w-3" /> Expert Intelligence
+                        <Sparkles className="h-3 w-3" /> Market Assistant
                     </div>
                     <h2 className="text-4xl font-bold tracking-tight text-white">{headline}</h2>
                     <p className="text-zinc-400 text-lg leading-relaxed">{subtext}</p>
@@ -40,13 +40,13 @@ export function ChatAgentBlock({
                             <div className="w-8 h-8 rounded-full bg-zinc-800 flex items-center justify-center">
                                 <Instagram className="h-4 w-4" />
                             </div>
-                            Connected to Instagram DM
+                            Instagram Inbox Ready
                         </div>
                         <div className="flex items-center gap-3 text-sm text-zinc-300">
                             <div className="w-8 h-8 rounded-full bg-zinc-800 flex items-center justify-center">
                                 <Zap className="h-4 w-4" />
                             </div>
-                            Live 3,750+ Project Knowledge
+                            Project Details Ready
                         </div>
                     </div>
                 </div>
@@ -71,7 +71,7 @@ export function ChatAgentBlock({
                                 </div>
                             </div>
                             <Button variant="ghost" size="sm" className="text-xs text-zinc-500 hover:text-white">
-                                View Full Knowledge Base
+                                View Details
                             </Button>
                         </div>
 
@@ -79,17 +79,17 @@ export function ChatAgentBlock({
                         <div className="flex-1 p-6 space-y-4 overflow-y-auto custom-scrollbar">
                             <div className="flex justify-start">
                                 <div className="max-w-[80%] bg-zinc-800/80 rounded-2xl rounded-tl-none p-4 text-sm text-zinc-200">
-                                    Hello! I'm your AI market advisor. Ask me anything about current prices, ROIs in different areas, or upcoming launches.
+                                    Hello! I'm your market advisor. Ask me anything about pricing, availability, or upcoming launches.
                                 </div>
                             </div>
                             <div className="flex justify-end">
                                 <div className="max-w-[80%] bg-blue-600 rounded-2xl rounded-tr-none p-4 text-sm text-white shadow-lg shadow-blue-900/20">
-                                    What's the best ROI in Dubai Marina right now?
+                                    What are the best options in Dubai Marina right now?
                                 </div>
                             </div>
                             <div className="flex justify-start">
                                 <div className="max-w-[80%] bg-zinc-800/80 rounded-2xl rounded-tl-none p-4 text-sm text-zinc-200">
-                                    Currently, secondary market units in Dubai Marina are seeing 7.2% net ROI. However, for off-plan capital appreciation, Emaar Beachfront projects are outperforming with a projected 15% increase by handover. Would you like to see the comparison?
+                                    There are a few strong options based on your budget and timeline. Want a quick shortlist to review?
                                 </div>
                             </div>
                         </div>
@@ -109,7 +109,7 @@ export function ChatAgentBlock({
                                 </button>
                             </div>
                             <div className="flex gap-4 mt-4">
-                                {['ROI Stats', 'Floor Plans', 'Area Guide'].map(tag => (
+                                {['Price Range', 'Floor Plans', 'Area Guide'].map(tag => (
                                     <button key={tag} className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 hover:text-blue-400 transition-colors">
                                         {tag}
                                     </button>

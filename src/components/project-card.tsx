@@ -29,6 +29,7 @@ import {
   DialogClose
 } from "@/components/ui/dialog";
 import { useRouter } from "next/navigation";
+import { useToast } from "@/hooks/use-toast";
 
 interface ProjectCardProps {
   project: ProjectData;
@@ -42,6 +43,7 @@ const MAP_TEXTURE_IMAGE = "https://images.unsplash.com/photo-1524661135-423995f2
 
 export function ProjectCard({ project, index = 0 }: ProjectCardProps) {
   const router = useRouter();
+  const { toast } = useToast();
   const statusLabel = project.availability ?? project.status ?? 'Active';
   
   // Determine if we should show the real image or the map fallback
@@ -51,16 +53,49 @@ export function ProjectCard({ project, index = 0 }: ProjectCardProps) {
                        
   const displayImage = hasRealImage ? project.images[0] : MAP_TEXTURE_IMAGE;
 
-  // Fallback for Capital Gain if 0 (Simulate Market Average)
-  const capitalGain = project.performance?.capitalAppreciation && project.performance.capitalAppreciation > 0
+  const capitalGainValue = project.performance?.capitalAppreciation && project.performance.capitalAppreciation > 0
     ? project.performance.capitalAppreciation
-    : (12 + (index % 5)).toFixed(1); // Deterministic "random" 12-17%
+    : null;
+  const capitalGainLabel = capitalGainValue ? `+${capitalGainValue}%` : 'Not shared';
+  const roiValue = project.performance?.roi;
+  const roiLabel = roiValue ? `${roiValue}%` : 'Not shared';
+  const handoverLabel = project.handover ? `Q${project.handover.quarter} ${project.handover.year}` : 'TBD';
+  const marketCity = project.location?.city ?? 'local';
+  const marketSummary = project.performance?.marketTrend
+    ? project.performance.marketTrend === 'up'
+      ? `This project is tracking ahead of the ${marketCity} market index this quarter.`
+      : project.performance.marketTrend === 'down'
+        ? `This project is tracking below the ${marketCity} market index this quarter.`
+        : `This project is tracking with the ${marketCity} market index this quarter.`
+    : 'Market trend insights are not shared yet.';
 
-  const developerName = project.developer === "Verified Developer" ? "Private Developer" : project.developer;
+  const developerName = project.developer
+    ? project.developer === "Verified Developer"
+      ? "Private Developer"
+      : project.developer
+    : "Developer not shared";
 
   const handleCreateLandingPage = () => {
     router.push(`/builder?prompt=Luxury landing page for ${project.name} by ${developerName} in ${project.location?.area}`);
   };
+
+  const handleCopyLink = async () => {
+    if (!project.id) return;
+    const publicUrl = project.publicUrl;
+    const url = publicUrl
+      ? publicUrl.startsWith('http')
+        ? publicUrl
+        : `${window.location.origin}${publicUrl}`
+      : `${window.location.origin}/discover/${project.id}`;
+    try {
+      await navigator.clipboard.writeText(url);
+      toast({ title: "Link copied", description: "Project link copied to clipboard." });
+    } catch (error) {
+      console.error('Failed to copy link', error);
+    }
+  };
+
+  const brochureUrl = project.brochureUrl;
 
   return (
     <motion.div 
@@ -118,7 +153,7 @@ export function ProjectCard({ project, index = 0 }: ProjectCardProps) {
                 </div>
                 <div className="text-right">
                     <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-0.5">Starting</p>
-                    <p className="text-xl font-black text-white">{project.price?.label}</p>
+                    <p className="text-xl font-black text-white">{project.price?.label ?? 'Price on request'}</p>
                 </div>
             </div>
         </div>
@@ -128,19 +163,19 @@ export function ProjectCard({ project, index = 0 }: ProjectCardProps) {
             <div className="grid grid-cols-3 gap-4">
                 <DataMetric 
                     label="Yield (ROI)" 
-                    value={`${project.performance?.roi ?? 8.5}%`} 
+                    value={roiLabel} 
                     icon={BarChart3} 
                     color="blue"
                 />
                 <DataMetric 
                     label="Growth" 
-                    value={`+${capitalGain}%`} 
+                    value={capitalGainLabel} 
                     icon={ArrowUpRight} 
                     color="green"
                 />
                 <DataMetric 
                     label="Completion" 
-                    value={project.handover ? `Q${project.handover.quarter} ${project.handover.year}` : '2026'} 
+                    value={handoverLabel} 
                     icon={Calendar} 
                     color="orange"
                 />
@@ -187,20 +222,36 @@ export function ProjectCard({ project, index = 0 }: ProjectCardProps) {
                                     onClick={handleCreateLandingPage}
                                     className="h-20 rounded-[2rem] bg-blue-600 hover:bg-blue-700 text-white font-black gap-3 text-xl shadow-xl shadow-blue-600/20 group"
                                 >
-                                    <Zap className="h-6 w-6 text-blue-300 group-hover:scale-125 transition-transform" /> Generate Campaign
+                                    <Zap className="h-6 w-6 text-blue-300 group-hover:scale-125 transition-transform" /> Create Landing Page
                                 </Button>
-                                <Button variant="outline" className="h-20 rounded-[2rem] border-white/10 bg-white/5 hover:bg-white/10 font-bold gap-3 text-lg">
-                                    <Share2 className="h-5 w-5" /> Export Data Link
+                                <Button
+                                    variant="outline"
+                                    className="h-20 rounded-[2rem] border-white/10 bg-white/5 hover:bg-white/10 font-bold gap-3 text-lg"
+                                    onClick={handleCopyLink}
+                                >
+                                    <Share2 className="h-5 w-5" /> Copy Link
                                 </Button>
-                                <Button variant="outline" className="h-20 rounded-[2rem] border-white/10 bg-white/5 hover:bg-white/10 font-bold gap-3 text-lg">
-                                    <FileText className="h-5 w-5" /> Branded PDF
-                                </Button>
+                                {brochureUrl ? (
+                                    <Button
+                                      variant="outline"
+                                      className="h-20 rounded-[2rem] border-white/10 bg-white/5 hover:bg-white/10 font-bold gap-3 text-lg"
+                                      asChild
+                                    >
+                                      <a href={brochureUrl} target="_blank" rel="noopener noreferrer">
+                                        <FileText className="h-5 w-5" /> Project PDF
+                                      </a>
+                                    </Button>
+                                ) : (
+                                    <Button variant="outline" className="h-20 rounded-[2rem] border-white/10 bg-white/5 font-bold gap-3 text-lg" disabled>
+                                        <FileText className="h-5 w-5" /> PDF not shared
+                                    </Button>
+                                )}
                             </div>
 
                             <div className="grid lg:grid-cols-2 gap-16">
                                 <div className="space-y-10">
                                     <div className="space-y-4">
-                                        <h4 className="text-[10px] font-black uppercase tracking-[0.4em] text-zinc-500">Infrastructure Brief</h4>
+                                        <h4 className="text-[10px] font-black uppercase tracking-[0.4em] text-zinc-500">Project Overview</h4>
                                         <p className="text-zinc-300 leading-relaxed text-xl font-light">
                                             {project.description.full || project.description.short}
                                         </p>
@@ -208,11 +259,14 @@ export function ProjectCard({ project, index = 0 }: ProjectCardProps) {
                                     <div className="grid grid-cols-2 gap-8">
                                         <div className="p-8 rounded-[2rem] bg-zinc-900 border border-white/5">
                                             <p className="text-[10px] font-bold text-zinc-600 uppercase mb-2 tracking-widest">Expected Yield</p>
-                                            <p className="text-4xl font-black text-green-500">{project.performance?.roi ?? 8.5}% <span className="text-xs font-medium opacity-50 ml-1">PA</span></p>
+                                        <p className="text-4xl font-black text-green-500">
+                                          {roiLabel}
+                                          {roiValue && <span className="text-xs font-medium opacity-50 ml-1">PA</span>}
+                                        </p>
                                         </div>
                                         <div className="p-8 rounded-[2rem] bg-zinc-900 border border-white/5">
                                             <p className="text-[10px] font-bold text-zinc-600 uppercase mb-2 tracking-widest">Growth Potential</p>
-                                            <p className="text-4xl font-black text-blue-500">+{capitalGain}%</p>
+                                            <p className="text-4xl font-black text-blue-500">{capitalGainLabel}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -242,7 +296,7 @@ export function ProjectCard({ project, index = 0 }: ProjectCardProps) {
                                             <div className="h-2 w-2 rounded-full bg-blue-500 animate-pulse" />
                                             <p className="font-black uppercase tracking-widest text-xs text-white">Sentiment: {project.performance?.marketTrend === 'up' ? 'Aggressive' : 'Stable'}</p>
                                         </div>
-                                        <p className="text-sm text-zinc-400 leading-relaxed font-light relative z-10">This project is {project.performance?.marketTrend === 'up' ? 'outperforming' : 'aligning with'} the {project.location?.city} luxury index by {Math.floor(Number(capitalGain) / 3)}% this quarter.</p>
+                                        <p className="text-sm text-zinc-400 leading-relaxed font-light relative z-10">{marketSummary}</p>
                                     </div>
                                 </div>
                             </div>
@@ -252,7 +306,7 @@ export function ProjectCard({ project, index = 0 }: ProjectCardProps) {
                                 <h4 className="text-[10px] font-black uppercase tracking-[0.4em] text-zinc-500">Project DNA</h4>
                                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                                     <DnaTag label="Developer" value={developerName} />
-                                    <DnaTag label="Handover" value={project.handover ? `Q${project.handover.quarter} ${project.handover.year}` : '2026'} />
+                                    <DnaTag label="Handover" value={project.handover ? `Q${project.handover.quarter} ${project.handover.year}` : 'TBD'} />
                                     <DnaTag label="Price Range" value={project.price?.label ?? 'N/A'} />
                                     <DnaTag label="Status" value={statusLabel} />
                                 </div>

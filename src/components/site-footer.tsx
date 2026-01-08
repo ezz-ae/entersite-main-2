@@ -6,17 +6,16 @@ import { EntrestateLogo } from '@/components/icons';
 import { Twitter, Linkedin, Instagram, ArrowUpRight, Github, Globe, ShieldCheck, Zap } from 'lucide-react';
 
 const PLATFORM_LINKS = [
-    { href: "/features/ai-agents", label: "AI Sales Agents" },
-    { href: "/features/google-ads", label: "AI-Powered Ads" },
-    { href: "/features/audience-network", label: "Audience Network" },
-    { href: "/builder", label: "Website Builder" },
+    { href: "/instagram-assistant", label: "Instagram Assistant" },
+    { href: "/google-ads", label: "Google Ads" },
+    { href: "/audience-network", label: "Buyer Audience" },
 ];
 
 const RESOURCE_LINKS = [
-    { href: "/discover", label: "Project Discovery" },
-    { href: "/docs", label: "Documentation" },
+    { href: "/discover", label: "Market Feed" },
+    { href: "/docs", label: "Help Center" },
     { href: "/status", label: "System Status" },
-    { href: "/login", label: "Operator Login" },
+    { href: "/start", label: "Get Started" },
 ];
 
 export function SiteFooter() {
@@ -84,7 +83,7 @@ export function SiteFooter() {
                     <Zap className="h-4 w-4 fill-blue-500" />
                     <span className="text-[10px] font-black uppercase tracking-widest">System Status</span>
                 </div>
-                <p className="text-zinc-400 text-xs leading-relaxed font-medium mb-4">All systems are online. Our globally distributed network ensures optimal performance and 99.9% uptime.</p>
+                <p className="text-zinc-400 text-xs leading-relaxed font-medium mb-4">Core platform is online. Some features are still in pilot or setup mode.</p>
                 <Link href="/status" className="text-white text-[10px] font-black uppercase tracking-widest hover:underline flex items-center gap-2">
                     Live Status Page <ArrowUpRight className="h-3 w-3" />
                 </Link>
@@ -98,10 +97,10 @@ export function SiteFooter() {
              
              <div className="flex items-center gap-6 pt-4 border-t border-white/5 w-full justify-end">
                 <div className="flex items-center gap-2 text-zinc-800 text-[9px] font-black uppercase tracking-widest">
-                    <ShieldCheck className="h-3 w-3" /> SECURED
+                    <ShieldCheck className="h-3 w-3" /> SECURE
                 </div>
                 <div className="flex items-center gap-2 text-zinc-800 text-[9px] font-black uppercase tracking-widest">
-                    <Globe className="h-3 w-3" /> EDGE OPTIMIZED
+                    <Globe className="h-3 w-3" /> FAST WORLDWIDE
                 </div>
                 <div className="text-zinc-800 text-[9px] font-black uppercase tracking-[0.6em]">
                     © 2024

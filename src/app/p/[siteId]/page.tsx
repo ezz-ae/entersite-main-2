@@ -1,4 +1,4 @@
-import { getPublishedSite } from '@/lib/publish-service';
+import { getPublishedSite } from '@/server/publish-service';
 import { PageRenderer } from '@/components/page-renderer';
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
@@ -46,7 +46,7 @@ export default async function PublishedPage({ params, searchParams }: Props) {
     <main className="min-h-screen bg-background text-foreground">
       {shouldUseRefined && (
         <div className="bg-amber-100 text-amber-800 text-sm text-center py-3 px-4 border-b border-amber-200">
-          Viewing Refiner Draft for <span className="font-semibold">{page.title}</span>. Remove <code className="bg-white/60 px-2 py-0.5 rounded text-xs">?variant=refined</code> to see the published version.
+          Viewing the draft version for <span className="font-semibold">{page.title}</span>. Remove <code className="bg-white/60 px-2 py-0.5 rounded text-xs">?variant=refined</code> to see the live version.
         </div>
       )}
 

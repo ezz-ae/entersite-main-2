@@ -66,7 +66,7 @@ export function BuilderMotionShowcase() {
                              Auto-Saving
                          </div>
                          <div className="h-8 w-24 bg-white text-black rounded-lg flex items-center justify-center text-xs font-bold">
-                            Publish
+                            Preview
                          </div>
                     </div>
                 </div>

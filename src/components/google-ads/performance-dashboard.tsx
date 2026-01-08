@@ -49,7 +49,7 @@ export function PerformanceDashboard({ campaign }: { campaign: any }) {
       <Card className="lg:col-span-3">
         <CardHeader>
           <CardTitle>{campaign.name || 'Campaign Performance'}</CardTitle>
-          <CardDescription>High-level overview of your campaign metrics.</CardDescription>
+          <CardDescription>Sample metrics until your Google Ads account is connected.</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">

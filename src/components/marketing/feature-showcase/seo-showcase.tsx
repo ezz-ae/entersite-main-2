@@ -3,7 +3,7 @@
 import React from 'react';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { FileText, Search, Link as LinkIcon, Bot, TrendingUp, CheckCircle } from 'lucide-react';
+import { Search, TrendingUp, CheckCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export function SeoShowcase() {
@@ -26,7 +26,7 @@ export function SeoShowcase() {
                 <Card className="w-full shadow-2xl border-border/50 overflow-hidden bg-background">
                     <div className="p-4 border-b border-border/50 flex items-center justify-between bg-muted/30">
                         <h4 className="font-bold text-sm flex items-center gap-2 text-foreground">
-                            <Search className="h-4 w-4" /> SEO Optimizer
+                            <Search className="h-4 w-4" /> Search Preview
                         </h4>
                         <div className="flex gap-1.5">
                             <div className="w-2.5 h-2.5 rounded-full bg-red-400/80" />
@@ -55,13 +55,13 @@ export function SeoShowcase() {
                         </div>
                         
                         <div>
-                             <div className="text-xs font-semibold text-muted-foreground mb-3 uppercase tracking-wider">AI Keyword Suggestions</div>
+                             <div className="text-xs font-semibold text-muted-foreground mb-3 uppercase tracking-wider">Suggested search keywords</div>
                              <div className="flex flex-wrap gap-2">
                                 <Badge variant="outline" className="bg-green-500/10 text-green-700 border-green-500/20 hover:bg-green-500/20">dubai luxury villas</Badge>
                                 <Badge variant="outline" className="bg-green-500/10 text-green-700 border-green-500/20 hover:bg-green-500/20">golf course property</Badge>
-                                <Badge variant="outline" className="bg-green-500/10 text-green-700 border-green-500/20 hover:bg-green-500/20">emaar off-plan</Badge>
+                                <Badge variant="outline" className="bg-green-500/10 text-green-700 border-green-500/20 hover:bg-green-500/20">off-plan dubai</Badge>
                                 <Badge variant="outline" className="text-muted-foreground border-dashed">+ 5 more</Badge>
-                            </div>
+                             </div>
                         </div>
                     </div>
                 </Card>
@@ -71,30 +71,30 @@ export function SeoShowcase() {
           <div className="space-y-8 order-1 lg:order-2">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-green-500/10 text-green-600 text-xs font-medium border border-green-500/20">
               <TrendingUp className="h-3.5 w-3.5" />
-              Organic Growth
+              Get Found on Google
             </div>
             
             <h2 className="text-4xl md:text-5xl font-bold tracking-tighter leading-[1.05]">
-                Rank Higher, <br/>
-                <span className="text-muted-foreground">Convert More.</span>
+                Show Up on Google, <br/>
+                <span className="text-muted-foreground">Get More Calls.</span>
             </h2>
             
             <p className="text-lg text-muted-foreground leading-relaxed">
-              Our AI doesn't just write content; it writes content that ranks. Get automated meta tags, high-value keyword injection, and SEO-optimized copy for every listing.
+              We help your listings show up in search with clean titles, clear descriptions, and helpful keywords.
             </p>
             
             <ul className="space-y-4 pt-4">
                 <li className="flex items-start gap-3">
                     <div className="bg-green-100 p-1 rounded-full text-green-600 mt-0.5"><CheckCircle className="h-4 w-4" /></div>
-                    <span className="font-medium text-foreground/80">AI Meta Tag Generation</span>
+                    <span className="font-medium text-foreground/80">Search title & description</span>
                 </li>
                 <li className="flex items-start gap-3">
                     <div className="bg-green-100 p-1 rounded-full text-green-600 mt-0.5"><CheckCircle className="h-4 w-4" /></div>
-                    <span className="font-medium text-foreground/80">Competitor Keyword Analysis</span>
+                    <span className="font-medium text-foreground/80">Local keyword ideas</span>
                 </li>
                 <li className="flex items-start gap-3">
                     <div className="bg-green-100 p-1 rounded-full text-green-600 mt-0.5"><CheckCircle className="h-4 w-4" /></div>
-                    <span className="font-medium text-foreground/80">Automatic Schema Markup</span>
+                    <span className="font-medium text-foreground/80">Search-friendly page details</span>
                 </li>
             </ul>
           </div>

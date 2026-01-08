@@ -18,21 +18,21 @@ interface TestimonialBlockProps {
 }
 
 export function TestimonialBlock({
-  headline = "Trusted by Industry Leaders",
-  subtext = "Experience why the world's most innovative real estate professionals choose Entrestate.",
+  headline = "Trusted by Real Estate Teams",
+  subtext = "See how brokers and developers simplify marketing with Entrestate.",
   testimonials = [
     {
-      quote: "Entrestate has completely transformed our workflow. Converting brochures into landing pages has saved us hundreds of hours and the ROI data is spot on.",
+      quote: "Entrestate made it easy to turn brochures into clean, shareable pages and keep our messaging consistent.",
       author: "Fatima Al-Marzouqi",
       role: "CEO, Prestige Properties",
     },
     {
-      quote: "The automated Google Ads campaigns are incredibly effective. We saw a 200% increase in qualified leads within the first month. High-end execution.",
+      quote: "The ads tools give us a clear starting point and help our team launch campaigns faster.",
       author: "Johnathan Smith",
       role: "Marketing Director, Skyline Developments",
     },
     {
-      quote: "The AI Sales Agent is like having a top-performing broker working 24/7. It handles all our Instagram queries with real project knowledge.",
+      quote: "The chat assistant answers common questions and routes serious inquiries to our team.",
       author: "Chen Wei",
       role: "Founder, Urban Nest Realty",
     },

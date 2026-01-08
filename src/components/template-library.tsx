@@ -39,7 +39,7 @@ export function TemplateLibrary({ onTemplateSelect }: TemplateLibraryProps) {
               </div>
               <h1 className="text-4xl md:text-6xl font-bold tracking-tight mb-6">Start with a World-Class Foundation</h1>
               <p className="text-zinc-400 text-xl max-w-2xl mx-auto leading-relaxed">
-                  Choose from dozens of market-tested architectures designed for high conversion. Pre-loaded with real estate logic and verified data.
+                  Choose from dozens of market-tested layouts designed for high conversion. Pre-loaded with real estate sections you can customize fast.
               </p>
           </div>
       </section>

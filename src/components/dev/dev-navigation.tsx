@@ -28,7 +28,7 @@ export function DevNavigation() {
       
       <NavLink href="/" icon={Home} label="Home" active={pathname === '/'} />
       <NavLink href="/builder" icon={Layout} label="Builder" active={pathname === '/builder'} />
-      <NavLink href="/trending" icon={TrendingUp} label="Trending" active={pathname === '/trending'} />
+      <NavLink href="/instagram-assistant" icon={TrendingUp} label="Instagram Assistant" active={pathname === '/instagram-assistant'} />
       <NavLink href="/marketing-puzzle" icon={Puzzle} label="Puzzle" active={pathname === '/marketing-puzzle'} />
       <NavLink href="/blog" icon={FileText} label="Blog" active={pathname?.startsWith('/blog')} />
       <NavLink href="/docs" icon={Book} label="Docs" active={pathname?.startsWith('/docs')} />

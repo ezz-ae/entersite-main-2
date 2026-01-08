@@ -1,36 +1,52 @@
-import { NextResponse } from 'next/server';
-import { adminDb } from '@/lib/firebase/server';
-import { getAuth } from '@/lib/helpers/auth';
+import { NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
+import { FieldValue } from 'firebase-admin/firestore';
+import { getAdminDb } from '@/server/firebase-admin';
+import { requireTenantScope, UnauthorizedError, ForbiddenError } from '@/server/auth';
 
-export async function POST(req: Request) {
+const payloadSchema = z.object({
+  name: z.string().min(1),
+  email: z.string().email(),
+  phone: z.string().optional(),
+  message: z.string().optional(),
+  tenantId: z.string().optional(),
+});
+
+export async function POST(req: NextRequest) {
   try {
-    const { user } = await getAuth(req);
-    if (!user) {
-      return new NextResponse(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
-    }
+    const payload = payloadSchema.parse(await req.json());
+    const { tenantId } = await requireTenantScope(req, payload.tenantId);
 
-    const { name, email, phone, message } = await req.json();
+    const db = getAdminDb();
+    const leadRef = await db
+      .collection('tenants')
+      .doc(tenantId)
+      .collection('leads')
+      .add({
+        tenantId,
+        name: payload.name,
+        email: payload.email,
+        phone: payload.phone || null,
+        message: payload.message || null,
+        status: 'New',
+        priority: 'Warm',
+        source: 'Manual Entry',
+        createdAt: FieldValue.serverTimestamp(),
+        updatedAt: FieldValue.serverTimestamp(),
+      });
 
-    if (!name || !email) {
-      return new NextResponse(JSON.stringify({ error: 'Missing required fields' }), { status: 400 });
-    }
-
-    const leadRef = await adminDb.collection('leads').add({
-      ownerUid: user.uid,
-      name,
-      email,
-      phone,
-      message,
-      status: 'New',
-      priority: 'Warm',
-      source: 'Manual Entry',
-      createdAt: new Date().toISOString(),
-    });
-
-    return new NextResponse(JSON.stringify({ id: leadRef.id }), { status: 201 });
-
+    return NextResponse.json({ id: leadRef.id }, { status: 201 });
   } catch (error) {
-    console.error('Error creating lead:', error);
-    return new NextResponse(JSON.stringify({ error: 'Internal Server Error' }), { status: 500 });
+    console.error('[leads/create] error', error);
+    if (error instanceof z.ZodError) {
+      return NextResponse.json({ error: 'Invalid payload', details: error.errors }, { status: 400 });
+    }
+    if (error instanceof UnauthorizedError) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+    if (error instanceof ForbiddenError) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
+    return NextResponse.json({ error: 'Something went wrong. Please try again.' }, { status: 500 });
   }
 }

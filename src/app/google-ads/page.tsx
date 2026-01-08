@@ -7,12 +7,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { 
-  Zap, 
-  Search, 
   Target, 
-  ArrowRight, 
   MousePointerClick, 
-  Globe, 
   ShieldCheck, 
   TrendingUp,
   Cpu,
@@ -41,16 +37,70 @@ export default function GoogleAdsPublicPage() {
                         
                         <h1 className="text-6xl md:text-9xl font-black tracking-tighter leading-[0.85] text-white italic uppercase">
                             Google Ads <br/>
-                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-600 not-italic">On Autopilot.</span>
+                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-600 not-italic">Made Simple.</span>
                         </h1>
                         
                         <p className="text-zinc-500 text-2xl md:text-3xl max-w-3xl mx-auto font-light leading-relaxed">
-                            Connect your Google Ads account and let our AI-powered dashboard optimize your campaigns, so you can focus on what you do best.
+                            Start your ads setup and get clear campaign summaries with guided next steps, while we handle the account setup for you.
                         </p>
                         <Button asChild className="h-16 rounded-full bg-white text-black font-black text-lg hover:scale-105 transition-all shadow-2xl shadow-white/10">
-                            <Link href="/dashboard/google-ads">Connect Your Account <ChevronRight className="ml-2 h-5 w-5" /></Link>
+                            <Link href="/dashboard/google-ads">Start Setup <ChevronRight className="ml-2 h-5 w-5" /></Link>
                         </Button>
                     </motion.div>
+                </div>
+            </section>
+
+            {/* MANAGED SETUP */}
+            <section className="py-20 bg-zinc-950 border-t border-white/5">
+                <div className="container mx-auto px-6 max-w-6xl text-center space-y-10">
+                    <div className="space-y-4">
+                        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-[10px] font-black uppercase tracking-[0.3em] mx-auto">
+                            Managed Setup
+                        </div>
+                        <h2 className="text-4xl md:text-5xl font-black tracking-tight">No Google Ads account? We will set it up.</h2>
+                        <p className="text-zinc-500 text-lg md:text-xl max-w-3xl mx-auto font-light leading-relaxed">
+                            We can create a client account for you under our main ads account and handle the setup.
+                            You still get access, clean reporting, and full visibility into performance.
+                        </p>
+                    </div>
+                    <div className="grid md:grid-cols-3 gap-6 text-sm text-zinc-400">
+                        <div className="rounded-2xl border border-white/10 bg-zinc-900/40 p-6 space-y-3">
+                            <p className="text-[10px] font-black uppercase tracking-widest text-blue-400">Option A</p>
+                            <h3 className="text-xl font-bold text-white">Use your account</h3>
+                            <p>Connect your existing Google Ads account and keep billing as-is.</p>
+                        </div>
+                        <div className="rounded-2xl border border-white/10 bg-zinc-900/40 p-6 space-y-3">
+                            <p className="text-[10px] font-black uppercase tracking-widest text-blue-400">Option B</p>
+                            <h3 className="text-xl font-bold text-white">We create your client account</h3>
+                            <p>No account or card? We can set it up and share access when ready.</p>
+                        </div>
+                        <div className="rounded-2xl border border-white/10 bg-zinc-900/40 p-6 space-y-3">
+                            <p className="text-[10px] font-black uppercase tracking-widest text-blue-400">Clarity</p>
+                            <h3 className="text-xl font-bold text-white">Clear access & reporting</h3>
+                            <p>See every campaign, lead, and spend update in plain language.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            {/* WHAT YOU NEED */}
+            <section className="py-20 border-t border-white/5 bg-black">
+                <div className="container mx-auto px-6 max-w-5xl text-center space-y-8">
+                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-zinc-500 text-[10px] font-black uppercase tracking-[0.3em] mx-auto">
+                        What You Need
+                    </div>
+                    <h2 className="text-3xl md:text-4xl font-black tracking-tight">Before you connect</h2>
+                    <div className="grid md:grid-cols-3 gap-6 text-sm text-zinc-400">
+                        <div className="rounded-2xl border border-white/10 bg-zinc-900/50 p-6">
+                            Google Ads ID (10 digits) - we can provide this if we set it up
+                        </div>
+                        <div className="rounded-2xl border border-white/10 bg-zinc-900/50 p-6">
+                            Billing details if you use your own account
+                        </div>
+                        <div className="rounded-2xl border border-white/10 bg-zinc-900/50 p-6">
+                            Access to the ad account (or we create one for you)
+                        </div>
+                    </div>
                 </div>
             </section>
 
@@ -59,30 +109,30 @@ export default function GoogleAdsPublicPage() {
                 <div className="container mx-auto px-6 max-w-7xl">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
                         <div className="space-y-12">
-                            <h2 className="text-5xl md:text-7xl font-black tracking-tighter leading-tight text-white uppercase italic">Actionable Insights, <br/><span className="text-zinc-600 not-italic">Simplified.</span></h2>
+                            <h2 className="text-5xl md:text-7xl font-black tracking-tighter leading-tight text-white uppercase italic">Clear Results, <br/><span className="text-zinc-600 not-italic">Simple Actions.</span></h2>
                             <p className="text-zinc-500 text-xl font-light leading-relaxed max-w-xl">
-                                Our dashboard translates complex Google Ads data into clear, actionable insights. No more guessing games, just results.
+                                See what is working, what needs attention, and what to do next without digging through reports.
                             </p>
                             <div className="grid md:grid-cols-2 gap-8">
                                 <FeatureItem 
                                     icon={Target}
                                     title="Campaign Overview"
-                                    desc="See all your campaigns at a glance, with key metrics like clicks, conversions, and spend."
+                                    desc="See every campaign at a glance, with clear status and health indicators."
                                 />
                                 <FeatureItem 
                                     icon={MousePointerClick}
-                                    title="Keyword Performance"
-                                    desc="Identify your best-performing keywords and optimize your ad groups for maximum impact."
+                                    title="Search Performance"
+                                    desc="See which search terms bring the most inquiries."
                                 />
                                 <FeatureItem 
                                     icon={TrendingUp}
                                     title="Performance Trends"
-                                    desc="Track your campaign performance over time and make data-driven decisions to improve your ROI."
+                                    desc="Track changes over time and adjust budgets with confidence."
                                 />
                                 <FeatureItem 
                                     icon={ShieldCheck}
-                                    title="AI Recommendations"
-                                    desc="Get AI-powered recommendations to improve your campaigns and stay ahead of the competition."
+                                    title="Smart Suggestions"
+                                    desc="Get clear recommendations to improve results and reduce wasted spend."
                                 />
                             </div>
                         </div>
@@ -113,12 +163,12 @@ export default function GoogleAdsPublicPage() {
                                         </div>
                                         <div className="grid grid-cols-2 gap-8 pt-6 border-t border-white/5">
                                             <div>
-                                                <p className="text-[9px] font-black text-zinc-600 uppercase mb-1">Click-Through Rate</p>
-                                                <p className="text-3xl font-black text-white italic">5.7%</p>
+                                                <p className="text-[9px] font-black text-zinc-600 uppercase mb-1">Click Activity</p>
+                                                <p className="text-3xl font-black text-white italic">Steady</p>
                                             </div>
                                             <div>
-                                                <p className="text-[9px] font-black text-zinc-600 uppercase mb-1">Conversion Rate</p>
-                                                <p className="text-3xl font-black text-blue-500 italic">12.3%</p>
+                                                <p className="text-[9px] font-black text-zinc-600 uppercase mb-1">Lead Quality</p>
+                                                <p className="text-3xl font-black text-blue-500 italic">Improving</p>
                                             </div>
                                         </div>
                                     </div>

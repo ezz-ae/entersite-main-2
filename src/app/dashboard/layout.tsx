@@ -9,35 +9,38 @@ import { motion } from 'framer-motion';
 import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 import { 
   Bell, 
-  Home, 
   Settings, 
-  Zap,
   Search,
   Users,
   MessageSquare,
   Mail,
   Smartphone,
   Globe,
+  Link2,
   Target,
-  LayoutDashboard
+  LayoutDashboard,
+  CreditCard
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { UserNav } from "@/components/user-nav";
 import { EntrestateLogo } from "@/components/icons";
+import { MobileBottomNav } from "@/components/mobile-app/mobile-bottom-nav";
 
 const mainNavItems = [
     { href: "/dashboard", icon: LayoutDashboard, label: "Overview" },
-    { href: "/dashboard/sites", icon: Globe, label: "Site Architect" },
-    { href: "/dashboard/chat-agent", icon: MessageSquare, label: "Expert Chat Agent" },
-    { href: "/dashboard/google-ads", icon: Search, label: "Google Ads Engine" },
-    { href: "/dashboard/meta-audience", icon: Users, label: "Audience Architect" },
-    { href: "/dashboard/sms-marketing", icon: Smartphone, label: "SMS VIP Broadcast" },
-    { href: "/dashboard/email-marketing", icon: Mail, label: "Email Marketing" },
-    { href: "/dashboard/leads", icon: Target, label: "Lead CRM" },
+    { href: "/dashboard/sites", icon: Globe, label: "Website Builder" },
+    { href: "/dashboard/domain", icon: Link2, label: "Domains" },
+    { href: "/dashboard/chat-agent", icon: MessageSquare, label: "Chat Assistant" },
+    { href: "/dashboard/google-ads", icon: Search, label: "Google Ads" },
+    { href: "/dashboard/meta-audience", icon: Users, label: "Buyer Audience" },
+    { href: "/dashboard/sms-marketing", icon: Smartphone, label: "SMS Campaigns" },
+    { href: "/dashboard/email-marketing", icon: Mail, label: "Email Campaigns" },
+    { href: "/dashboard/leads", icon: Target, label: "Leads" },
 ];
 
 const secondaryNavItems = [
-    { href: "/dashboard/settings", icon: Settings, label: "Infrastructure" },
+    { href: "/dashboard/billing", icon: CreditCard, label: "Billing" },
+    { href: "/dashboard/brand", icon: Settings, label: "Brand" },
 ];
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -72,15 +75,15 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <div className="flex flex-1 flex-col sm:pl-20">
                  <header className="sticky top-0 z-40 flex h-20 items-center gap-4 border-b border-white/5 bg-zinc-950/80 backdrop-blur-xl px-8">
                     <div className="flex items-center gap-4">
-                        <span className="text-xs font-black uppercase tracking-[0.3em] text-white">Entrestate OS</span>
+                        <span className="text-xs font-black uppercase tracking-[0.3em] text-white">Entrestate</span>
                         <div className="h-4 w-px bg-white/10" />
-                        <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Active Cluster: DIFC-01</span>
+                        <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Region: Dubai</span>
                     </div>
                     
                     <div className="ml-auto flex items-center gap-6">
                         <div className="hidden lg:flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-500/5 border border-blue-500/10">
                             <div className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
-                            <span className="text-[10px] font-bold text-blue-500 uppercase tracking-widest">System Optimal</span>
+                            <span className="text-[10px] font-bold text-blue-500 uppercase tracking-widest">All Systems Go</span>
                         </div>
                         <Button variant="ghost" size="icon" className="h-10 w-10 text-zinc-400 hover:text-white hover:bg-white/5 rounded-full relative transition-colors">
                             <Bell className="h-5 w-5" />
@@ -89,9 +92,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                     </div>
                 </header>
 
-                <main className="flex-1 p-8 md:p-12 overflow-x-hidden">
+                <main className="flex-1 p-8 md:p-12 overflow-x-hidden pb-24 sm:pb-12">
                     {children}
                 </main>
+            </div>
+            <div className="sm:hidden">
+                <MobileBottomNav />
             </div>
         </div>
     );

@@ -12,17 +12,17 @@ import { cn } from '@/lib/utils';
 // --- Content Configuration ---
 const SERVICE_DATA = {
   website: {
-    title: "Site Architect",
+    title: "Website Builder",
     tagline: "Brochure to Web in 30 Seconds",
-    description: "Deploy high-converting project landing pages by simply uploading a brochure. Our AI extracts project data, generates SEO-optimized copy, and builds a professional layout instantly.",
+    description: "Upload a brochure and get a ready-to-share project page in minutes. We pull the details, write the copy, and build the layout for you.",
     icon: Globe,
     color: "blue",
     features: [
-      "Auto-extraction of project details & specs",
-      "Vertex AI generated sales copy",
-      "Mobile-first responsive architecture",
-      "Direct integration with market data nodes",
-      "sitename.site.entrestate.com subdomain"
+      "Auto-pull project details and specs",
+      "Sales copy written for you",
+      "Looks great on mobile",
+      "Connected to live market data",
+      "Preview link included (sitename.site.entrestate.com)"
     ],
     cta: "Launch Architect",
     href: "/builder"
@@ -30,50 +30,50 @@ const SERVICE_DATA = {
   'ai-market-expert': {
     title: "Market Intelligence",
     tagline: "Real-time UAE Project Data",
-    description: "Access our centralized intelligence node with 3,750+ verified UAE projects. Get live ROI data, capital appreciation trends, and inventory updates.",
+    description: "Access a centralized market hub with curated projects, pricing insights, and inventory updates.",
     icon: Bot,
     color: "orange",
     features: [
         "Real-time ROI & Yield analytics",
-        "Developer performance tracking",
+        "Developer performance insights",
         "Historical price trend visualization",
         "Branded PDF export for investors",
         "Direct campaign generation"
     ],
-    cta: "Explore Data Engine",
+    cta: "Explore Market Data",
     href: "/discover"
   },
   'google-ads': {
     title: "Ads Synchronization",
-    tagline: "High-ROI Search Campaigns",
-    description: "Launch targeted Google Search campaigns directly from your project data. Our AI handles keyword bidding, ad copy, and budget optimization for maximum leads.",
+    tagline: "High-Intent Search Campaigns",
+    description: "Launch targeted Google Search campaigns directly from your project data. We handle keyword grouping, ad copy, and budget guidance to drive more leads.",
     icon: Search,
     color: "green",
     features: [
-        "One-click campaign deployment",
+        "One-click campaign launch",
         "High-intent keyword grouping",
         "AI-optimized ad copy variations",
         "Real-time performance dashboard",
-        "Automatic tracking pixel setup"
+        "Automatic tracking setup"
     ],
-    cta: "Sync Google Ads",
+    cta: "Connect Google Ads",
     href: "/dashboard/google-ads"
   },
   'instagram-bot': {
     title: "Social Automation",
-    tagline: "24/7 Instagram DM Sales",
+    tagline: "Always-On Instagram Replies",
     description: "Turn your Instagram profile into a sales engine. Our AI bot handles project inquiries, qualifies investors, and pushes hot leads to your WhatsApp.",
     icon: Facebook,
     color: "pink",
     features: [
-        "Official Meta API integration",
+        "Official Meta connection",
         "Speaks 40+ languages natively",
         "Automated project info sharing",
-        "Lead qualification & CRM sync",
+        "Lead qualification & CRM updates",
         "Zero missed inquiries policy"
     ],
-    cta: "Deploy Insta-Bot",
-    href: "/trending"
+    cta: "Launch Instagram Assistant",
+    href: "/instagram-assistant"
   }
 };
 
@@ -113,7 +113,7 @@ export default function ServicePage({ params }: PageProps) {
               >
                   <div className={cn("inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-[10px] font-bold uppercase tracking-[0.3em] mx-auto", `text-${service.color}-500`)}>
                     <Activity className="h-3.5 w-3.5" />
-                    Service Infrastructure
+                    Service Overview
                   </div>
                   <h1 className="text-6xl md:text-8xl font-black tracking-tighter leading-[0.9]">{service.title}<br/><span className="text-zinc-600 italic uppercase">{service.tagline}</span></h1>
                   <p className="text-zinc-500 text-2xl max-w-3xl mx-auto font-light leading-relaxed">
@@ -130,7 +130,7 @@ export default function ServicePage({ params }: PageProps) {
                   
                   <div className="space-y-12">
                       <div>
-                          <h2 className="text-4xl font-bold mb-8">Enterprise Capabilities</h2>
+                          <h2 className="text-4xl font-bold mb-8">What You Get</h2>
                           <div className="space-y-6">
                               {service.features.map((feature, i) => (
                                   <div key={i} className="flex items-start gap-4">
@@ -157,22 +157,22 @@ export default function ServicePage({ params }: PageProps) {
                                   <Icon className="h-8 w-8" />
                               </div>
                               <div>
-                                  <p className="text-xs font-black text-zinc-500 uppercase tracking-widest">Active Module</p>
-                                  <h4 className="text-xl font-bold text-white">{service.title} v2.0</h4>
+                                  <p className="text-xs font-black text-zinc-500 uppercase tracking-widest">Service Status</p>
+                                  <h4 className="text-xl font-bold text-white">{service.title}</h4>
                               </div>
                           </div>
                           
                           <div className="space-y-6">
                               <div className="p-6 rounded-2xl bg-black/40 border border-white/5">
-                                  <p className="text-[10px] font-bold text-zinc-600 uppercase mb-2">Sync Status</p>
+                                  <p className="text-[10px] font-bold text-zinc-600 uppercase mb-2">Connection Status</p>
                                   <div className="flex items-center gap-3">
                                       <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                                      <p className="text-sm font-bold text-white">Connected to UAE Data Nodes</p>
+                                      <p className="text-sm font-bold text-white">Connected to UAE market data</p>
                                   </div>
                               </div>
                               <div className="p-6 rounded-2xl bg-black/40 border border-white/5">
-                                  <p className="text-[10px] font-bold text-zinc-600 uppercase mb-2">AI Optimization</p>
-                                  <p className="text-lg font-black text-white">Vertex Pro Active</p>
+                                  <p className="text-[10px] font-bold text-zinc-600 uppercase mb-2">Smart Optimization</p>
+                                  <p className="text-lg font-black text-white">Smart tuning active</p>
                               </div>
                           </div>
 
@@ -195,9 +195,9 @@ export default function ServicePage({ params }: PageProps) {
       <section className="py-40 bg-zinc-950 border-y border-white/5 text-center">
           <div className="container mx-auto px-6 max-w-4xl space-y-6">
               <Target className="h-12 w-12 text-blue-500 mx-auto mb-4" />
-              <h3 className="text-4xl font-bold">Part of the Growth Infrastructure.</h3>
+              <h3 className="text-4xl font-bold">Part of Your Growth Toolkit.</h3>
               <p className="text-zinc-500 text-xl font-light leading-relaxed">
-                  All Entrestate services are interconnected. Data from the <span className="text-white font-medium">Architect</span> flows directly into your <span className="text-white font-medium">Ads Manager</span> and <span className="text-white font-medium">Chat Experts</span>, creating a seamless high-conversion loop.
+                  All Entrestate services work together. Your website, ads, and chat assistant stay connected so you can follow up faster and close more.
               </p>
           </div>
       </section>

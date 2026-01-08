@@ -6,12 +6,15 @@ import type { ProjectData } from '@/lib/types';
 const MAX_DATA_LOAD = 8000;
 
 function parseFilters(searchParams: URLSearchParams) {
+  const limitParam = parseInt(searchParams.get('limit') || '12', 10);
+  const safeLimit = Number.isFinite(limitParam) ? Math.min(Math.max(limitParam, 1), 12) : 12;
+
   return {
     query: searchParams.get('query')?.toLowerCase() ?? '',
     city: searchParams.get('city')?.toLowerCase() ?? 'all',
     status: searchParams.get('status')?.toLowerCase() ?? 'all',
     page: Math.max(parseInt(searchParams.get('page') || '1', 10), 1),
-    limit: Math.min(parseInt(searchParams.get('limit') || '12', 10), 50),
+    limit: safeLimit,
   };
 }
 
@@ -33,18 +36,32 @@ export async function GET(req: NextRequest) {
 
     const source: ProjectData[] = snapshot.docs.map((doc) => {
         const data = doc.data();
+        const performance = {
+            roi: data.performance?.roi ?? 0,
+            capitalAppreciation: data.performance?.capitalAppreciation ?? 0,
+            rentalYield: data.performance?.rentalYield ?? 0,
+            marketTrend: data.performance?.marketTrend ?? 'stable',
+            priceHistory: Array.isArray(data.performance?.priceHistory) ? data.performance.priceHistory : [],
+        };
+
         return {
             id: doc.id,
             ...data,
             name: data.name || "Untitled Project",
             developer: data.developer || "Unknown Developer",
-            price: data.price || { label: "Price on Request" },
-            performance: data.performance || { roi: "N/A", growth: "N/A" },
-            handover: data.handover || { year: "TBA" },
+            availability: data.availability || data.status || "Available",
+            price: {
+                ...data.price,
+                label: data.price?.label || "Price on request",
+                from: data.price?.from ?? 0,
+            },
+            performance,
+            handover: data.handover ?? null,
             location: {
                 ...data.location,
                 city: data.location?.city || "Unknown City",
                 area: data.location?.area || "Unknown Area",
+                mapQuery: data.location?.mapQuery || "",
             }
         } as ProjectData;
     });
@@ -61,7 +78,7 @@ export async function GET(req: NextRequest) {
   } catch (error: any) {
     console.error('[projects/search] Critical Database Error:', error.message);
     return NextResponse.json(
-        { message: 'Failed to retrieve project data due to a server error.' },
+        { message: 'Could not load projects right now. Please try again.' },
         { status: 500 }
     );
   }

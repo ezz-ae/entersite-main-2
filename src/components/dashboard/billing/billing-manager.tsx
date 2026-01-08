@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -11,7 +11,7 @@ const PLANS = [
     {
         id: 'starter',
         name: 'Growth Plan',
-        price: '299',
+        price: 299,
         desc: 'Perfect for solo agents and small teams.',
         features: [
             '10 Brochure Conversions /mo',
@@ -24,8 +24,8 @@ const PLANS = [
     },
     {
         id: 'enterprise',
-        name: 'Brokerage OS',
-        price: '999',
+        name: 'Brokerage Suite',
+        price: 999,
         desc: 'Full-scale intelligence for large brokerages.',
         features: [
             'Unlimited Brochure Conversions',
@@ -38,9 +38,20 @@ const PLANS = [
 ];
 
 export function BillingManager() {
+  const [currency, setCurrency] = useState<'AED' | 'USD'>('AED');
+  const exchangeRate = 3.67;
+  const paypalCurrency = 'USD';
+
+  const formatPrice = (value: number) => {
+    if (currency === 'AED') {
+      return Math.round(value * exchangeRate).toLocaleString();
+    }
+    return value.toLocaleString();
+  };
+
   const initialOptions = {
     clientId: "test",
-    currency: "USD",
+    currency: paypalCurrency,
     intent: "capture",
     components: "buttons",
     "enable-funding": "venmo,paylater",
@@ -50,10 +61,33 @@ export function BillingManager() {
     <div className="space-y-16 max-w-7xl mx-auto py-20 px-6">
       <div className="text-center space-y-4">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-[10px] font-bold uppercase tracking-widest text-zinc-500 mb-4">
-            <Lock className="h-3 w-3" /> Secure License Activation
+            <Lock className="h-3 w-3" /> Secure Checkout
         </div>
-        <h2 className="text-5xl md:text-7xl font-black tracking-tighter text-white">Choose your <br/><span className="text-zinc-600">Infrastructure.</span></h2>
-        <p className="text-zinc-500 text-xl font-light max-w-2xl mx-auto">Scalable AI intelligence designed for the modern real estate empire.</p>
+        <h2 className="text-5xl md:text-7xl font-black tracking-tighter text-white">Choose your <br/><span className="text-zinc-600">Plan.</span></h2>
+        <p className="text-zinc-500 text-xl font-light max-w-2xl mx-auto">Scalable tools designed for modern real estate teams.</p>
+        <div className="flex items-center justify-center gap-2 pt-4">
+          <button
+            onClick={() => setCurrency('AED')}
+            className={cn(
+              'h-9 px-4 rounded-full border text-xs font-bold uppercase tracking-widest transition-all',
+              currency === 'AED' ? 'bg-white text-black border-white' : 'bg-white/5 text-white border-white/10'
+            )}
+          >
+            AED
+          </button>
+          <button
+            onClick={() => setCurrency('USD')}
+            className={cn(
+              'h-9 px-4 rounded-full border text-xs font-bold uppercase tracking-widest transition-all',
+              currency === 'USD' ? 'bg-white text-black border-white' : 'bg-white/5 text-white border-white/10'
+            )}
+          >
+            USD
+          </button>
+        </div>
+        {currency === 'AED' && (
+          <p className="text-xs text-zinc-500">AED shown as an estimated conversion. Checkout runs in USD for now.</p>
+        )}
       </div>
 
       <div className="grid md:grid-cols-2 gap-10">
@@ -78,14 +112,16 @@ export function BillingManager() {
                     <CardTitle className="text-3xl font-bold text-white tracking-tight">{plan.name}</CardTitle>
                     <CardDescription className="text-zinc-500 text-lg mt-3 font-medium">{plan.desc}</CardDescription>
                     <div className="pt-10 flex items-baseline gap-2">
-                        <span className="text-7xl font-black text-white tracking-tighter">${plan.price}</span>
+                        <span className="text-7xl font-black text-white tracking-tighter">
+                          {currency === 'USD' ? `$${formatPrice(plan.price)}` : `AED ${formatPrice(plan.price)}`}
+                        </span>
                         <span className="text-zinc-600 font-bold uppercase tracking-[0.3em] text-[10px]">/ monthly</span>
                     </div>
                 </CardHeader>
 
                 <CardContent className="p-12 pt-0 space-y-12">
                     <div className="space-y-5">
-                        <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Included Intelligence</p>
+                        <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">What's Included</p>
                         {plan.features.map(feature => (
                             <div key={feature} className="flex items-center gap-4 text-zinc-300 group/item">
                                 <div className="w-6 h-6 rounded-full bg-white/5 flex items-center justify-center border border-white/5 group-hover/item:border-blue-500/50 transition-colors">
@@ -109,7 +145,7 @@ export function BillingManager() {
                                     }} 
                                     createOrder={(data, actions) => {
                                         return actions.order.create({
-                                            purchase_units: [{ amount: { value: plan.price, currency_code: "USD" } }],
+                                            purchase_units: [{ amount: { value: String(plan.price), currency_code: paypalCurrency } }],
                                             intent: "CAPTURE"
                                         });
                                     }}

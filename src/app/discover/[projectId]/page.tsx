@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { NextPage } from 'next';
 import { useParams } from 'next/navigation';
 import { doc, getDoc } from 'firebase/firestore';
-import { db } from '@/firebase/config';
+import { db } from '@/firebase';
 import { ProjectData } from '@/lib/types';
 import { 
     Loader2, 
@@ -14,12 +14,9 @@ import {
     TrendingUp, 
     Calendar, 
     BarChart, 
-    Home, 
-    CheckCircle, 
-    Info, 
-    Phone, 
-    Mail, 
-    Globe
+    CheckCircle2, 
+    Globe,
+    Home
 } from 'lucide-react';
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -29,6 +26,26 @@ const ProjectDetailPage: NextPage = () => {
   const { projectId } = useParams();
   const [project, setProject] = useState<ProjectData | null>(null);
   const [loading, setLoading] = useState(true);
+
+  const formatDate = (value?: string) => {
+    if (!value) return 'Not shared';
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return 'Not shared';
+    return new Intl.DateTimeFormat('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+    }).format(date);
+  };
+
+  const formatPrice = (value?: number) => {
+    if (!value || Number.isNaN(value)) return 'Price on request';
+    return new Intl.NumberFormat('en-AE', {
+      style: 'currency',
+      currency: 'AED',
+      maximumFractionDigits: 0,
+    }).format(value);
+  };
 
   useEffect(() => {
     const fetchProject = async () => {
@@ -68,6 +85,27 @@ const ProjectDetailPage: NextPage = () => {
     );
   }
 
+  const priceLabel = project.price?.label ?? 'Price on request';
+  const roiLabel = project.performance?.roi ? `${project.performance.roi}%` : 'Not shared';
+  const appreciationLabel = project.performance?.capitalAppreciation
+    ? `${project.performance.capitalAppreciation}%`
+    : 'Not shared';
+  const rentalYieldLabel = project.performance?.rentalYield
+    ? `${project.performance.rentalYield}%`
+    : 'Not shared';
+  const handoverLabel = project.handover
+    ? `Q${project.handover.quarter} ${project.handover.year}`
+    : 'TBD';
+  const bedroomsLabel = project.bedrooms?.label ?? 'Not shared';
+  const areaLabel = project.areaSqft?.label ?? 'Not shared';
+  const marketTrendLabel = project.performance?.marketTrend
+    ? project.performance.marketTrend === 'up'
+      ? 'Rising'
+      : project.performance.marketTrend === 'down'
+        ? 'Softening'
+        : 'Steady'
+    : 'Not shared';
+
   return (
     <div className="bg-black text-white min-h-screen">
       <div 
@@ -76,7 +114,7 @@ const ProjectDetailPage: NextPage = () => {
       >
         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/70 to-transparent"/>
         <div className="relative z-10">
-            <Badge className="mb-4 bg-blue-500 text-white">{project.project_status || 'Under Construction'}</Badge>
+            <Badge className="mb-4 bg-blue-500 text-white">{project.status || project.availability || 'Under Construction'}</Badge>
             <h1 className="text-5xl font-black italic uppercase tracking-tighter">{project.name}</h1>
             <div className="flex items-center gap-4 mt-2 text-zinc-300">
                 <div className="flex items-center gap-2"><Building className="h-5 w-5"/><span>{project.developer}</span></div>
@@ -93,33 +131,73 @@ const ProjectDetailPage: NextPage = () => {
                         <CardTitle className="text-xl font-bold tracking-tight">Project Overview</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <p className="text-zinc-400">{project.description || 'No description available.'}</p>
+                        <p className="text-zinc-400">
+                          {project.description?.full || project.description?.short || 'No description available.'}
+                        </p>
                     </CardContent>
                 </Card>
 
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-                  <InfoCard icon={DollarSign} label="Starting Price" value={project.price.label} />
-                  <InfoCard icon={TrendingUp} label="Est. ROI" value={`${project.performance.roi}%`} />
-                  <InfoCard icon={BarChart} label="Est. Growth" value={`${project.performance.growth}%`} />
-                  <InfoCard icon={Calendar} label="Handover" value={project.handover.year} />
+                  <InfoCard icon={DollarSign} label="Starting Price" value={priceLabel} />
+                  <InfoCard icon={TrendingUp} label="Est. ROI" value={roiLabel} />
+                  <InfoCard icon={BarChart} label="Est. Appreciation" value={appreciationLabel} />
+                  <InfoCard icon={Calendar} label="Handover" value={handoverLabel} />
+                  <InfoCard icon={Building} label="Bedrooms" value={bedroomsLabel} />
+                  <InfoCard icon={Home} label="Home Size" value={areaLabel} />
+                  <InfoCard icon={BarChart} label="Rental Yield" value={rentalYieldLabel} />
+                  <InfoCard icon={Globe} label="Market Trend" value={marketTrendLabel} />
                 </div>
 
-                {project.payment_plan && (
-                    <Card className="bg-zinc-900 border-white/10 rounded-2xl">
-                        <CardHeader>
-                            <CardTitle>Payment Plan</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                           <ul className="space-y-3">
-                            {Object.entries(project.payment_plan).map(([key, value]) => (
-                                <li key={key} className="flex justify-between items-center bg-zinc-800 p-3 rounded-lg">
-                                    <span className="font-semibold text-zinc-300">{key.replace('_', ' ')}</span>
-                                    <span className="font-bold text-white">{value}</span>
-                                </li>
-                            ))}
-                            </ul>
-                        </CardContent>
-                    </Card>
+                {(project.features?.length ?? 0) > 0 && (
+                  <Card className="bg-zinc-900 border-white/10 rounded-2xl">
+                    <CardHeader>
+                      <CardTitle className="text-xl font-bold tracking-tight">Features & Amenities</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm text-zinc-300">
+                        {project.features.map((feature) => (
+                          <div key={feature} className="flex items-center gap-2">
+                            <CheckCircle2 className="h-4 w-4 text-blue-500" />
+                            <span>{feature}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+
+                <Card className="bg-zinc-900 border-white/10 rounded-2xl">
+                  <CardHeader>
+                    <CardTitle className="text-xl font-bold tracking-tight">Price & Availability</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4 text-sm text-zinc-300">
+                    <InfoRow label="Starting from" value={priceLabel} />
+                    <InfoRow
+                      label="Avg. size"
+                      value={project.price?.sqftAvg ? `${project.price.sqftAvg.toLocaleString()} sqft` : 'Not shared'}
+                    />
+                    <InfoRow label="Inventory updated" value={formatDate(project.unitsStockUpdatedAt)} />
+                    <InfoRow label="Availability" value={project.availability || project.status || 'Available'} />
+                  </CardContent>
+                </Card>
+
+                {(project.performance?.priceHistory?.length ?? 0) > 0 && (
+                  <Card className="bg-zinc-900 border-white/10 rounded-2xl">
+                    <CardHeader>
+                      <CardTitle className="text-xl font-bold tracking-tight">Price History</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm text-zinc-300">
+                        {project.performance.priceHistory.map((entry) => (
+                          <InfoRow
+                            key={entry.year}
+                            label={String(entry.year)}
+                            value={formatPrice(entry.avgPrice)}
+                          />
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
                 )}
 
             </div>
@@ -130,14 +208,32 @@ const ProjectDetailPage: NextPage = () => {
                     <p className="text-blue-200 mb-6">Contact our sales team for a private consultation.</p>
                     <Button className="bg-white text-blue-600 hover:bg-zinc-200 w-full font-bold">Request a Call</Button>
                 </Card>
-                 <Card className="bg-zinc-900 border-white/10 rounded-2xl p-8">
-                    <h3 className="font-bold mb-4">Developer Information</h3>
-                    <div className="space-y-3 text-sm">
-                        <p className="flex items-center gap-3"><Globe className="h-4 w-4 text-zinc-400"/>{project.developer}</p>
-                        {/* Placeholder details */}
-                        <p className="flex items-center gap-3"><Mail className="h-4 w-4 text-zinc-400"/>sales@developer.com</p>
-                        <p className="flex items-center gap-3"><Phone className="h-4 w-4 text-zinc-400"/>+971 4 123 4567</p>
+                <Card className="bg-zinc-900 border-white/10 rounded-2xl p-8">
+                  <h3 className="font-bold mb-4">Project Details</h3>
+                  <div className="space-y-3 text-sm text-zinc-300">
+                    <InfoRow label="Developer" value={project.developer || 'Not shared'} />
+                    <InfoRow
+                      label="Location"
+                      value={
+                        project.location?.area && project.location?.city
+                          ? `${project.location.area}, ${project.location.city}`
+                          : 'Not shared'
+                      }
+                    />
+                    <InfoRow label="Status" value={project.status || project.availability || 'Available'} />
+                    {project.publicUrl && (
+                      <LinkRow href={project.publicUrl} label="Project page" />
+                    )}
+                  </div>
+                  {(project.tags?.length ?? 0) > 0 && (
+                    <div className="mt-6 flex flex-wrap gap-2">
+                      {project.tags?.map((tag) => (
+                        <Badge key={tag} className="bg-white/10 text-white border-white/10">
+                          {tag}
+                        </Badge>
+                      ))}
                     </div>
+                  )}
                 </Card>
             </div>
         </div>
@@ -158,6 +254,29 @@ function InfoCard({ icon: Icon, label, value }: { icon: React.ElementType, label
             </div>
         </div>
     )
+}
+
+function InfoRow({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex items-center justify-between gap-4 border-b border-white/5 pb-3 last:border-b-0 last:pb-0">
+      <span className="text-zinc-500 text-xs uppercase tracking-widest">{label}</span>
+      <span className="text-white font-semibold text-sm text-right">{value}</span>
+    </div>
+  );
+}
+
+function LinkRow({ href, label }: { href: string; label: string }) {
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noreferrer"
+      className="flex items-center justify-between gap-4 border-b border-white/5 pb-3 last:border-b-0 last:pb-0 text-blue-400 hover:text-blue-200 transition-colors"
+    >
+      <span className="text-zinc-500 text-xs uppercase tracking-widest">{label}</span>
+      <span className="text-sm font-semibold">Open</span>
+    </a>
+  );
 }
 
 export default ProjectDetailPage;

@@ -61,7 +61,7 @@ export function CuriosityHero() {
                 className="space-y-8 relative z-10"
             >
                 <div className="inline-block px-4 py-1.5 rounded-full border border-white/10 bg-white/5 text-sm text-zinc-400 mb-4 font-medium tracking-wide">
-                    The Operating System for Real Estate
+                    The all-in-one platform for real estate
                 </div>
                 
                 <h1 className="text-5xl md:text-8xl font-bold text-white tracking-tighter max-w-5xl leading-[0.9]">
@@ -272,7 +272,7 @@ function renderBlockContent(type: string) {
                     <div className="h-2 w-24 bg-white/10 rounded" />
                     <div className="flex gap-2 mt-2">
                         <div className="w-6 h-6 rounded-full bg-white/5 border border-white/10" />
-                        <div className.="w-6 h-6 rounded-full bg-white/5 border border-white/10" />
+                        <div className="w-6 h-6 rounded-full bg-white/5 border border-white/10" />
                         <div className="w-6 h-6 rounded-full bg-white/5 border border-white/10" />
                     </div>
                 </div>

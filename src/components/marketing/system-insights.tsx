@@ -1,22 +1,8 @@
 'use client';
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { 
-  BarChart3, 
-  Search, 
-  Globe, 
-  Bot, 
-  Zap, 
-  ArrowRight, 
-  TrendingUp, 
-  ShieldCheck,
-  Cpu,
-  Target,
-  LineChart,
-  Network
-} from 'lucide-react';
+import { Card } from '@/components/ui/card';
+import { Search, Bot, Zap, Cpu, Target, LineChart } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
@@ -34,34 +20,34 @@ export function SystemInsights() {
                 <div className="space-y-6">
                     <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-orange-500/10 text-orange-600 border border-orange-500/20 text-[10px] font-bold uppercase tracking-[0.3em]">
                         <Cpu className="h-3.5 w-3.5" />
-                        Infrastructure Intelligence
+                        Growth Insights
                     </div>
-                    <h2 className="text-6xl md:text-8xl font-black tracking-tighter leading-none text-white">Intelligently Engineered for <br/><span className="text-zinc-600 italic uppercase">Real Estate Growth.</span></h2>
+                    <h2 className="text-6xl md:text-8xl font-black tracking-tighter leading-none text-white">Built for <br/><span className="text-zinc-600 italic uppercase">Real Estate Teams.</span></h2>
                     <p className="text-zinc-500 text-2xl font-light leading-relaxed max-w-xl">
-                        Entrestate OS is more than a builder. It's a comprehensive AI platform that automates your entire sales and marketing funnel, from lead generation to closing.
+                        Entrestate keeps listings, leads, and follow-ups in one simple workspace so your team stays organized without extra tools.
                     </p>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <InsightItem 
                         icon={Search} 
-                        title="Semantic SEO" 
-                        desc="Enhance your online visibility. Our AI automatically generates optimized content and structured data from your project materials, designed to improve search engine rankings."
+                        title="Get Found on Google" 
+                        desc="We format each listing so it looks great in search and is easy to share with buyers."
                     />
                     <InsightItem 
                         icon={Target} 
-                        title="Hyper-Targeted Ads" 
-                        desc="Reach high-intent investors with unparalleled precision. Our system leverages real-time market data to create and manage high-performing global ad campaigns effortlessly."
+                        title="Ad Launch" 
+                        desc="Pick a budget and area, then launch ads with guided setup and clear previews."
                     />
                     <InsightItem 
                         icon={Bot} 
-                        title="AI Sales Agents" 
-                        desc="Deploy autonomous AI agents trained on thousands of real estate projects. They engage leads, answer complex questions, and schedule viewings 24/7."
+                        title="Lead Assistant" 
+                        desc="Answer common questions, share details, and book viewings without manual typing."
                     />
                     <InsightItem 
                         icon={LineChart} 
-                        title="Live Market Intelligence" 
-                        desc="Integrate real-time ROI calculations and market trends directly into your properties, ensuring your data is always current and compelling."
+                        title="Market Snapshots" 
+                        desc="See pricing, handover timelines, and availability in one clean view."
                     />
                 </div>
             </div>
@@ -72,8 +58,8 @@ export function SystemInsights() {
                     <div className="space-y-10">
                         <div className="flex items-center justify-between border-b border-white/5 pb-8">
                             <div>
-                                <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-1.5">System Performance</p>
-                                <h3 className="text-3xl font-black text-white">Growth Engine</h3>
+                                <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-1.5">Platform Performance</p>
+                                <h3 className="text-3xl font-black text-white">Growth Overview</h3>
                             </div>
                             <div className="h-16 w-16 rounded-2xl bg-blue-600/10 flex items-center justify-center border border-blue-500/20">
                                 <Zap className="h-8 w-8 text-blue-500" />
@@ -81,20 +67,20 @@ export function SystemInsights() {
                         </div>
 
                         <div className="space-y-6">
-                            <StatBar label="SEO Performance Score" value={98} color="blue" />
-                            <StatBar label="Avg. Ad ROAS Increase" value={42} color="orange" suffix="%" />
-                            <StatBar label="AI Lead Qualification Rate" value={87} color="green" />
-                            <StatBar label="Real-Time Data Sync" value={99.9} color="purple" />
+                            <StatBar label="Search Visibility" value={72} valueLabel="Improving" color="blue" />
+                            <StatBar label="Ad Lead Flow" value={68} valueLabel="Growing" color="orange" />
+                            <StatBar label="Lead Responses" value={74} valueLabel="On Track" color="green" />
+                            <StatBar label="Listing Updates" value={80} valueLabel="Up to Date" color="purple" />
                         </div>
 
                         <div className="pt-10 grid grid-cols-2 gap-6">
                             <div className="p-6 rounded-3xl bg-black/40 border border-white/5">
-                                <p className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest mb-2">Build Speed</p>
-                                <p className="text-3xl font-black text-white">{"<"} 30s</p>
+                                <p className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest mb-2">Build Time</p>
+                                <p className="text-3xl font-black text-white">Minutes, not days</p>
                             </div>
                             <div className="p-6 rounded-3xl bg-black/40 border border-white/5">
-                                <p className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest mb-2">Sync Latency</p>
-                                <p className="text-3xl font-black text-white">12ms</p>
+                                <p className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest mb-2">Listing Updates</p>
+                                <p className="text-3xl font-black text-white">Keeps up with changes</p>
                             </div>
                         </div>
                     </div>
@@ -119,7 +105,7 @@ function InsightItem({ icon: Icon, title, desc }: any) {
     )
 }
 
-function StatBar({ label, value, color, suffix="%" }: { label: string, value: number, color: string, suffix?:string }) {
+function StatBar({ label, value, valueLabel, color }: { label: string, value: number, valueLabel: string, color: string }) {
     const colors: any = {
         blue: "bg-blue-600",
         orange: "bg-orange-600",
@@ -131,7 +117,7 @@ function StatBar({ label, value, color, suffix="%" }: { label: string, value: nu
         <div className="space-y-2">
             <div className="flex justify-between text-[10px] font-bold text-zinc-500 uppercase tracking-widest">
                 <span>{label}</span>
-                <span className="text-white font-mono">{value}{suffix}</span>
+                <span className="text-white font-mono">{valueLabel}</span>
             </div>
             <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
                 <motion.div 

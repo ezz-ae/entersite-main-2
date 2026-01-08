@@ -187,7 +187,7 @@ function BuilderContent() {
     const handleSave = async () => {
         if (!user) {
             toast({
-                title: "Authentication Required",
+                title: "Please Sign In",
                 description: "Please sign in to save your progress.",
                 variant: "destructive"
             });
@@ -333,7 +333,7 @@ function BuilderContent() {
     const handleRefinerRun = async () => {
         if (!user) {
             toast({
-                title: "Authentication Required",
+                title: "Please Sign In",
                 description: "Sign in to run Refiner AI.",
                 variant: "destructive",
             });
@@ -397,7 +397,7 @@ function BuilderContent() {
     const handleApplyRefinerDraft = useCallback(async () => {
         if (!user) {
             toast({
-                title: 'Authentication Required',
+                title: 'Please Sign In',
                 description: 'Sign in before applying the Refiner draft.',
                 variant: 'destructive'
             });
@@ -707,23 +707,23 @@ function RefinerReviewSplit({ page, tenantId, projectName, onApply, onExit, isAp
                                 <Sparkles className="h-6 w-6 text-amber-500" />
                             </div>
                             <div>
-                                <p className="text-xs uppercase tracking-[0.4em] text-amber-600 font-semibold">Refiner Draft</p>
-                                <h3 className="text-2xl font-bold text-amber-900 mt-1">AI polish is almost ready</h3>
+                                <p className="text-xs uppercase tracking-[0.4em] text-amber-600 font-semibold">Draft Review</p>
+                                <h3 className="text-2xl font-bold text-amber-900 mt-1">Your updates are almost ready</h3>
                             </div>
                             <p className="text-sm text-amber-900/80 max-w-md mx-auto">
-                                We captured your layout snapshot and are training the Refiner agent to improve copy hierarchy, layout spacing, and CTA clarity.
-                                This placeholder will be replaced with a live preview once the agent delivers the diff.
+                                We captured your layout and are preparing a cleaner version with clearer text and spacing.
+                                The updated preview will appear here shortly.
                             </p>
                             <div className="text-left text-sm text-amber-900/80 space-y-2 mx-auto">
-                                <p className="font-semibold text-amber-900 uppercase tracking-[0.3em] text-xs">Incoming upgrades</p>
+                                <p className="font-semibold text-amber-900 uppercase tracking-[0.3em] text-xs">What changes next</p>
                                 <ul className="space-y-1">
                                     <li>• Harmonized typography scale for hero and CTA blocks.</li>
                                     <li>• Improved listing grid spacing on tablet/mobile.</li>
-                                    <li>• Fresh CTA copy variations tailored for Entrestate funnels.</li>
+                                    <li>• Fresh CTA copy variations tailored for lead capture.</li>
                                 </ul>
                             </div>
                             <p className="text-xs text-amber-800/70">
-                                You can apply the Refiner draft now to mark this review complete, or exit and revisit later from Jobs.
+                                You can apply this draft now or return later from Jobs.
                             </p>
                         </>
                     )}
@@ -775,6 +775,31 @@ const extractRefinerArtifacts = (job?: Job | null): RefinerArtifacts => {
 };
 
 export default function BuilderPage() {
+    const searchParams = useSearchParams();
+    const builderReady = searchParams.get('beta') === '1';
+
+    if (!builderReady) {
+        return (
+            <main className="min-h-screen bg-zinc-950 text-white flex items-center justify-center px-6 py-24">
+                <div className="max-w-2xl w-full text-center space-y-6">
+                    <p className="text-[10px] font-bold uppercase tracking-[0.4em] text-zinc-500">Website Builder</p>
+                    <h1 className="text-4xl md:text-6xl font-black tracking-tight">Early Access</h1>
+                    <p className="text-zinc-400 text-lg">
+                        The builder is in pilot mode. Request access and we will set it up for your team.
+                    </p>
+                    <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+                        <Button asChild className="h-12 px-6 rounded-full bg-white text-black font-bold">
+                            <a href="mailto:support@entrestate.com">Request Access</a>
+                        </Button>
+                        <Button asChild variant="outline" className="h-12 px-6 rounded-full border-white/10 bg-white/5">
+                            <a href="/dashboard">Go to Dashboard</a>
+                        </Button>
+                    </div>
+                </div>
+            </main>
+        );
+    }
+
     return (
         <Suspense fallback={
             <div className="h-screen w-screen flex items-center justify-center bg-zinc-950">

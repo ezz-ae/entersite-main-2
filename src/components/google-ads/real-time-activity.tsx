@@ -45,7 +45,7 @@ export function RealTimeActivity({ campaignId }: { campaignId: string }) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Real-Time Activity</CardTitle>
+        <CardTitle>Recent Activity (Sample)</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="space-y-4">

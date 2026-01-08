@@ -6,7 +6,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { Button } from '@/components/ui/button';
 import { UploadCloud, FileText, Loader2, AlertTriangle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { apiFetch } from '@/lib/apiFetch';
+import { authorizedFetch } from '@/lib/auth-fetch';
 
 interface ImportSmsContactsDialogProps {
   open: boolean;
@@ -47,7 +47,7 @@ export function ImportSmsContactsDialog({ open, onOpenChange, onImportComplete }
     formData.append('file', file);
 
     try {
-      const res = await apiFetch('/api/sms/import', {
+      const res = await authorizedFetch('/api/sms/import', {
         method: 'POST',
         body: formData,
       });
@@ -66,7 +66,7 @@ export function ImportSmsContactsDialog({ open, onOpenChange, onImportComplete }
         setError(result.error || 'An unknown error occurred.');
       }
     } catch (e: any) {
-      setError("Failed to connect to the server. Please try again.");
+      setError("Couldn't connect right now. Please try again.");
       console.error(e);
     } finally {
       setUploading(false);

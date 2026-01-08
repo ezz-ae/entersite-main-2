@@ -1,74 +1,73 @@
 
-import { NextResponse } from 'next/server';
-import { doc, getDoc, updateDoc } from 'firebase/firestore';
-import { db } from '@/firebase';
-import { nanoid } from 'nanoid';
-import type { SitePage } from '@/lib/types';
-import { PageRenderer } from '@/components/page-renderer';
-import { renderToString } from 'react-dom/server';
-import { promises as fs } from 'fs';
-import path from 'path';
+import { NextRequest, NextResponse } from 'next/server';
+import { FieldValue } from 'firebase-admin/firestore';
+import { getAdminDb } from '@/server/firebase-admin';
+import { requireTenantScope, UnauthorizedError, ForbiddenError } from '@/server/auth';
 
-// This is a placeholder for a function that will handle the actual deployment to Vercel
-async function deployToVercel(siteData: SitePage) {
-    console.log(`Deploying site ${siteData.id} to Vercel`);
+const slugify = (value: string) =>
+  value
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 48);
 
-    // 1. Render the site to a static HTML string
-    const html = renderToString(
-        <PageRenderer 
-            page={siteData} 
-            tenantId={siteData.tenantId || 'public'} 
-            projectName={siteData.title} 
-        />
-    );
-    const fullHtml = `<!DOCTYPE html><html><head><title>${siteData.seo.title || siteData.title}</title><meta name="description" content="${siteData.seo.description}"></head><body>${html}</body></html>`;
+const normalizeDomain = (domain: string) => domain.replace(/^https?:\/\//, '').replace(/\/+$/, '');
 
-    // 2. In a real implementation, you would use the Vercel API to create a deployment.
-    // This would involve creating a temporary file with the HTML content, 
-    // and then using a library or raw fetch calls to interact with the Vercel API.
-    // For this example, we'll just simulate a successful deployment.
-    await new Promise(resolve => setTimeout(resolve, 2000));
-
-    const deploymentId = `dpl_${nanoid()}`;
-    const publishedUrl = `https://${siteData.slug || siteData.id}-${nanoid(5)}.vercel.app`;
-
-    return { deploymentId, publishedUrl };
-}
-
-export async function POST(request: Request) {
-    try {
-        const { siteId } = await request.json();
-        if (!siteId) {
-            return NextResponse.json({ message: 'Site ID is required' }, { status: 400 });
-        }
-
-        const siteRef = doc(db, 'sites', siteId);
-        const siteSnap = await getDoc(siteRef);
-
-        if (!siteSnap.exists()) {
-            return NextResponse.json({ message: 'Site not found' }, { status: 404 });
-        }
-
-        const siteData = siteSnap.data() as SitePage;
-
-        // Deploy the site to Vercel
-        const { deploymentId, publishedUrl } = await deployToVercel(siteData);
-
-        // Update the site document with the new deployment information
-        await updateDoc(siteRef, {
-            published: true,
-            publishedUrl,
-            lastPublishedAt: new Date().toISOString(),
-        });
-
-        return NextResponse.json({ 
-            siteId, 
-            publishedUrl, 
-            deploymentId 
-        });
-
-    } catch (error) {
-        console.error('Vercel publishing error:', error);
-        return NextResponse.json({ message: 'An unexpected error occurred during publishing.' }, { status: 500 });
+export async function POST(request: NextRequest) {
+  try {
+    const { siteId } = await request.json();
+    if (!siteId) {
+      return NextResponse.json({ message: 'Site ID is required' }, { status: 400 });
     }
+
+    const { decoded } = await requireTenantScope(request);
+    const db = getAdminDb();
+    const siteRef = db.collection('sites').doc(siteId);
+    const siteSnap = await siteRef.get();
+
+    if (!siteSnap.exists) {
+      return NextResponse.json({ message: 'Site not found' }, { status: 404 });
+    }
+
+    const siteData = siteSnap.data() || {};
+    const ownerUid = siteData.ownerUid as string | undefined;
+    if (ownerUid && ownerUid !== decoded.uid) {
+      return NextResponse.json({ message: 'Forbidden' }, { status: 403 });
+    }
+
+    const rootDomain = normalizeDomain(process.env.NEXT_PUBLIC_ROOT_DOMAIN || 'entrestate.com');
+    const siteDomain = normalizeDomain(process.env.NEXT_PUBLIC_SITE_DOMAIN || `site.${rootDomain}`);
+    const existingSubdomain = typeof siteData.subdomain === 'string' ? siteData.subdomain : '';
+    const suffix = siteId.slice(0, 4);
+    const baseSlug = slugify(String(siteData.title || 'site'));
+    const subdomain = existingSubdomain || (baseSlug ? `${baseSlug}-${suffix}` : `site-${suffix}`);
+    const customDomain = typeof siteData.customDomain === 'string' ? siteData.customDomain : '';
+    const publishedUrl = customDomain ? `https://${customDomain}` : `https://${subdomain}.${siteDomain}`;
+
+    await siteRef.set(
+      {
+        published: true,
+        publishedUrl,
+        subdomain,
+        lastPublishedAt: FieldValue.serverTimestamp(),
+      },
+      { merge: true }
+    );
+
+    return NextResponse.json({
+      siteId,
+      publishedUrl,
+      subdomain,
+    });
+  } catch (error) {
+    console.error('[publish/vercel] error', error);
+    if (error instanceof UnauthorizedError) {
+      return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
+    }
+    if (error instanceof ForbiddenError) {
+      return NextResponse.json({ message: 'Forbidden' }, { status: 403 });
+    }
+    return NextResponse.json({ message: 'An unexpected error occurred during publishing.' }, { status: 500 });
+  }
 }

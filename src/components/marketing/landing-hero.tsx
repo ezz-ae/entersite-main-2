@@ -6,7 +6,6 @@ import {
   ArrowRight, 
   UploadCloud, 
   FileText, 
-  Zap, 
   CheckCircle2, 
   Sparkles,
   Loader2
@@ -82,16 +81,16 @@ export function LandingHero() {
             className="space-y-6"
         >
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-500/10 border border-blue-500/20 text-[10px] font-bold uppercase tracking-[0.3em] text-blue-500 mb-4">
-                <Sparkles className="h-3 w-3" /> Industry First: Brochure-to-Web AI
+                <Sparkles className="h-3 w-3" /> Brochure to Listing Page
             </div>
             
             <h1 className="text-6xl md:text-8xl lg:text-9xl font-black tracking-tighter leading-[0.9]">
-                PDF to <br />
-                <span className="text-blue-600">Empire.</span>
+                Brochure to <br />
+                <span className="text-blue-600">Listing Page.</span>
             </h1>
             
             <p className="text-xl md:text-2xl text-zinc-400 max-w-2xl mx-auto font-light leading-relaxed">
-                Drop your project brochure. Our AI extracts the data and builds a high-converting landing page in seconds.
+                Upload your brochure and get a clean listing page ready to share with buyers.
             </p>
         </motion.div>
 
@@ -131,13 +130,13 @@ export function LandingHero() {
                     <UploadCloud className="h-10 w-10 text-white" />
                   </div>
                   <div className="space-y-2">
-                    <p className="text-2xl font-bold">Drop your Brochure (PDF)</p>
-                    <p className="text-zinc-500 font-medium">Any project, any developer. Instant results.</p>
+                    <p className="text-2xl font-bold">Upload your brochure (PDF)</p>
+                    <p className="text-zinc-500 font-medium">Any project, any developer. Preview in minutes.</p>
                   </div>
                   <div className="flex gap-4 text-[10px] font-bold uppercase tracking-widest text-zinc-600">
-                    <span className="flex items-center gap-1.5"><CheckCircle2 className="h-3.5 w-3.5 text-blue-500" /> Extracts ROI</span>
+                    <span className="flex items-center gap-1.5"><CheckCircle2 className="h-3.5 w-3.5 text-blue-500" /> Key Details</span>
                     <span className="flex items-center gap-1.5"><CheckCircle2 className="h-3.5 w-3.5 text-blue-500" /> Floor Plans</span>
-                    <span className="flex items-center gap-1.5"><CheckCircle2 className="h-3.5 w-3.5 text-blue-500" /> Lead Sync</span>
+                    <span className="flex items-center gap-1.5"><CheckCircle2 className="h-3.5 w-3.5 text-blue-500" /> Lead Form</span>
                   </div>
                 </motion.div>
               ) : (
@@ -155,7 +154,7 @@ export function LandingHero() {
                     </div>
                   </div>
                   <div className="space-y-4 w-full max-w-xs">
-                    <p className="text-xl font-bold text-white">Analyzing Architectural Data...</p>
+                    <p className="text-xl font-bold text-white">Reading your brochure...</p>
                     <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
                       <motion.div 
                         className="h-full bg-blue-600"
@@ -171,9 +170,9 @@ export function LandingHero() {
           </div>
           
           <div className="mt-8 flex justify-center items-center gap-4 text-zinc-500">
-            <span className="text-xs font-medium">Or start with a simple prompt</span>
+            <span className="text-xs font-medium">Or start with a quick form</span>
             <ArrowRight className="h-3 w-3" />
-            <Link href="/start" className="text-white font-bold text-xs hover:underline">Launch Architect</Link>
+            <Link href="/start" className="text-white font-bold text-xs hover:underline">Start without a brochure</Link>
          </div>
        </motion.div>
      </div>

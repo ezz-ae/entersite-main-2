@@ -42,6 +42,20 @@ const nextConfig = {
             bodySizeLimit: '4.5mb',
         },
     },
+    async rewrites() {
+        const rootDomain = process.env.NEXT_PUBLIC_ROOT_DOMAIN || 'entrestate.com';
+        const siteDomain = process.env.NEXT_PUBLIC_SITE_DOMAIN || `site.${rootDomain}`;
+        const normalizedSiteDomain = siteDomain.replace(/^https?:\/\//, '').replace(/\/+$/, '');
+        const hostPattern = `(?<subdomain>[^.]+)\\.${normalizedSiteDomain.replace(/\./g, '\\.')}`;
+
+        return [
+            {
+                source: '/:path*',
+                has: [{ type: 'host', value: hostPattern }],
+                destination: '/p/:subdomain',
+            },
+        ];
+    },
 };
 
 export default nextConfig;

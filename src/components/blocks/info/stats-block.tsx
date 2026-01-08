@@ -16,13 +16,13 @@ interface StatsBlockProps {
 }
 
 export function StatsBlock({
-  headline = "Numbers That Speak For Themselves",
-  subtext = "Our track record of success in the real estate market.",
+  headline = "Highlights That Build Trust",
+  subtext = "Add the proof points your buyers care about.",
   stats = [
-      { value: "10B+", label: "Sales Volume (AED)", icon: <Trophy className="h-6 w-6" /> },
-      { value: "5,000+", label: "Happy Clients", icon: <Users className="h-6 w-6" /> },
-      { value: "15+", label: "Years Experience", icon: <Star className="h-6 w-6" /> },
-      { value: "98%", label: "Client Satisfaction", icon: <Check className="h-6 w-6" /> },
+      { value: "Fast", label: "Setup", icon: <Trophy className="h-6 w-6" /> },
+      { value: "Mobile", label: "First", icon: <Users className="h-6 w-6" /> },
+      { value: "Clear", label: "Details", icon: <Star className="h-6 w-6" /> },
+      { value: "Trusted", label: "Support", icon: <Check className="h-6 w-6" /> },
   ]
 }: StatsBlockProps) {
   return (

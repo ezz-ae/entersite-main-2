@@ -18,14 +18,21 @@ interface HeroLeadFormBlockProps {
 
 export function HeroLeadFormBlock({
   headline = "Find Your Dream Home in Dubai",
-  subtext = "Browse thousands of verified listings and get exclusive offers directly from developers.",
+  subtext = "Browse available listings and request offers directly from developers.",
   backgroundImage = "https://images.unsplash.com/photo-1512453979798-5ea904ac66de?auto=format&fit=crop&q=80&w=2000",
   tenantId = "public",
   projectName,
   siteId,
 }: HeroLeadFormBlockProps) {
   const attribution = useCampaignAttribution();
-  const [formState, setFormState] = useState({ location: "", propertyType: "", priceRange: "" });
+  const [formState, setFormState] = useState({
+    location: "",
+    propertyType: "",
+    priceRange: "",
+    name: "",
+    email: "",
+    phone: "",
+  });
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
@@ -36,6 +43,9 @@ export function HeroLeadFormBlock({
       await captureLead({
         source: "hero-lead-form",
         project: projectName || formState.location || "Hero Form Lead",
+        name: formState.name,
+        email: formState.email,
+        phone: formState.phone,
         context: { page: 'hero-lead-form', buttonId: 'hero-lead-search', service: 'listings' },
         metadata: { ...formState, siteId },
         attribution: attribution ?? undefined,
@@ -77,8 +87,8 @@ export function HeroLeadFormBlock({
                     <Button variant="outline" onClick={() => setSubmitted(false)}>Submit another search</Button>
                   </div>
                 ) : (
-                  <form className="flex flex-col md:flex-row gap-2" onSubmit={handleSubmit}>
-                      <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-2">
+                  <form className="flex flex-col gap-3" onSubmit={handleSubmit}>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
                           <Input
                             placeholder="Location (e.g. Dubai Marina)"
                             className="h-12 border-none bg-gray-50 focus:ring-0"
@@ -109,8 +119,32 @@ export function HeroLeadFormBlock({
                               <option value="3m-plus">3M+ AED</option>
                           </select>
                       </div>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+                          <Input
+                            placeholder="Your Name"
+                            className="h-12 border-none bg-gray-50 focus:ring-0"
+                            value={formState.name}
+                            onChange={(e) => setFormState((prev) => ({ ...prev, name: e.target.value }))}
+                            required
+                          />
+                          <Input
+                            placeholder="Email"
+                            type="email"
+                            className="h-12 border-none bg-gray-50 focus:ring-0"
+                            value={formState.email}
+                            onChange={(e) => setFormState((prev) => ({ ...prev, email: e.target.value }))}
+                            required
+                          />
+                          <Input
+                            placeholder="Phone (optional)"
+                            type="tel"
+                            className="h-12 border-none bg-gray-50 focus:ring-0"
+                            value={formState.phone}
+                            onChange={(e) => setFormState((prev) => ({ ...prev, phone: e.target.value }))}
+                          />
+                      </div>
                       <Button type="submit" size="lg" className="h-12 px-8 text-base" disabled={loading}>
-                        {loading ? 'Matching inventory…' : 'Search'}
+                        {loading ? 'Sending…' : 'Get Listings'}
                       </Button>
                   </form>
                 )}

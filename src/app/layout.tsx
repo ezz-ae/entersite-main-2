@@ -19,21 +19,21 @@ const inter = localFont({
 });
 
 export const metadata: Metadata = {
-  title: 'Entrestate OS',
+  title: 'Entrestate',
   description:
-    'The operating system for real estate developers and marketers. Launch a full-featured website, generate leads, and manage your sales pipeline, all in one place.',
+    'All-in-one real estate platform to launch websites, generate leads, and manage your pipeline in one place.',
   metadataBase: new URL('https://entrestate.com'),
   openGraph: {
     type: 'website',
     locale: 'en_US',
     url: 'https://entrestate.com',
-    siteName: 'Entrestate OS',
+    siteName: 'Entrestate',
     images: [
       {
         url: '/og-image.jpg',
         width: 1200,
         height: 630,
-        alt: 'Entrestate OS',
+        alt: 'Entrestate',
       },
     ],
   },

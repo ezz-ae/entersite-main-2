@@ -1,12 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAuth, UnauthorizedError, ForbiddenError } from '@/server/auth';
 import { getAdminDb } from '@/server/firebase-admin';
-import { DEFAULT_MARKETING_METRICS } from '@/data/marketing-metrics';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
-const DEFAULT_CAMPAIGNS = DEFAULT_MARKETING_METRICS.campaigns;
 
 export async function GET(req: NextRequest) {
   try {
@@ -21,7 +19,7 @@ export async function GET(req: NextRequest) {
       .get();
 
     if (snapshot.empty) {
-      return NextResponse.json({ data: DEFAULT_CAMPAIGNS });
+      return NextResponse.json({ data: [] });
     }
 
     const campaigns = snapshot.docs.map((doc) => ({
@@ -38,6 +36,6 @@ export async function GET(req: NextRequest) {
     if (error instanceof ForbiddenError) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
-    return NextResponse.json({ data: DEFAULT_CAMPAIGNS });
+    return NextResponse.json({ data: [] });
   }
 }

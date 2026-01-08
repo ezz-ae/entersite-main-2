@@ -75,7 +75,7 @@ export function BuilderLandingPage({ onStartWithAI, onChooseTemplate }: BuilderL
                   <UploadCloud className="h-10 w-10 text-blue-500" />
               </div>
               <h1 className="text-4xl font-bold tracking-tight">Upload Project Brochure</h1>
-              <p className="text-zinc-400 text-lg">Drop your PDF here. Our AI Architect will extract the data and build your landing page instantly.</p>
+              <p className="text-zinc-400 text-lg">Drop your PDF here. We will pull the key details and build your page.</p>
               
               <label htmlFor="pdf-upload" className="border-2 border-dashed border-white/10 rounded-[2.5rem] p-12 bg-white/5 hover:bg-white/10 transition-all cursor-pointer group block">
                   <input id="pdf-upload" type="file" className="sr-only" onChange={handleFileChange} accept=".pdf"/>
@@ -98,7 +98,7 @@ export function BuilderLandingPage({ onStartWithAI, onChooseTemplate }: BuilderL
 
               <div className="pt-8 flex flex-col gap-4">
                   <Button onClick={() => onStartWithAI("Built from brochure")} className="h-16 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-lg w-full" disabled={!file}>
-                      Architect from Document
+                      Build from Brochure
                   </Button>
                   <button onClick={() => setStep('category')} className="text-zinc-500 font-bold uppercase tracking-widest text-xs hover:text-white transition-colors">
                       Cancel & Go Back
@@ -113,8 +113,8 @@ function CategorySelectionScreen({ onSelect }: { onSelect: (cat: any) => void; }
   return (
     <div className="min-h-screen w-screen bg-zinc-950 text-white flex flex-col items-center justify-center p-8">
       <div className="text-center mb-16 space-y-4">
-        <h1 className="text-5xl md:text-7xl font-bold tracking-tight">How will you build?</h1>
-        <p className="text-zinc-500 text-xl max-w-2xl mx-auto font-light leading-relaxed">Select a starting point. Every path is powered by Entrestate Intelligence.</p>
+        <h1 className="text-5xl md:text-7xl font-bold tracking-tight">Choose how to start.</h1>
+        <p className="text-zinc-500 text-xl max-w-2xl mx-auto font-light leading-relaxed">Select a starting point. We guide you step by step.</p>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl w-full">
         {projectCategories.map(cat => (

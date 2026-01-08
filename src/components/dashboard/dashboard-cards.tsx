@@ -4,28 +4,24 @@ import React from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { 
-  LayoutDashboard, 
   Globe, 
-  Megaphone, 
   Users, 
-  Bot, 
-  ImageIcon, 
-  Palette,
-  Briefcase
+  MessageSquare,
+  Search,
+  Smartphone,
+  Mail,
+  Palette
 } from 'lucide-react';
-import { cn } from '@/lib/utils';
 
 const services = [
-    { name: 'Overview', href: '/dashboard', icon: LayoutDashboard, description: 'View key metrics and updates.' },
-    { name: 'My Sites', href: '/dashboard/sites', icon: Globe, description: 'Manage your public websites.' },
-    { name: 'Domain', href: '/dashboard/domain', icon: Globe, description: 'Connect and manage your domains.' },
-    { name: 'Marketing & Ads', href: '/dashboard/marketing', icon: Megaphone, description: 'Run campaigns and track performance.' },
-    { name: 'CRM & Leads', href: '/dashboard/leads', icon: Users, description: 'Manage customer relationships.' },
-    { name: 'AI Tools', href: '/dashboard/ai-tools', icon: Bot, description: 'Leverage AI for your business.' },
-    { name: 'Assets', href: '/dashboard/assets', icon: ImageIcon, description: 'Manage your media and files.' },
-    { name: 'Brand Kit', href: '/dashboard/brand', icon: Palette, description: 'Define your brand identity.' },
-    { name: 'Team', href: '/dashboard/team', icon: Users, description: 'Manage your team members.' },
-    { name: 'Jobs', href: '/admin/jobs', icon: Briefcase, description: 'Manage job openings.' },
+    { name: 'Website Builder', href: '/dashboard/sites', icon: Globe, description: 'Create and publish project pages.' },
+    { name: 'Chat Assistant', href: '/dashboard/chat-agent', icon: MessageSquare, description: 'Answer buyer questions automatically.' },
+    { name: 'Google Ads', href: '/dashboard/google-ads', icon: Search, description: 'Launch and monitor search campaigns.' },
+    { name: 'Buyer Audience', href: '/dashboard/meta-audience', icon: Users, description: 'Activate your buyer list.' },
+    { name: 'SMS Campaigns', href: '/dashboard/sms-marketing', icon: Smartphone, description: 'Send quick updates to buyers.' },
+    { name: 'Email Campaigns', href: '/dashboard/email-marketing', icon: Mail, description: 'Send project announcements fast.' },
+    { name: 'Leads', href: '/dashboard/leads', icon: Users, description: 'Track and follow up with leads.' },
+    { name: 'Brand Kit', href: '/dashboard/brand', icon: Palette, description: 'Keep logos and colors consistent.' },
 ];
 
 const cardVariants = {

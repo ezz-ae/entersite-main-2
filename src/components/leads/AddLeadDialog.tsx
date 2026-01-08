@@ -12,7 +12,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { apiFetch } from '@/lib/apiFetch';
+import { authorizedFetch } from '@/lib/auth-fetch';
 import { getAuth } from 'firebase/auth';
 import { useAuthState } from 'react-firebase-hooks/auth';
 
@@ -44,13 +44,9 @@ export function AddLeadDialog({ open, onOpenChange, onLeadAdded }: AddLeadDialog
       if (!user) {
         throw new Error('You must be logged in to add a lead.');
       }
-      const token = await user.getIdToken();
-      const res = await apiFetch('/api/leads/create', {
+      const res = await authorizedFetch('/api/leads/create', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, email, phone, message }),
       });
 

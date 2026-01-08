@@ -10,7 +10,7 @@ import { apiFetch } from '@/lib/apiFetch';
 import { useToast } from '@/hooks/use-toast';
 import { Slider } from '@/components/ui/slider';
 
-const steps = ['Goal', 'Targeting', 'Keywords', 'Ad Creative', 'Budget', 'Launch'];
+const steps = ['Goal', 'Targeting', 'Keywords', 'Ad Creative', 'Budget', 'Review'];
 
 // Mock data for goals
 const goals = [
@@ -31,7 +31,7 @@ export function CampaignWizard({ onCampaignCreated }: { onCampaignCreated: (camp
   const handlePrev = () => setCurrentStep(prev => Math.max(prev - 1, 0));
 
   const handleUpdateForm = (field: string, value: any) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData((prev: Record<string, any>) => ({ ...prev, [field]: value }));
   };
 
   const handleFetchKeywords = async () => {
@@ -59,10 +59,10 @@ export function CampaignWizard({ onCampaignCreated }: { onCampaignCreated: (camp
       });
       const newCampaign = await res.json();
       if (res.ok) {
-        toast({ title: 'Campaign Launched!', description: 'Your new campaign is now live.' });
+        toast({ title: 'Draft Saved', description: 'Your campaign draft is ready.' });
         onCampaignCreated(newCampaign);
       } else {
-        toast({ title: 'Error', description: 'Could not launch campaign.', variant: 'destructive' });
+        toast({ title: 'Error', description: 'Could not save draft.', variant: 'destructive' });
       }
     } catch (error) {
       toast({ title: 'Error', description: 'Could not launch campaign.', variant: 'destructive' });
@@ -151,10 +151,10 @@ export function CampaignWizard({ onCampaignCreated }: { onCampaignCreated: (camp
             />
           </div>
         );
-      case 5: // Launch
+      case 5: // Review
         return (
           <div>
-            <h3 className="font-bold mb-4">Review Campaign</h3>
+            <h3 className="font-bold mb-4">Review Draft</h3>
             <p><strong>Goal:</strong> {formData.goal}</p>
             <p><strong>Location:</strong> {formData.location}</p>
             <p><strong>Keywords:</strong> {keywords.length}</p>
@@ -169,7 +169,7 @@ export function CampaignWizard({ onCampaignCreated }: { onCampaignCreated: (camp
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Create New Campaign</CardTitle>
+        <CardTitle>Create Campaign Draft</CardTitle>
         <CardDescription>Step {currentStep + 1} of {steps.length}: {steps[currentStep]}</CardDescription>
       </CardHeader>
       <CardContent>
@@ -184,7 +184,7 @@ export function CampaignWizard({ onCampaignCreated }: { onCampaignCreated: (camp
           {currentStep === steps.length - 1 ? (
             <Button onClick={handleLaunch} disabled={isLoading}>
               {isLoading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
-              Launch Campaign
+              Save Draft
             </Button>
           ) : (
             <Button onClick={handleNext}>

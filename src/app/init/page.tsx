@@ -32,17 +32,17 @@ export default function InitControlRoom() {
 
     useEffect(() => {
         const events = [
-            "Initializing OS Kernel...",
-            "Synchronizing with Master Node Dubai-01",
-            "Verifying AI Logic Cluster (Vertex AI)",
-            "Auditing Firestore Security Rules",
-            "Handshake with Vercel Edge Node",
-            "Payment Gateway Heartbeat: PayPal Active",
-            "Payment Gateway Heartbeat: Ziina Active",
-            "Messaging Node: SendGrid Ready",
-            "Messaging Node: Twilio Ready",
-            "System Integrity Check: 100% Secure",
-            "DEPLOYMENT READY."
+            "Starting your system...",
+            "Connecting to the Dubai data feed...",
+            "Checking smart features...",
+            "Checking data security...",
+            "Confirming hosting network...",
+            "Payment gateway check: PayPal active",
+            "Payment gateway check: Ziina active",
+            "Email service ready",
+            "SMS service ready",
+            "System check: all clear",
+            "READY TO LAUNCH."
         ];
 
         let i = 0;
@@ -68,13 +68,13 @@ export default function InitControlRoom() {
             <div className="max-w-[1800px] mx-auto flex justify-between items-start mb-20 border-b border-white/5 pb-8 relative z-10">
                 <div className="flex gap-10">
                     <div className="space-y-1">
-                        <p className="text-[10px] font-black text-zinc-600 uppercase tracking-[0.3em]">System OS</p>
-                        <h1 className="text-3xl font-black text-white italic uppercase tracking-tighter">Entrestate Control</h1>
+                        <p className="text-[10px] font-black text-zinc-600 uppercase tracking-[0.3em]">System</p>
+                        <h1 className="text-3xl font-black text-white italic uppercase tracking-tighter">Entrestate Status</h1>
                     </div>
                     <div className="h-12 w-px bg-white/5" />
                     <div className="space-y-1">
-                        <p className="text-[10px] font-black text-zinc-600 uppercase tracking-[0.3em]">Global Node</p>
-                        <p className="text-xl font-bold text-blue-500 uppercase">DXB-MASTER-01</p>
+                        <p className="text-[10px] font-black text-zinc-600 uppercase tracking-[0.3em]">Primary Region</p>
+                        <p className="text-xl font-bold text-blue-500 uppercase">Dubai (DXB)</p>
                     </div>
                 </div>
                 
@@ -84,7 +84,7 @@ export default function InitControlRoom() {
                         <div className="flex items-center gap-2">
                             <div className={cn("w-2 h-2 rounded-full animate-pulse", status === 'live' ? "bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.5)]" : "bg-orange-500")} />
                             <span className={cn("text-xs font-bold uppercase", status === 'live' ? "text-green-500" : "text-orange-500")}>
-                                {status === 'live' ? 'System Fully Operational' : 'Synchronizing Clusters...'}
+                                {status === 'live' ? 'All Systems Ready' : 'Getting things ready...'}
                             </span>
                         </div>
                     </div>
@@ -97,7 +97,7 @@ export default function InitControlRoom() {
                 <div className="lg:col-span-1 space-y-8">
                      <div className="space-y-4">
                         <h4 className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-zinc-500">
-                            <Terminal className="h-3 w-3" /> Boot Sequence
+                            <Terminal className="h-3 w-3" /> Startup Status
                         </h4>
                         <div className="bg-zinc-900/50 border border-white/5 rounded-2xl p-6 h-[400px] overflow-hidden">
                             <div className="space-y-2">
@@ -116,29 +116,29 @@ export default function InitControlRoom() {
                      </div>
 
                      <div className="p-8 rounded-2xl bg-blue-600/5 border border-blue-500/10 space-y-4">
-                        <h4 className="text-[10px] font-black uppercase text-blue-500 tracking-widest">Active Intelligence</h4>
+                        <h4 className="text-[10px] font-black uppercase text-blue-500 tracking-widest">Smart Insights</h4>
                         <p className="text-xs text-zinc-400 leading-relaxed font-medium italic">
-                            "AI Agents are currently processing 1,240+ project data points for the live dashboard feed."
+                            "Your dashboard is preparing the latest project insights."
                         </p>
                      </div>
                 </div>
 
                 {/* 3. CORE INFRASTRUCTURE STATUS */}
                 <div className="lg:col-span-3 grid md:grid-cols-3 gap-8">
-                    <StatusCard title="Database Node" icon={Database} status="Connected" sub="Firestore Persistence" />
-                    <StatusCard title="AI Intelligence" icon={Cpu} status="Optimized" sub="Gemini & Vertex AI" />
-                    <StatusCard title="Edge Network" icon={Globe} status="Live" sub="Vercel Nodes Active" />
-                    <StatusCard title="Messaging Hub" icon={Radio} status="Ready" sub="Twilio & SendGrid Sync" />
-                    <StatusCard title="Revenue Engine" icon={CreditCard} status="Secure" sub="PayPal & Ziina Wired" />
-                    <StatusCard title="Ad Master Node" icon={Target} status="Standby" sub="Google Ads API Pool" />
+                    <StatusCard title="Database" icon={Database} status="Connected" sub="Secure data storage" />
+                    <StatusCard title="Smart Assistant" icon={Cpu} status="Optimized" sub="Smart recommendations" />
+                    <StatusCard title="Hosting Network" icon={Globe} status="Live" sub="Fast global hosting" />
+                    <StatusCard title="Messaging" icon={Radio} status="Ready" sub="Email & SMS ready" />
+                    <StatusCard title="Payments" icon={CreditCard} status="Secure" sub="Payments connected" />
+                    <StatusCard title="Ads Center" icon={Target} status="Standby" sub="Google Ads ready" />
 
                     {/* BIG STATUS MONITOR */}
                     <div className="md:col-span-3">
                         <Card className="bg-zinc-950 border-white/5 rounded-[3rem] overflow-hidden border-2 border-blue-600/20 shadow-2xl">
                             <div className="p-10 border-b border-white/5 flex justify-between items-center bg-zinc-900/20">
                                 <div>
-                                    <h3 className="text-xl font-bold text-white uppercase italic tracking-tighter">System Pulse Monitor</h3>
-                                    <p className="text-[10px] text-zinc-500 font-black uppercase tracking-widest mt-1">Real-time Latency Across Global Nodes</p>
+                                    <h3 className="text-xl font-bold text-white uppercase italic tracking-tighter">System Health Monitor</h3>
+                                    <p className="text-[10px] text-zinc-500 font-black uppercase tracking-widest mt-1">Live performance across regions</p>
                                 </div>
                                 <Badge className="bg-green-500/10 text-green-500 border-0 text-[10px] font-black uppercase px-4 py-2 rounded-full">Optimal Performance</Badge>
                             </div>
@@ -159,10 +159,10 @@ export default function InitControlRoom() {
                                     ))}
                                 </div>
                                 <div className="grid grid-cols-4 gap-10 mt-12 pt-10 border-t border-white/5">
-                                    <MetricItem label="AI Latency" value="840ms" />
-                                    <MetricItem label="DB Throughput" value="12.4K req/s" />
-                                    <MetricItem label="Network Uptime" value="99.99%" />
-                                    <MetricItem label="Load Balancing" value="Active" />
+                                    <MetricItem label="Smart Response Time" value="840ms" />
+                                    <MetricItem label="Data Speed" value="12.4K req/s" />
+                                    <MetricItem label="Uptime" value="99.99%" />
+                                    <MetricItem label="Traffic Balance" value="Active" />
                                 </div>
                             </CardContent>
                         </Card>

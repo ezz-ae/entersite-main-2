@@ -17,9 +17,7 @@ import {
   Download,
   Plus,
   Zap,
-  CheckCircle2,
   Clock,
-  ChevronRight,
   Loader2,
   X
 } from 'lucide-react';
@@ -43,7 +41,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { Textarea } from '@/components/ui/textarea';
-import { apiFetch } from '@/lib/apiFetch';
+import { authorizedFetch } from '@/lib/auth-fetch';
 import { AddLeadDialog } from '@/components/leads/AddLeadDialog';
 
 interface LeadRecord {
@@ -75,6 +73,11 @@ export default function LeadCrmPage() {
   const [statusFilter, setStatusFilter] = useState<'all' | LeadRecord['status']>('all');
   const [priorityFilter, setPriorityFilter] = useState<'all' | LeadRecord['priority']>('all');
   const [isAddLeadOpen, setAddLeadOpen] = useState(false);
+  const [settingsLoading, setSettingsLoading] = useState(true);
+  const [settingsSaving, setSettingsSaving] = useState(false);
+  const [notificationEmail, setNotificationEmail] = useState('');
+  const [crmWebhookUrl, setCrmWebhookUrl] = useState('');
+  const [settingsMessage, setSettingsMessage] = useState<string | null>(null);
 
   const loadLeads = useCallback(async () => {
     if (!user) return;
@@ -85,7 +88,7 @@ export default function LeadCrmPage() {
         tenantId: user.uid,
         limit: '20',
       });
-      const res = await apiFetch(`/api/leads/list?${params.toString()}`, {
+      const res = await authorizedFetch(`/api/leads/list?${params.toString()}`, {
         cache: 'no-store',
       });
       if (res.ok) {
@@ -104,6 +107,23 @@ export default function LeadCrmPage() {
     }
   }, [user]);
 
+  const loadSettings = useCallback(async () => {
+    if (!user) return;
+    try {
+      setSettingsLoading(true);
+      const res = await authorizedFetch('/api/leads/settings', { cache: 'no-store' });
+      if (res.ok) {
+        const data = await res.json();
+        setNotificationEmail(data.settings?.notificationEmail || '');
+        setCrmWebhookUrl(data.settings?.crmWebhookUrl || '');
+      }
+    } catch (fetchError) {
+      console.error('Failed to load lead settings', fetchError);
+    } finally {
+      setSettingsLoading(false);
+    }
+  }, [user]);
+
   useEffect(() => {
     if (authLoading) {
       setLoading(true);
@@ -116,7 +136,8 @@ export default function LeadCrmPage() {
       return;
     }
     loadLeads();
-  }, [authLoading, loadLeads, user]);
+    loadSettings();
+  }, [authLoading, loadLeads, loadSettings, user]);
 
   const filteredLeads = leads.filter(lead => {
     const searchTermLower = searchTerm.toLowerCase();
@@ -147,18 +168,83 @@ export default function LeadCrmPage() {
     setAddLeadOpen(false);
   };
 
+  const handleSaveSettings = async () => {
+    if (!user) return;
+    try {
+      setSettingsSaving(true);
+      setSettingsMessage(null);
+      const res = await authorizedFetch('/api/leads/settings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          notificationEmail: notificationEmail || null,
+          crmWebhookUrl: crmWebhookUrl || null,
+        }),
+      });
+      if (res.ok) {
+        setSettingsMessage('Saved!');
+      } else {
+        setSettingsMessage('Could not save settings.');
+      }
+    } catch (error) {
+      console.error('Failed to save lead settings', error);
+      setSettingsMessage('Could not save settings.');
+    } finally {
+      setSettingsSaving(false);
+    }
+  };
+
+  const handleExport = () => {
+    if (!leads.length) return;
+    const headers = ['Name', 'Email', 'Phone', 'Project', 'Source', 'Status', 'Priority', 'Created At'];
+    const rows = leads.map((lead) => ([
+      lead.name || '',
+      lead.email || '',
+      lead.phone || '',
+      lead.project || '',
+      lead.source || '',
+      lead.status || '',
+      lead.priority || '',
+      lead.createdAt || '',
+    ]));
+    const csv = [headers, ...rows]
+      .map((row) => row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(','))
+      .join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `entrestate-leads-${new Date().toISOString().slice(0, 10)}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
+  const handleJumpToSettings = () => {
+    const el = document.getElementById('lead-settings');
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
+
   return (
     <div className="space-y-10 animate-in fade-in duration-700">
       
       {/* Header */}
       <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 border-b border-white/5 pb-10">
         <div>
-          <h1 className="text-4xl font-black tracking-tight text-white uppercase">Investor Relationship Manager</h1>
-          <p className="text-zinc-500 text-xl font-light">Monitor, qualify, and engage every investor lead from a unified command center.</p>
+          <h1 className="text-4xl font-black tracking-tight text-white uppercase">Leads</h1>
+          <p className="text-zinc-500 text-xl font-light">Track, qualify, and follow up with every inquiry in one place.</p>
         </div>
         <div className="flex gap-3 w-full lg:w-auto">
-            <Button variant="outline" className="flex-1 lg:flex-none h-12 rounded-full border-white/10 bg-white/5 text-zinc-400 font-bold gap-2">
-                <Download className="h-4 w-4" /> Export Data
+            <Button
+              variant="outline"
+              className="flex-1 lg:flex-none h-12 rounded-full border-white/10 bg-white/5 text-zinc-400 font-bold gap-2"
+              onClick={handleExport}
+              disabled={!leads.length}
+            >
+                <Download className="h-4 w-4" /> Export CSV
             </Button>
             <Button className="flex-1 lg:flex-none h-12 rounded-full bg-blue-600 hover:bg-blue-700 font-bold gap-2" onClick={() => setAddLeadOpen(true)}>
                 <Plus className="h-4 w-4" /> Add Lead
@@ -302,24 +388,52 @@ export default function LeadCrmPage() {
                 </CardHeader>
                 <CardContent className="relative z-10 p-10 pt-0 space-y-8">
                     <p className="text-blue-100 font-medium">Never miss an opportunity. Get new leads delivered directly to your phone via WhatsApp or SMS in real-time.</p>
-                    <Button className="w-full h-14 rounded-2xl bg-white text-blue-600 font-black text-lg hover:bg-zinc-100 shadow-xl">
-                        Activate Now
+                    <Button
+                        className="w-full h-14 rounded-2xl bg-white text-blue-600 font-black text-lg hover:bg-zinc-100 shadow-xl"
+                        onClick={handleJumpToSettings}
+                    >
+                        Add Notification Email
                     </Button>
                 </CardContent>
              </Card>
 
-             <Card className="bg-zinc-950 border-white/5 rounded-[2.5rem] p-10 space-y-8">
-                <h4 className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">CRM Integration Bridge</h4>
-                <div className="space-y-4">
-                    <CrmButton name="HubSpot" active={true} />
-                    <CrmButton name="Salesforce" active={false} />
-                    <CrmButton name="Custom Webhook" active={false} />
+             <Card id="lead-settings" className="bg-zinc-950 border-white/5 rounded-[2.5rem] p-10 space-y-8">
+                <div className="space-y-2">
+                    <h4 className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Lead Notifications</h4>
+                    <p className="text-sm text-zinc-400">Every new lead is sent to this email.</p>
+                    <Input
+                        placeholder="you@brokerage.com"
+                        className="bg-black/40 border-white/10 h-12 rounded-xl"
+                        value={notificationEmail}
+                        onChange={(e) => setNotificationEmail(e.target.value)}
+                        disabled={settingsLoading}
+                    />
                 </div>
+                <div className="space-y-2">
+                    <h4 className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">CRM Connection Link (Optional)</h4>
+                    <p className="text-sm text-zinc-400">Paste your CRM connection link to auto-send new leads.</p>
+                    <Input
+                        placeholder="https://connect.your-crm.com/lead"
+                        className="bg-black/40 border-white/10 h-12 rounded-xl"
+                        value={crmWebhookUrl}
+                        onChange={(e) => setCrmWebhookUrl(e.target.value)}
+                        disabled={settingsLoading}
+                    />
+                </div>
+                <Button
+                    className="w-full h-12 rounded-xl bg-white text-black font-bold"
+                    onClick={handleSaveSettings}
+                    disabled={settingsSaving || settingsLoading}
+                >
+                    {settingsSaving ? 'Saving…' : 'Save Settings'}
+                </Button>
+                {settingsMessage && (
+                    <p className="text-xs text-green-500 font-semibold">{settingsMessage}</p>
+                )}
                 <Separator className="bg-white/5" />
-                <div className="flex items-center gap-3 cursor-pointer group">
-                    <div className="w-10 h-10 rounded-xl bg-white/5 group-hover:bg-blue-600 transition-colors flex items-center justify-center text-zinc-500 group-hover:text-white"><Plus className="h-5 w-5" /></div>
-                    <span className="text-xs font-bold text-zinc-500 group-hover:text-white transition-colors uppercase tracking-widest">Request Integration</span>
-                </div>
+                <p className="text-xs text-zinc-500">
+                    Want a direct HubSpot or Salesforce connector? Share your request and we will set it up.
+                </p>
              </Card>
           </div>
 
@@ -347,7 +461,7 @@ function LeadDetailPanel({ lead, onClose, onUpdate }: { lead: LeadRecord, onClos
     const loadNotes = useCallback(async () => {
         try {
             setLoadingNotes(true);
-            const res = await apiFetch(`/api/leads/notes/list?leadId=${lead.id}`);
+            const res = await authorizedFetch(`/api/leads/notes/list?leadId=${lead.id}`);
             if (res.ok) {
                 const data = await res.json();
                 setNotes(data.notes || []);
@@ -368,7 +482,7 @@ function LeadDetailPanel({ lead, onClose, onUpdate }: { lead: LeadRecord, onClos
     const handleAddNote = async () => {
         if (!newNote.trim()) return;
         try {
-            const res = await apiFetch('/api/leads/notes', {
+            const res = await authorizedFetch('/api/leads/notes', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ leadId: lead.id, note: newNote }),
@@ -387,7 +501,7 @@ function LeadDetailPanel({ lead, onClose, onUpdate }: { lead: LeadRecord, onClos
     const handleStatusUpdate = async (status: LeadRecord['status']) => {
         setIsUpdating(true);
         try {
-            const res = await apiFetch(`/api/leads/update`, {
+            const res = await authorizedFetch(`/api/leads/update`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ leadId: lead.id, status }),
@@ -459,18 +573,6 @@ function LeadDetailPanel({ lead, onClose, onUpdate }: { lead: LeadRecord, onClos
     );
 }
 
-function CrmButton({ name, active }: any) {
-    return (
-        <div className={cn(
-            "flex items-center justify-between p-4 rounded-2xl border transition-all cursor-pointer group",
-            active ? "bg-green-500/10 border-green-500/30" : "bg-white/5 border-white/5 hover:border-blue-500/30"
-        )}>
-            <span className={cn("text-sm font-bold", active ? "text-green-400" : "text-zinc-400 group-hover:text-white")}>{name}</span>
-            {active ? <CheckCircle2 className="h-5 w-5 text-green-500" /> : <ChevronRight className="h-5 w-5 text-zinc-700 group-hover:text-white" />}
-        </div>
-    )
-}
-
 function MetricCard({ label, value, trend, icon: Icon, active }: any) {
     return (
         <Card className="bg-zinc-900/50 border-white/5 rounded-[2rem]">
@@ -496,7 +598,7 @@ function AuthRequiredNotice({ isLoading, message }: { isLoading: boolean; messag
                     {isLoading ? 'Verifying Access' : 'Access Restricted'}
                 </CardTitle>
                 <CardDescription className="text-zinc-500 text-base max-w-md mx-auto">
-                    {isLoading ? 'Checking your credentials to unlock your Investor Relationship Manager.' : (message || 'Please sign in to access your lead intelligence dashboard.')}
+                    {isLoading ? 'Checking your credentials to unlock your lead manager.' : (message || 'Please sign in to access your leads dashboard.')}
                 </CardDescription>
             </CardHeader>
             <CardContent>
@@ -505,7 +607,7 @@ function AuthRequiredNotice({ isLoading, message }: { isLoading: boolean; messag
                         className="h-12 px-10 rounded-full bg-blue-600 font-bold text-white hover:bg-blue-700"
                         onClick={() => window.location.assign('/login')}
                     >
-                        Proceed to Login
+                        Go to Sign In
                     </Button>
                 </div>
             </CardContent>

@@ -17,12 +17,12 @@ interface CityGuideBlockProps {
 export function CityGuideBlock({
   city = "Dubai",
   headline = "Why Invest in Dubai?",
-  description = "Dubai offers a unique combination of high rental yields, tax-free income, and a world-class lifestyle. With a visionary government and robust infrastructure, it remains one of the safest and most profitable real estate markets globally.",
+  description = "Dubai offers modern infrastructure, strong rental demand, and a global lifestyle. Use this section to highlight what makes your area attractive to buyers.",
   stats = [
-      { label: "Tax Free", value: "0% Income Tax" },
-      { label: "High Yields", value: "6-10% ROI" },
-      { label: "Safety", value: "Top 5 Safest Cities" },
-      { label: "Growth", value: "Vision 2040" }
+      { label: "Residency Options", value: "Available" },
+      { label: "Rental Demand", value: "Strong" },
+      { label: "Infrastructure", value: "Modern" },
+      { label: "Lifestyle", value: "Global" }
   ],
   image = "https://images.unsplash.com/photo-1512453979798-5ea904ac66de?auto=format&fit=crop&q=80&w=1200"
 }: CityGuideBlockProps) {
@@ -72,11 +72,11 @@ export function CityGuideBlock({
                     <ul className="space-y-3">
                         <li className="flex items-start gap-3 text-muted-foreground">
                             <div className="w-1.5 h-1.5 rounded-full bg-primary mt-2"></div>
-                            Golden Visa eligibility for property investors.
+                            Residency options may be available for eligible investors.
                         </li>
                         <li className="flex items-start gap-3 text-muted-foreground">
                             <div className="w-1.5 h-1.5 rounded-full bg-primary mt-2"></div>
-                            Regulated market with escrow account protection.
+                            Clear purchase processes and buyer protections.
                         </li>
                         <li className="flex items-start gap-3 text-muted-foreground">
                             <div className="w-1.5 h-1.5 rounded-full bg-primary mt-2"></div>

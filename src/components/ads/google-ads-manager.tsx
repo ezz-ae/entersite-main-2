@@ -87,8 +87,8 @@ export function GoogleAdsManager({
       setTimeout(() => {
           setAdData({
             variations: [
-                { id: "v1", headlines: ["Luxury Marina Apartments", "5-Year Payment Plan"], descriptions: ["Own a piece of the Dubai skyline. Starting from AED 2.5M. Book your viewing today.", "Exclusive waterfront living with world-class amenities."] },
-                { id: "v2", headlines: ["Invest in Dubai Marina", "High ROI Potential"], descriptions: ["Prime location, high rental yields. Perfect for investors.", "Secure your unit with just 10% down payment."] }
+                { id: "v1", headlines: ["Luxury Marina Apartments", "Flexible Payment Plan"], descriptions: ["Own a piece of the Dubai skyline. Book your viewing today.", "Exclusive waterfront living with world-class amenities."] },
+                { id: "v2", headlines: ["Invest in Dubai Marina", "Investor-Friendly Options"], descriptions: ["Prime location with strong rental demand. Perfect for investors.", "Secure your unit with flexible payment options."] }
             ],
             keywordGroups: [
                 { category: "High Intent", keywords: ["buy apartment dubai marina", "luxury flats for sale dubai", "emaar beachfront sale"] },
@@ -130,12 +130,12 @@ export function GoogleAdsManager({
           setStatus('active');
           toast({
               title: "Campaign Funded & Active!",
-              description: `Campaign is now live on the EntreSite Master Node.`,
+              description: `Campaign is now live in your ads dashboard.`,
           });
       } catch (error: any) {
           toast({
               title: 'Failed to launch',
-              description: error?.message || 'Check your authentication.',
+              description: error?.message || 'Please sign in again.',
               variant: 'destructive',
           });
           setStatus('draft');
@@ -192,8 +192,8 @@ export function GoogleAdsManager({
                     <Loader2 className="h-16 w-16 text-blue-500 animate-spin relative z-10" />
                </div>
                <div className="text-center">
-                    <h3 className="text-2xl font-black italic uppercase tracking-tighter">Processing Funding...</h3>
-                    <p className="text-zinc-500 text-sm font-medium mt-2">Deploying to Master Ad Account: Node-01</p>
+                    <h3 className="text-2xl font-black italic uppercase tracking-tighter">Processing Payment...</h3>
+                    <p className="text-zinc-500 text-sm font-medium mt-2">Setting up your ad account...</p>
                </div>
           </div>
       )
@@ -224,7 +224,7 @@ export function GoogleAdsManager({
 
               <Card className="bg-zinc-900/50 border-white/5 rounded-[2.5rem]">
                   <CardHeader>
-                      <CardTitle className="text-sm font-bold uppercase tracking-widest text-zinc-500">Live Yield Analytics</CardTitle>
+                  <CardTitle className="text-sm font-bold uppercase tracking-widest text-zinc-500">Live Performance</CardTitle>
                   </CardHeader>
                   <CardContent className="h-[150px] flex items-end gap-1 pb-4 px-8">
                       {[40, 65, 80, 50, 90, 100, 85, 95, 120, 110].map((h, i) => (
@@ -241,10 +241,10 @@ export function GoogleAdsManager({
         <CardHeader className="p-10 border-b border-white/5">
             <div className="flex justify-between items-start">
                 <div>
-                    <CardTitle className="text-3xl font-bold tracking-tight text-white">Ad Strategy Center</CardTitle>
+                    <CardTitle className="text-3xl font-bold tracking-tight text-white">Ad Setup Center</CardTitle>
                     <CardDescription className="text-zinc-500 text-lg">Managed Google Ads placement for {pageTitle}.</CardDescription>
                 </div>
-                {adData && <Badge className="bg-blue-600/10 text-blue-500 border-blue-500/20 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest">AI Strategy Active</Badge>}
+                {adData && <Badge className="bg-blue-600/10 text-blue-500 border-blue-500/20 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest">Smart Strategy Active</Badge>}
             </div>
         </CardHeader>
         
@@ -252,7 +252,7 @@ export function GoogleAdsManager({
             {status === 'generating' ? (
                 <div className="h-64 flex flex-col items-center justify-center space-y-6">
                     <Loader2 className="h-12 w-12 animate-spin text-blue-500" />
-                    <p className="text-zinc-500 font-bold uppercase tracking-[0.3em] animate-pulse">Mining High-Intent Keywords...</p>
+                    <p className="text-zinc-500 font-bold uppercase tracking-[0.3em] animate-pulse">Finding High-Intent Keywords...</p>
                 </div>
             ) : !adData ? (
                  <div className="space-y-6">
@@ -261,8 +261,8 @@ export function GoogleAdsManager({
                              <Zap className="h-8 w-8 text-blue-500" />
                          </div>
                          <div className="space-y-2">
-                             <h3 className="font-bold text-2xl text-white">Autonomous Launch</h3>
-                             <p className="text-zinc-500 max-w-md mx-auto">AI will architect a sub-campaign on our Master Account. No Google Ads experience needed.</p>
+                             <h3 className="font-bold text-2xl text-white">Quick Launch</h3>
+                             <p className="text-zinc-500 max-w-md mx-auto">We will draft a campaign for you. No Google Ads experience needed.</p>
                          </div>
                          
                          <div className="max-w-xs mx-auto space-y-4 text-left w-full">
@@ -274,7 +274,7 @@ export function GoogleAdsManager({
                                  </div>
                              </div>
                              <Button onClick={handleGenerate} className="w-full h-14 bg-white text-black hover:bg-zinc-200 font-bold rounded-2xl">
-                                 <Sparkles className="h-5 w-5 mr-2" /> Generate Blueprint
+                                 <Sparkles className="h-5 w-5 mr-2" /> Generate Draft
                              </Button>
                          </div>
                      </div>
@@ -291,7 +291,7 @@ export function GoogleAdsManager({
                         <div className="p-8 bg-zinc-900/50 border border-white/5 rounded-[2.5rem] space-y-10">
                              <div className="space-y-6">
                                 <div className="flex justify-between items-center">
-                                    <Label className="text-lg font-bold text-white">Daily Placement Budget</Label>
+                                    <Label className="text-lg font-bold text-white">Daily Budget</Label>
                                     <span className="font-black text-3xl text-blue-500">${budget[0]}</span>
                                 </div>
                                 <Slider value={budget} min={20} max={1000} step={10} onValueChange={setBudget} className="py-4" />
@@ -345,7 +345,7 @@ export function GoogleAdsManager({
                         <div className="p-10 bg-blue-600 rounded-[2.5rem] text-white">
                              <div className="flex justify-between items-center mb-8">
                                 <div>
-                                    <p className="text-[10px] font-bold uppercase tracking-widest opacity-60 mb-2">Total Managed Budget</p>
+                                    <p className="text-[10px] font-bold uppercase tracking-widest opacity-60 mb-2">Total Budget</p>
                                     <p className="text-5xl font-black">${(budget[0] * 30).toLocaleString()}</p>
                                     <p className="text-xs font-bold opacity-60 mt-1">First 30 days of placement</p>
                                 </div>
@@ -355,11 +355,11 @@ export function GoogleAdsManager({
                                 </div>
                              </div>
                              <Button onClick={handleFundCampaign} className="w-full h-20 rounded-[1.5rem] bg-white text-blue-600 font-black text-2xl shadow-2xl hover:scale-[1.02] transition-transform">
-                                <CreditCard className="mr-3 h-6 w-6" /> Fund & Launch Now
+                                <CreditCard className="mr-3 h-6 w-6" /> Confirm & Launch
                              </Button>
                              <div className="mt-6 flex items-center justify-center gap-6 opacity-60">
                                 <div className="flex items-center gap-2 text-[8px] font-bold uppercase tracking-widest"><Lock className="h-3 w-3" /> PCI Compliant</div>
-                                <div className="flex items-center gap-2 text-[8px] font-bold uppercase tracking-widest"><Target className="h-3 w-3" /> Master Node Sync</div>
+                                <div className="flex items-center gap-2 text-[8px] font-bold uppercase tracking-widest"><Target className="h-3 w-3" /> Campaign Sync</div>
                              </div>
                         </div>
                     </TabsContent>

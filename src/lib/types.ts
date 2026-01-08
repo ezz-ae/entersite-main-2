@@ -64,6 +64,7 @@ export interface ProjectData {
   tags?: string[];
   publicUrl?: string;
   unitsStockUpdatedAt?: string;
+  brochureUrl?: string;
 }
 
 
@@ -89,6 +90,11 @@ export interface SitePage {
   refinerDraftSnapshot?: SitePage;
   refinerDraftHtml?: string;
   refinerPreviewUrl?: string;
+  published?: boolean;
+  publishedUrl?: string;
+  subdomain?: string;
+  customDomain?: string;
+  lastPublishedAt?: string | Date;
   seo: {
     title: string;
     description: string;

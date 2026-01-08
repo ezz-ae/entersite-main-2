@@ -59,13 +59,13 @@ X5W+6K9X8VjWkX2X5W+6K9X8VjWkX2X5W+6K9X8VjWkX2X5W+6K9X8VjWkX2X5W+
                 <PhoneCall className="h-8 w-8" />
             </div>
             <div>
-                <h1 className="text-4xl font-black tracking-tight uppercase italic">Twilio Flex <span className="text-zinc-600">SSO</span></h1>
-                <p className="text-zinc-500 text-lg font-light">Securely integrate your enterprise contact center with Entrestate Auth.</p>
+                <h1 className="text-4xl font-black tracking-tight uppercase italic">Twilio Flex <span className="text-zinc-600">Setup</span></h1>
+                <p className="text-zinc-500 text-lg font-light">Advanced setup for enterprise contact centers.</p>
             </div>
         </div>
         <div className="flex gap-3">
             <Badge variant="outline" className="bg-green-500/10 text-green-500 border-green-500/20 h-8 px-4">
-                <ShieldCheck className="h-3 w-3 mr-2" /> SAML 2.0 Ready
+                <ShieldCheck className="h-3 w-3 mr-2" /> Enterprise Ready
             </Badge>
         </div>
       </div>
@@ -78,13 +78,13 @@ X5W+6K9X8VjWkX2X5W+6K9X8VjWkX2X5W+6K9X8VjWkX2X5W+6K9X8VjWkX2X5W+
                 </div>
                 
                 <CardHeader className="p-0 mb-10">
-                    <CardTitle className="text-2xl font-bold">Identity Provider Details</CardTitle>
-                    <CardDescription>Copy these exact values into the Twilio Flex Single Sign-on configuration.</CardDescription>
+                    <CardTitle className="text-2xl font-bold">Connection Details</CardTitle>
+                    <CardDescription>Copy these values into your Twilio Flex setup.</CardDescription>
                 </CardHeader>
 
                 <CardContent className="p-0 space-y-8 relative z-10">
                     <ConfigField 
-                        label="Identity Provider SSO URL" 
+                        label="Sign-in URL" 
                         value={FLEX_CONFIG.idpSsoUrl} 
                         onCopy={() => copyToClipboard(FLEX_CONFIG.idpSsoUrl, 'sso')}
                         isCopied={copied === 'sso'}
@@ -106,11 +106,11 @@ X5W+6K9X8VjWkX2X5W+6K9X8VjWkX2X5W+6K9X8VjWkX2X5W+6K9X8VjWkX2X5W+
                                 {copied === 'cert' ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
                             </button>
                         </div>
-                        <p className="text-[10px] text-zinc-500 font-medium italic">Standard SAML 2.0 Base64-encoded X.509 certificate for entrestate.com.</p>
+                        <p className="text-[10px] text-zinc-500 font-medium italic">Certificate for secure sign-in on entrestate.com.</p>
                     </div>
 
                     <div className="pt-8 border-t border-white/5">
-                        <p className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest mb-6">IdP Metadata Attributes</p>
+                        <p className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest mb-6">User Fields</p>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                             <AttributeTag label="full_name" value="user.profile.name" />
                             <AttributeTag label="email" value="user.profile.email" />
@@ -125,12 +125,12 @@ X5W+6K9X8VjWkX2X5W+6K9X8VjWkX2X5W+6K9X8VjWkX2X5W+6K9X8VjWkX2X5W+
                     <div className="w-10 h-10 rounded-xl bg-blue-600/10 flex items-center justify-center text-blue-500">
                         <UserCheck className="h-5 w-5" />
                     </div>
-                    <h3 className="text-xl font-bold">Role Hierarchy Mapping</h3>
+                    <h3 className="text-xl font-bold">Role Mapping</h3>
                 </div>
                 <div className="grid md:grid-cols-3 gap-6">
                     <RoleCard role="Agent" description="Investor response team." flexRole="agent" />
-                    <RoleCard role="Supervisor" description="Real-time dash monitoring." flexRole="supervisor" />
-                    <RoleCard role="Administrator" description="Full cluster configuration." flexRole="administrator" />
+                    <RoleCard role="Supervisor" description="Team monitoring." flexRole="supervisor" />
+                    <RoleCard role="Administrator" description="Full admin access." flexRole="administrator" />
                 </div>
             </Card>
         </div>
@@ -138,7 +138,7 @@ X5W+6K9X8VjWkX2X5W+6K9X8VjWkX2X5W+6K9X8VjWkX2X5W+6K9X8VjWkX2X5W+
         <div className="space-y-6">
             <Card className="bg-zinc-900 border-white/5 rounded-[3rem] p-10 space-y-8 relative overflow-hidden group">
                 <CardHeader className="p-0">
-                    <CardTitle className="text-sm font-black uppercase tracking-[0.2em] text-zinc-500">App Metadata</CardTitle>
+                    <CardTitle className="text-sm font-black uppercase tracking-[0.2em] text-zinc-500">App Details</CardTitle>
                 </CardHeader>
                 <CardContent className="p-0 space-y-6">
                     <div className="space-y-1">
@@ -151,17 +151,17 @@ X5W+6K9X8VjWkX2X5W+6K9X8VjWkX2X5W+6K9X8VjWkX2X5W+6K9X8VjWkX2X5W+
                     </div>
                     <div className="pt-4 flex flex-col gap-3">
                         <Button className="w-full h-14 rounded-2xl bg-blue-600 hover:bg-blue-700 font-bold text-lg gap-2 shadow-xl shadow-blue-900/20">
-                            Validate Connection <Zap className="h-4 w-4" />
+                            Test Connection <Zap className="h-4 w-4" />
                         </Button>
-                        <p className="text-[9px] text-center text-zinc-600 font-bold uppercase tracking-widest">SAML 2.0 Handshake Required</p>
+                        <p className="text-[9px] text-center text-zinc-600 font-bold uppercase tracking-widest">Advanced setup required</p>
                     </div>
                 </CardContent>
             </Card>
 
             <Card className="bg-blue-600 border-none text-white rounded-[3rem] p-10 space-y-6 relative overflow-hidden group">
                  <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent pointer-events-none" />
-                <h4 className="text-xl font-black uppercase leading-tight relative z-10">DIFC Production <br/>Cluster</h4>
-                <p className="text-blue-100 text-sm font-medium relative z-10 leading-relaxed">System ready for deployment on entrestate.com</p>
+                <h4 className="text-xl font-black uppercase leading-tight relative z-10">Dubai Production <br/>Region</h4>
+                <p className="text-blue-100 text-sm font-medium relative z-10 leading-relaxed">System ready to go live on entrestate.com</p>
                 <Button className="w-full h-14 rounded-[1.5rem] bg-white text-blue-600 font-black text-sm uppercase tracking-widest shadow-2xl relative z-10">
                     Go Live
                 </Button>

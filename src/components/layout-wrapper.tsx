@@ -15,7 +15,7 @@ export function LayoutWrapper({ children }: { children: React.ReactNode }) {
   const isAdmin = pathname?.startsWith('/admin');
   const isProfile = pathname?.startsWith('/profile');
   const isPublished = pathname?.startsWith('/p/');
-  const isTrending = pathname === '/trending'; // The AI Agent "Terminal" Page
+  const isTrending = pathname === '/instagram-assistant';
 
   // Hide global header/footer on app-like pages or dashboard
   const hideChrome = isEditor || isDashboard || isAdmin || isProfile || isPublished || isTrending;
@@ -27,7 +27,7 @@ export function LayoutWrapper({ children }: { children: React.ReactNode }) {
       </div>
       
       {/* Mobile-Only Dashboard & App Navigation */}
-      {isMobile && (isDashboard || isTrending) && <MobileBottomNav />}
+  {isMobile && (isDashboard || isTrending) && <MobileBottomNav />}
     </div>
   );
 }

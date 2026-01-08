@@ -18,7 +18,7 @@ import {
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
 import { useToast } from '@/hooks/use-toast';
-import { apiFetch } from '@/lib/apiFetch';
+import { authorizedFetch } from '@/lib/auth-fetch';
 
 interface DnsRecord {
   type: string;
@@ -32,14 +32,19 @@ export function DomainDashboard() {
   const [verificationRecords, setVerificationRecords] = useState<DnsRecord[]>([]);
   const { toast } = useToast();
   const [sites, setSites] = useState<any[]>([]);
+  const [selectedSiteId, setSelectedSiteId] = useState('');
 
   useEffect(() => {
     const fetchSites = async () => {
       try {
-        const res = await apiFetch('/api/sites');
+        const res = await authorizedFetch('/api/sites');
         const data = await res.json();
         if (res.ok) {
-          setSites(data);
+          const siteList = data.sites || [];
+          setSites(siteList);
+          if (!selectedSiteId && siteList.length) {
+            setSelectedSiteId(siteList[0].id);
+          }
         }
       } catch (error) {
         console.error("Error fetching sites:", error);
@@ -52,20 +57,29 @@ export function DomainDashboard() {
     setIsVerifying(true);
     setVerificationRecords([]);
     try {
-      const res = await apiFetch('/api/domain/vercel', { 
+      const res = await authorizedFetch('/api/domains', { 
         method: 'POST',
-        body: JSON.stringify({ domain })
+        body: JSON.stringify({ domain, siteId: selectedSiteId || undefined })
       });
       const data = await res.json();
       if (res.ok) {
-        if (data.status === 'pending_verification') {
+        if (data.records?.length) {
           setVerificationRecords(data.records);
-          toast({ title: "Verification Initiated", description: "Please add the following DNS records to your domain provider." });
+          toast({ title: "Verification Started", description: "Add these two records at your domain provider to connect your site." });
+          try {
+            const refresh = await authorizedFetch('/api/sites');
+            const refreshData = await refresh.json();
+            if (refresh.ok) {
+              setSites(refreshData.sites || []);
+            }
+          } catch (refreshError) {
+            console.error('Failed to refresh sites', refreshError);
+          }
         } else {
-            toast({ title: "Error", description: data.message || "An unexpected error occurred.", variant: 'destructive' });
+          toast({ title: "Connected", description: "Domain request submitted. DNS updates may take a few minutes." });
         }
       } else {
-        toast({ title: "Verification Failed", description: data.message, variant: 'destructive' });
+        toast({ title: "Verification Failed", description: data.error || data.message || "Could not verify domain.", variant: 'destructive' });
       }
     } catch (error) {
       toast({ title: "Error", description: "An unexpected error occurred.", variant: 'destructive' });
@@ -83,12 +97,12 @@ export function DomainDashboard() {
     <div className="space-y-12 animate-in fade-in duration-700">
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-3xl font-bold tracking-tight text-white uppercase italic">Domain Dashboard</h2>
-          <p className="text-zinc-500">Manage your domains and connect them to your Vercel projects.</p>
+          <h2 className="text-3xl font-bold tracking-tight text-white uppercase italic">Domains</h2>
+          <p className="text-zinc-500">Manage your domains and connect them to your sites.</p>
         </div>
         <div className="flex gap-2">
            <Badge variant="outline" className="bg-blue-500/10 text-blue-500 border-blue-500/20 px-3 py-1">
-             <Zap className="h-3 w-3 mr-1.5" /> Powered by Vercel
+             <Zap className="h-3 w-3 mr-1.5" /> Fast hosting included
            </Badge>
         </div>
       </div>
@@ -106,20 +120,33 @@ export function DomainDashboard() {
                 </CardHeader>
                 <CardContent className="p-8 pt-0">
                     <div className="space-y-4">
-                        {sites.map((site) => (
-                            <div key={site.name} className="flex items-center justify-between p-4 bg-black/40 border border-white/5 rounded-2xl">
-                                <div className="flex items-center gap-4">
-                                    <div className={cn("w-2.5 h-2.5 rounded-full", site.status === 'live' ? 'bg-green-500' : 'bg-yellow-500')} />
-                                    <p className="font-bold text-white">{site.name}</p>
-                                </div>
-                                <a href={`http://${site.name}`} target="_blank" rel="noopener noreferrer">
-                                <Button variant="ghost" size="sm" className="text-zinc-400 hover:text-white">
-                                    <ExternalLink className="h-4 w-4 mr-2" />
-                                    Visit
-                                </Button>
-                                </a>
-                            </div>
-                        ))}
+                        {sites.length === 0 ? (
+                          <p className="text-sm text-zinc-500">No sites yet. Build your first site to connect a domain.</p>
+                        ) : (
+                          sites.map((site) => (
+                              <div key={site.id} className="flex items-center justify-between p-4 bg-black/40 border border-white/5 rounded-2xl">
+                                  <div className="flex items-center gap-4">
+                                      <div className={cn("w-2.5 h-2.5 rounded-full", site.published ? 'bg-green-500' : 'bg-yellow-500')} />
+                                      <div>
+                                        <p className="font-bold text-white">{site.title}</p>
+                                        <p className="text-xs text-zinc-500">{site.url || 'Draft not published yet'}</p>
+                                      </div>
+                                  </div>
+                                  {site.url ? (
+                                    <a href={site.url} target="_blank" rel="noopener noreferrer">
+                                      <Button variant="ghost" size="sm" className="text-zinc-400 hover:text-white">
+                                          <ExternalLink className="h-4 w-4 mr-2" />
+                                          Visit
+                                      </Button>
+                                    </a>
+                                  ) : (
+                                    <Button variant="ghost" size="sm" className="text-zinc-600" disabled>
+                                      Draft
+                                    </Button>
+                                  )}
+                              </div>
+                          ))
+                        )}
                     </div>
                 </CardContent>
             </Card>
@@ -129,11 +156,25 @@ export function DomainDashboard() {
               <CardHeader className="p-8 pb-4">
                  <CardTitle className="text-2xl font-bold flex items-center gap-3">
                     <Globe className="h-6 w-6 text-blue-500" />
-                    Connect External Domain
+                    Connect a Domain
                  </CardTitle>
-                 <CardDescription>Already own a domain? Connect it to your Vercel project.</CardDescription>
+                 <CardDescription>Already own a domain? Connect it to your site.</CardDescription>
               </CardHeader>
               <CardContent className="p-8 pt-0 space-y-6">
+                 <div className="space-y-2">
+                    <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Choose Site</p>
+                    <select
+                        className="w-full h-12 bg-black/40 border border-white/10 rounded-2xl px-4 text-sm text-zinc-300 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                        value={selectedSiteId}
+                        onChange={(e) => setSelectedSiteId(e.target.value)}
+                    >
+                        {sites.map((site) => (
+                          <option key={site.id} value={site.id}>
+                            {site.title || site.name || site.id}
+                          </option>
+                        ))}
+                    </select>
+                 </div>
                  <div className="flex gap-3">
                     <Input 
                         placeholder="e.g. miamiluxury.com" 
@@ -143,7 +184,7 @@ export function DomainDashboard() {
                     />
                     <Button 
                         onClick={handleVerify}
-                        disabled={!domain || isVerifying}
+                        disabled={!domain || isVerifying || !selectedSiteId}
                         className="h-14 px-8 bg-white text-black font-bold rounded-2xl min-w-[140px]"
                     >
                         {isVerifying ? <Loader2 className="h-5 w-5 animate-spin" /> : "Verify"}
@@ -156,7 +197,7 @@ export function DomainDashboard() {
                         animate={{ opacity: 1, y: 0 }}
                         className="space-y-4 pt-4 border-t border-white/5"
                      >
-                        <p className="text-xs font-bold text-zinc-500 uppercase tracking-widest px-1">Required DNS Records for Vercel</p>
+                        <p className="text-xs font-bold text-zinc-500 uppercase tracking-widest px-1">Domain Records to Add</p>
                         <div className="grid grid-cols-1 gap-3">
                             {verificationRecords.map((record, index) => (
                                 <DnsRecordRow key={index} type={record.type} name={record.name} value={record.value} onCopy={copyValue} />
@@ -175,16 +216,16 @@ export function DomainDashboard() {
                  <Globe className="h-40 w-40" />
               </div>
               <CardHeader className="p-8">
-                 <CardTitle className="text-2xl font-bold italic uppercase">Powered by Vercel</CardTitle>
+                 <CardTitle className="text-2xl font-bold italic uppercase">Fast Hosting Included</CardTitle>
               </CardHeader>
               <CardContent className="p-8 pt-0 space-y-6 relative z-10">
                  <p className="text-blue-100 text-lg font-light leading-relaxed">
-                    Custom domains on our platform are powered by Vercel's robust infrastructure, ensuring optimal performance and reliability.
+                    Custom domains on our platform use fast, reliable hosting to keep your site quick and secure.
                  </p>
                  <div className="space-y-4 pt-4 border-t border-blue-500">
-                    <FeatureItem text="Global Edge Network" />
+                    <FeatureItem text="Fast worldwide delivery" />
                     <FeatureItem text="Automatic HTTPS" />
-                    <FeatureItem text="Continuous Deployment" />
+                    <FeatureItem text="Instant updates" />
                  </div>
               </CardContent>
            </Card>

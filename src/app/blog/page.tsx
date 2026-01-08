@@ -29,7 +29,7 @@ const DEFAULT_POSTS: BlogPost[] = [
   },
   {
     id: 'meta-lookalike-strategy',
-    title: 'Leveraging 3,750+ Data Points for Meta Ads',
+    title: 'Leveraging Market Signals for Meta Ads',
     excerpt: 'A deep dive into how Entrestate builds custom audiences for off-plan launches.',
     author: 'James Wilson',
     date: 'Sep 15, 2025',
@@ -69,7 +69,7 @@ export default async function BlogPage() {
                 </Card>
                 <Card className="px-6 py-4 rounded-3xl bg-zinc-900/50 border border-white/5 backdrop-blur-xl">
                     <p className="text-[10px] font-bold text-zinc-500 uppercase mb-1">Subscribers</p>
-                    <p className="text-2xl font-black text-white">8.2K</p>
+                    <p className="text-2xl font-black text-white">Growing</p>
                 </Card>
             </div>
         </div>

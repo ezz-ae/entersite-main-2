@@ -2,9 +2,10 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Search, MousePointerClick, TrendingUp, Sparkles, Target, ArrowRight } from 'lucide-react';
+import { TrendingUp, Sparkles, Target, ArrowRight } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import Link from 'next/link';
 
 export function AdsShowcase() {
   return (
@@ -28,7 +29,7 @@ export function AdsShowcase() {
                         <span className="text-xs text-zinc-500">https://luxury.emaar-beachfront.ai</span>
                     </div>
                     <h4 className="text-xl font-bold text-blue-400 mb-2">Luxury Waterfront Apartments | Emaar Beachfront Launch</h4>
-                    <p className="text-sm text-zinc-400">Secure your dream home with 10% down payment. Private beach access, stunning views. Limited units remaining...</p>
+                    <p className="text-sm text-zinc-400">Secure your next home with flexible payment plans. Private beach access and waterfront views. Limited availability...</p>
                 </motion.div>
 
                 {/* Dashboard Snippet */}
@@ -40,8 +41,8 @@ export function AdsShowcase() {
                 >
                     <div className="flex justify-between items-start mb-8">
                         <div>
-                            <p className="text-xs font-bold uppercase tracking-widest text-zinc-500 mb-1">Campaign ROI</p>
-                            <h3 className="text-4xl font-bold">12.4x</h3>
+                            <p className="text-xs font-bold uppercase tracking-widest text-zinc-500 mb-1">Campaign Health</p>
+                            <h3 className="text-4xl font-bold">On Track</h3>
                         </div>
                         <div className="w-12 h-12 rounded-2xl bg-blue-600 flex items-center justify-center text-white">
                             <TrendingUp className="h-6 w-6" />
@@ -50,16 +51,16 @@ export function AdsShowcase() {
                     
                     <div className="space-y-4">
                         <div className="flex justify-between items-center text-sm font-bold border-b pb-4">
-                            <span className="text-zinc-500">Leads Captured</span>
-                            <span>842</span>
+                            <span className="text-zinc-500">Lead Flow</span>
+                            <span>Building</span>
                         </div>
                         <div className="flex justify-between items-center text-sm font-bold border-b pb-4">
                             <span className="text-zinc-500">Cost Per Lead</span>
-                            <span className="text-blue-600">AED 42.50</span>
+                            <span className="text-blue-600">Optimizing</span>
                         </div>
                         <div className="flex justify-between items-center text-sm font-bold">
                             <span className="text-zinc-500">Conversion Rate</span>
-                            <span className="text-green-600">8.2%</span>
+                            <span className="text-green-600">Improving</span>
                         </div>
                     </div>
                 </motion.div>
@@ -74,21 +75,23 @@ export function AdsShowcase() {
             
             <h2 className="text-5xl md:text-7xl font-bold tracking-tighter leading-[1.1]">
               Google Ads <br/>
-              <span className="text-zinc-500 font-light">on Autopilot.</span>
+              <span className="text-zinc-500 font-light">handled for you.</span>
             </h2>
             
             <p className="text-xl text-zinc-400 leading-relaxed max-w-xl">
-              Don't waste money on broad keywords. Our AI builds high-intent search campaigns that target the right investors at the right time.
+              Don't waste money on broad keywords. We build high-intent search campaigns that target the right investors at the right time.
             </p>
 
             <div className="space-y-6">
-               <AdFeature title="Dynamic Keyword Insertion" desc="Automatically targets terms like 'Apartments in Dubai Creek' based on real demand." />
-               <AdFeature title="Automated Bidding" desc="Our engine optimizes your budget 24/7 for the lowest cost per lead." />
-               <AdFeature title="Meta Audience Sync" desc="Create lookalike audiences from our database of verified buyers." />
+               <AdFeature title="Smart keywords" desc="Focus on search terms that match buyer intent." />
+               <AdFeature title="Budget control" desc="Keep spend aligned with your daily target." />
+               <AdFeature title="Buyer matching" desc="Reach people similar to your current buyer list." />
             </div>
 
-            <Button size="lg" className="h-16 px-10 rounded-full bg-white text-black font-bold text-lg mt-8 group">
-              Start Scaling <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+            <Button size="lg" className="h-16 px-10 rounded-full bg-white text-black font-bold text-lg mt-8 group" asChild>
+              <Link href="/dashboard/google-ads">
+                Start Setup <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+              </Link>
             </Button>
           </div>
 

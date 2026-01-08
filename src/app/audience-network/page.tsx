@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
@@ -8,23 +8,12 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { 
   Network, 
-  Database, 
-  Users, 
-  Sparkles, 
-  ShieldCheck, 
-  Zap, 
-  Globe, 
-  Cpu, 
-  TrendingUp, 
   ArrowRight,
   Target,
-  MessageSquare,
   Mail,
   Smartphone,
   ChevronRight,
-  DatabaseZap,
-  Lock,
-  CreditCard
+  DatabaseZap
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -49,7 +38,7 @@ export default function AudienceNetworkPublicPage() {
                     >
                         <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-500 text-[10px] font-black uppercase tracking-[0.3em] mx-auto">
                             <Network className="h-3.5 w-3.5" />
-                            Proprietary Data Node
+                            Pilot Buyer Network
                         </div>
                         
                         <h1 className="text-6xl md:text-[10rem] font-black tracking-tighter leading-[0.8] text-white uppercase italic">
@@ -58,13 +47,13 @@ export default function AudienceNetworkPublicPage() {
                         </h1>
                         
                         <p className="text-zinc-500 text-2xl md:text-3xl max-w-4xl mx-auto font-light leading-relaxed">
-                            Access our Master pool of <span className="text-white font-black italic">12,450 Verified UAE Property Buyers</span>. One click to feed your Meta ads, SMS, and Email marketing.
+                            Run your campaigns with an invite-only audience pool or bring your own list. Designed for broker teams who want clean, organized outreach.
                         </p>
                     </motion.div>
 
                     <div className="flex flex-col sm:flex-row items-center justify-center gap-6 pt-8">
                         <Button asChild className="h-20 px-12 rounded-full bg-blue-600 text-white font-black text-xl hover:bg-blue-700 shadow-[0_0_50px_-10px_rgba(37,99,235,0.5)] transition-all">
-                            <Link href="/dashboard/billing">Unlock Data Pool <ArrowRight className="ml-2 h-6 w-6" /></Link>
+                            <Link href="/dashboard/billing">Unlock Buyer Pool <ArrowRight className="ml-2 h-6 w-6" /></Link>
                         </Button>
                         <Button onClick={handleScrollToSegments} variant="outline" className="h-20 px-12 rounded-full border-white/10 bg-white/5 text-white font-bold text-xl hover:bg-white/10">
                             Explore Segments
@@ -73,10 +62,10 @@ export default function AudienceNetworkPublicPage() {
 
                     {/* Live Counter */}
                     <div className="pt-20 grid grid-cols-2 md:grid-cols-4 gap-8">
-                         <CounterItem label="Verified HNW Leads" value="12,450" />
-                         <CounterItem label="Monthly Interactions" value="1.2M+" />
-                         <CounterItem label="Avg. Portfolio Value" value="$4.2M" />
-                         <CounterItem label="Conversion Lift" value="3.5x" />
+                         <CounterItem label="Access" value="Invite-only" />
+                         <CounterItem label="Data Source" value="Broker-owned" />
+                         <CounterItem label="List Type" value="Opt-in only" />
+                         <CounterItem label="Status" value="Pilot Live" />
                     </div>
                 </div>
             </section>
@@ -86,7 +75,7 @@ export default function AudienceNetworkPublicPage() {
                 <div className="container mx-auto px-6 max-w-7xl">
                     <div className="text-center mb-32 space-y-4">
                         <h2 className="text-5xl md:text-7xl font-black tracking-tighter text-white uppercase italic">One Pool. <span className="text-zinc-600">Total Reach.</span></h2>
-                        <p className="text-zinc-500 text-2xl font-light">Choose your delivery node and activate the sequence.</p>
+                        <p className="text-zinc-500 text-2xl font-light">Choose your delivery channel and start a sequence.</p>
                     </div>
 
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -94,27 +83,27 @@ export default function AudienceNetworkPublicPage() {
                         <DeliveryCard 
                             icon={Target}
                             title="Meta Lookalike Feed"
-                            desc="We seed your Facebook/Instagram ads with our master list. Result: 94% higher lead quality from day one."
-                            price="$499 / campaign"
-                            tag="HIGH CONVERSION"
+                            desc="Use your own list or approved pilot segments to seed lookalikes."
+                            price="Pilot access"
+                            tag="INVITE-ONLY"
                             color="blue"
                         />
                         {/* SMS VIP Broadcast */}
                         <DeliveryCard 
                             icon={Smartphone}
                             title="SMS VIP Broadcast"
-                            desc="Direct-to-WhatsApp and SMS delivery to 5,000+ investors. Perfect for project launches and pre-sales."
-                            price="$0.45 / Lead"
-                            tag="INSTANT HYPED"
+                            desc="Private SMS and WhatsApp sequences for pre-launch updates."
+                            price="Request access"
+                            tag="PILOT"
                             color="green"
                         />
                         {/* Email Intelligence */}
                         <DeliveryCard 
                             icon={Mail}
                             title="Email Intelligence"
-                            desc="Hyper-personalized ROI sequences. AI writes the pitch based on the recipient's buying history."
-                            price="$299 / month"
-                            tag="LONG-TERM YIELD"
+                            desc="Structured email sequences with clear follow-up steps."
+                            price="Request access"
+                            tag="PILOT"
                             color="purple"
                         />
                     </div>
@@ -127,16 +116,16 @@ export default function AudienceNetworkPublicPage() {
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
                         <div className="space-y-12">
                             <div className="space-y-6">
-                                <Badge className="bg-blue-600 text-white font-black text-[10px] px-4 py-2 rounded-full uppercase tracking-widest border-0">Network Security</Badge>
-                                <h2 className="text-5xl md:text-7xl font-black tracking-tighter leading-tight text-white uppercase">Verified <br/><span className="text-zinc-600 italic uppercase">Human Capital.</span></h2>
+                                <Badge className="bg-blue-600 text-white font-black text-[10px] px-4 py-2 rounded-full uppercase tracking-widest border-0">Pilot Access</Badge>
+                                <h2 className="text-5xl md:text-7xl font-black tracking-tighter leading-tight text-white uppercase">Broker-Owned <br/><span className="text-zinc-600 italic uppercase">Audiences.</span></h2>
                                 <p className="text-zinc-500 text-xl font-light leading-relaxed">
-                                    Our data isn't scraped. It's built from 3 years of official project interactions across the UAE. Every lead in our network is double opt-in and GDPR compliant.
+                                    Use your own list or request access to pilot segments. Everything stays controlled by your team and shared only with your approval.
                                 </p>
                             </div>
                             <div className="space-y-6">
-                                <TrustPoint title="Financial Verification" desc="We filter for minimum liquid assets of $500K+." />
-                                <TrustPoint title="Recent Intent" desc="Only users active in the last 90 days are included." />
-                                <TrustPoint title="Region Nodes" desc="Interest-mapped for Dubai Marina, Saadiyat, and Palm Jumeirah." />
+                                <TrustPoint title="You control the list" desc="Only contacts you approve are used for outreach." />
+                                <TrustPoint title="Opt-in only" desc="Every contact is permission-based and easy to remove." />
+                                <TrustPoint title="Pilot safeguards" desc="Manual review before any campaign goes live." />
                             </div>
                         </div>
 
@@ -150,13 +139,13 @@ export default function AudienceNetworkPublicPage() {
                                         </div>
                                         <div className="flex items-center gap-2">
                                             <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                                            <span className="text-[10px] font-black text-green-500 uppercase tracking-widest">Master Pool Synced</span>
+                                            <span className="text-[10px] font-black text-green-500 uppercase tracking-widest">Pilot Access</span>
                                         </div>
                                     </div>
                                     <div className="space-y-8">
                                         <div className="flex items-center justify-between">
                                             <h4 className="text-xl font-bold italic uppercase tracking-tighter text-white">Segment Activity</h4>
-                                            <span className="text-xs font-bold text-zinc-500">Live View</span>
+                                            <span className="text-xs font-bold text-zinc-500">Sample View</span>
                                         </div>
                                         <div className="space-y-4">
                                             <ActivityRow label="European Luxury Search" value="High" color="blue" />
@@ -166,7 +155,7 @@ export default function AudienceNetworkPublicPage() {
                                     </div>
                                     <div className="pt-8 border-t border-white/5 text-center">
                                         <Button asChild className="w-full h-16 rounded-2xl bg-white text-black font-black text-lg hover:scale-105 transition-all">
-                                            <Link href="/dashboard/billing">Access Node Data</Link>
+                                            <Link href="/dashboard/meta-audience">View Audience Details</Link>
                                         </Button>
                                     </div>
                                 </div>
@@ -209,8 +198,9 @@ function DeliveryCard({ icon: Icon, title, desc, price, tag, color }: any) {
                 <div className="flex items-baseline gap-2">
                     <span className="text-3xl font-black text-white tracking-tighter">{price}</span>
                 </div>
+                <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Requires subscription</p>
                 <Button asChild className="w-full h-14 rounded-2xl bg-white text-black font-black hover:bg-zinc-200">
-                    <Link href="/dashboard/billing">Activate Node <ChevronRight className="ml-2 h-4 w-4" /></Link>
+                    <Link href="/dashboard/billing">Request Access <ChevronRight className="ml-2 h-4 w-4" /></Link>
                 </Button>
             </div>
         </Card>

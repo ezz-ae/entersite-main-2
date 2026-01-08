@@ -30,10 +30,17 @@ export async function GET(req: NextRequest) {
       .limit(parsed.limit)
       .get();
 
-    const leads = snapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-    }));
+    const leads = snapshot.docs.map((doc) => {
+      const data = doc.data();
+      const createdAt = data.createdAt?.toDate ? data.createdAt.toDate().toISOString() : data.createdAt;
+      const updatedAt = data.updatedAt?.toDate ? data.updatedAt.toDate().toISOString() : data.updatedAt;
+      return {
+        id: doc.id,
+        ...data,
+        createdAt,
+        updatedAt,
+      };
+    });
 
     return NextResponse.json({ data: leads });
   } catch (error) {

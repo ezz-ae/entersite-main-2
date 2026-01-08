@@ -7,10 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { 
   Users, 
-  Target, 
   Filter, 
-  DollarSign, 
-  MapPin, 
   BarChart2, 
   Loader2, 
   CheckCircle, 
@@ -18,7 +15,6 @@ import {
   TrendingUp, 
   Sparkles
 } from 'lucide-react';
-import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
 import { apiFetch } from '@/lib/apiFetch';
 
@@ -45,7 +41,7 @@ export function AudienceDashboard() {
       const data = await res.json();
       if (res.ok) {
         setAudience(data);
-        toast({ title: 'Audience Generated', description: 'Insights are ready.' });
+        toast({ title: 'Preview Ready', description: 'Estimated insights are ready.' });
       } else {
         toast({ title: 'Error', description: data.error, variant: 'destructive' });
       }
@@ -60,7 +56,7 @@ export function AudienceDashboard() {
     setIsLaunching(true);
     try {
       await new Promise(resolve => setTimeout(resolve, 2000));
-      toast({ title: 'Campaign Launched!', description: `Your ad campaign is now live for the ${audience.estimatedSize} potential investors.` });
+      toast({ title: 'Segment Saved', description: `Saved ${audience.estimatedSize} potential buyers for your next campaign.` });
       // Reset
       setAudience(null);
     } catch (error) {
@@ -74,12 +70,12 @@ export function AudienceDashboard() {
     <div className="space-y-8 pb-20 animate-in fade-in duration-700">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 border-b border-white/5 pb-8">
           <div>
-              <h1 className="text-4xl font-black tracking-tight text-white uppercase italic">Audience Builder</h1>
-              <p className="text-zinc-500 text-lg font-light">Define & target hyper-specific investor segments.</p>
+              <h1 className="text-4xl font-black tracking-tight text-white uppercase italic">Audience Estimator</h1>
+              <p className="text-zinc-500 text-lg font-light">Estimate buyer segments before you launch a campaign.</p>
           </div>
           <Button onClick={handleBuildAudience} disabled={isBuilding} size="lg" className="h-12 text-lg font-bold gap-2">
             {isBuilding ? <Loader2 className="h-5 w-5 animate-spin" /> : <Sparkles className="h-5 w-5" />}
-            Generate Audience
+            Preview Audience
           </Button>
       </div>
 
@@ -117,7 +113,7 @@ export function AudienceDashboard() {
                     <Card className="bg-zinc-900 border-white/5 shadow-xl">
                         <CardHeader>
                             <CardTitle>Audience Insights</CardTitle>
-                            <CardDescription>Estimated reach and demographics for your campaign.</CardDescription>
+                            <CardDescription>Preview estimates for reach and demographics.</CardDescription>
                         </CardHeader>
                         <CardContent className="grid md:grid-cols-3 gap-6">
                             <div className="flex items-center gap-4 p-4 bg-black/20 rounded-lg">
@@ -146,15 +142,15 @@ export function AudienceDashboard() {
                     
                     <Button onClick={handleLaunchCampaign} disabled={isLaunching} className="w-full h-16 text-xl font-bold bg-green-600 hover:bg-green-700 gap-3">
                         {isLaunching ? <Loader2 className="h-6 w-6 animate-spin" /> : <CheckCircle className="h-6 w-6" />}
-                        Launch Campaign
+                        Save Segment
                     </Button>
                 </div>
             ) : (
                 <Card className="bg-zinc-900/50 border-2 border-dashed border-white/10 flex items-center justify-center py-20">
                     <div className="text-center text-zinc-500">
                         <BarChart2 className="h-12 w-12 mx-auto mb-4" />
-                        <h3 className="text-lg font-bold text-zinc-300">Your audience insights will appear here</h3>
-                        <p className="text-sm">Click \"Generate Audience\" to get started.</p>
+                        <h3 className="text-lg font-bold text-zinc-300">Your audience preview will appear here</h3>
+                        <p className="text-sm">Click \"Preview Audience\" to get started.</p>
                     </div>
                 </Card>
             )}

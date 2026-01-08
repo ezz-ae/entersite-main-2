@@ -2,16 +2,18 @@
 
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
-import { Star, MapPin } from 'lucide-react';
-import { ResponsiveImage } from '@/components/ui/responsive-image';
-import { getRandomImage } from '@/lib/images';
+import { Star } from 'lucide-react';
 import Image from 'next/image';
 
 export function GoogleReviewsBlock({
-  headline = "Trusted by 500+ Investors",
-  rating = "4.9",
-  reviewCount = "128",
+  headline = "Recent Google Reviews",
+  rating = "New",
+  reviewCount = "new",
 }: { headline?: string, rating?: string, reviewCount?: string }) {
+  const parsedRating = Number(rating);
+  const hasRating = Number.isFinite(parsedRating);
+  const starCount = hasRating ? Math.round(parsedRating) : 0;
+  const ratingLabel = hasRating ? parsedRating.toFixed(1).replace(/\.0$/, "") : rating;
   
   return (
     <section className="py-20 bg-background">
@@ -22,11 +24,14 @@ export function GoogleReviewsBlock({
                 <span className="font-semibold text-sm">Google Reviews</span>
                 <div className="w-px h-4 bg-gray-200 mx-1" />
                 <div className="flex gap-0.5">
-                    {[1, 2, 3, 4, 5].map(i => (
-                        <Star key={i} className="h-3.5 w-3.5 fill-yellow-400 text-yellow-400" />
+                    {[0, 1, 2, 3, 4].map((i) => (
+                        <Star
+                            key={i}
+                            className={i < starCount ? "h-3.5 w-3.5 fill-yellow-400 text-yellow-400" : "h-3.5 w-3.5 text-gray-300"}
+                        />
                     ))}
                 </div>
-                <span className="text-sm font-bold text-gray-700">{rating}</span>
+                <span className="text-sm font-bold text-gray-700">{ratingLabel}</span>
                 <span className="text-xs text-gray-500">({reviewCount})</span>
             </div>
             <h2 className="text-3xl md:text-5xl font-bold tracking-tight">{headline}</h2>
@@ -34,7 +39,7 @@ export function GoogleReviewsBlock({
 
         <div className="grid md:grid-cols-3 gap-6">
             {[
-                { name: "Sarah Johnson", date: "2 days ago", text: "The team helped me find the perfect off-plan investment in Downtown. The ROI calculator was spot on!", type: "Investment" },
+                { name: "Sarah Johnson", date: "2 days ago", text: "The team helped me find the right off-plan investment in Downtown. Clear guidance and fast follow-up.", type: "Investment" },
                 { name: "Mohammed Al-Fayed", date: "1 week ago", text: "Professional service and deep market knowledge. Highly recommend for international buyers.", type: "Buying" },
                 { name: "David Chen", date: "3 weeks ago", text: "Seamless process from viewing to handover. They handled all the paperwork efficiently.", type: "Property Management" },
             ].map((review, i) => (

@@ -8,7 +8,7 @@ export function KeywordPerformance({ keywords }: { keywords: any[] }) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Keyword Performance</CardTitle>
+        <CardTitle>Keyword Performance (Sample)</CardTitle>
       </CardHeader>
       <CardContent>
         <Table>

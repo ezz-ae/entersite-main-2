@@ -53,7 +53,7 @@ export function InteractiveAgentCreator() {
     const [agentTone, setAgentTone] = useState('Professional & Persuasive');
     const [selectedMarkets, setSelectedMarkets] = useState<string[]>(['dubai']);
     const [messages, setMessages] = useState<Message[]>([
-        { role: 'agent', text: "Hi! I'm your Entrestate AI Sales Agent. I'm already trained on 3,750+ UAE projects. Try chatting with me or customize my identity in the sidebar!" }
+        { role: 'agent', text: "Hi! I'm your Entrestate chat assistant. I'm ready to learn your listings and FAQs. Ask me anything about your projects or the Dubai market." }
     ]);
     const [input, setInput] = useState('');
     const [isLoading, setIsLoading] = useState(false);
@@ -113,7 +113,7 @@ export function InteractiveAgentCreator() {
                         <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center">
                             <Settings2 className="h-4 w-4 text-white" />
                         </div>
-                        <h3 className="font-bold text-white uppercase tracking-widest text-xs">Agent Architect</h3>
+                        <h3 className="font-bold text-white uppercase tracking-widest text-xs">Assistant Setup</h3>
                     </div>
                     <Button variant="ghost" size="icon" className="h-8 w-8 text-zinc-500" onClick={() => setIsSidebarOpen(false)}>
                         <ChevronLeft className="h-5 w-5" />
@@ -127,11 +127,11 @@ export function InteractiveAgentCreator() {
                         <div className="space-y-6">
                             <div className="flex items-center gap-2 text-blue-500">
                                 <User className="h-4 w-4" />
-                                <span className="text-[10px] font-black uppercase tracking-[0.2em]">Agent Identity</span>
+                                <span className="text-[10px] font-black uppercase tracking-[0.2em]">Assistant Profile</span>
                             </div>
                             <div className="space-y-4">
                                 <div className="space-y-2">
-                                    <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Display Name</label>
+                                    <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Assistant Name</label>
                                     <Input 
                                         value={agentName}
                                         onChange={(e) => setAgentName(e.target.value)}
@@ -140,7 +140,7 @@ export function InteractiveAgentCreator() {
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Response Tone</label>
+                                    <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Conversation Tone</label>
                                     <select 
                                         value={agentTone}
                                         onChange={(e) => setAgentTone(e.target.value)}
@@ -159,7 +159,7 @@ export function InteractiveAgentCreator() {
                         <div className="space-y-6">
                              <div className="flex items-center gap-2 text-emerald-500">
                                 <Database className="h-4 w-4" />
-                                <span className="text-[10px] font-black uppercase tracking-[0.2em]">Local Knowledge</span>
+                                <span className="text-[10px] font-black uppercase tracking-[0.2em]">Market Focus</span>
                             </div>
                             <div className="grid grid-cols-1 gap-2">
                                 {MARKET_KNOWLEDGE.map((market) => (
@@ -188,8 +188,8 @@ export function InteractiveAgentCreator() {
                         {/* Conversion Section */}
                         <div className="pt-6 border-t border-white/5 space-y-6">
                             <div className="p-6 rounded-2xl bg-blue-600 text-white space-y-4">
-                                <h4 className="font-bold leading-tight">Ready to sell?</h4>
-                                <p className="text-[10px] opacity-80 leading-relaxed">Connecting to Instagram creates your Entrestate account and activates your 24/7 AI Sales Machine.</p>
+                                <h4 className="font-bold leading-tight">Connect Instagram</h4>
+                                <p className="text-[10px] opacity-80 leading-relaxed">Connect Instagram to activate your assistant and start capturing leads.</p>
                                 <Button 
                                     className="w-full bg-white text-blue-600 font-bold hover:bg-zinc-100 rounded-xl h-12 gap-2"
                                     onClick={() => setIsConnecting(true)}
@@ -304,7 +304,7 @@ export function InteractiveAgentCreator() {
                             </Button>
                         </div>
                     </div>
-                    <p className="text-center text-[10px] text-zinc-600 font-bold uppercase tracking-[0.3em] mt-4">Powered by Entrestate Intelligence OS</p>
+                    <p className="text-center text-[10px] text-zinc-600 font-bold uppercase tracking-[0.3em] mt-4">Powered by Entrestate Intelligence</p>
                 </div>
 
             </div>
@@ -318,25 +318,25 @@ export function InteractiveAgentCreator() {
                                 <Instagram className="h-12 w-12 text-white" />
                             </div>
                             <div>
-                                <h3 className="text-4xl font-black italic uppercase tracking-tighter">Deploy to Instagram.</h3>
-                                <p className="text-zinc-500 text-lg font-light mt-2">Activate your Agent and open full platform power.</p>
+                                <h3 className="text-4xl font-black italic uppercase tracking-tighter">Connect to Instagram.</h3>
+                                <p className="text-zinc-500 text-lg font-light mt-2">Activate your assistant and unlock the full experience.</p>
                             </div>
                         </CardHeader>
                         <CardContent className="p-12 pt-0 space-y-10">
                             <div className="space-y-4">
                                 <div className="flex justify-between items-center py-4 border-b border-white/5">
-                                    <span className="text-zinc-400 font-medium">Monthly Infrastructure Fee</span>
+                                    <span className="text-zinc-400 font-medium">Monthly Platform Fee</span>
                                     <span className="text-white font-black text-xl">$19.00</span>
                                 </div>
                                 <div className="flex justify-between items-center py-4 border-b border-white/5">
-                                    <span className="text-zinc-400 font-medium">Meta API Connector</span>
+                                    <span className="text-zinc-400 font-medium">Meta Connection</span>
                                     <span className="text-green-500 font-black text-xs uppercase tracking-widest">Included</span>
                                 </div>
                             </div>
 
                             <Button className="w-full h-20 rounded-3xl bg-blue-600 hover:bg-blue-700 text-white font-black text-2xl shadow-2xl flex flex-col justify-center items-center gap-1 group">
                                 <span>Pay & Activate Now</span>
-                                <span className="text-[10px] font-bold uppercase tracking-[0.2em] opacity-60 group-hover:opacity-100 transition-opacity">Instant Delivery</span>
+                                <span className="text-[10px] font-bold uppercase tracking-[0.2em] opacity-60 group-hover:opacity-100 transition-opacity">Instant Setup</span>
                             </Button>
 
                             <div className="flex flex-col items-center gap-4">

@@ -4,15 +4,28 @@ import { getAuth } from 'firebase-admin/auth';
 
 function getServiceAccount(): ServiceAccount {
     const serviceAccountString = process.env.FIREBASE_ADMIN_SDK_CONFIG;
-    if (!serviceAccountString) {
-        throw new Error('The FIREBASE_ADMIN_SDK_CONFIG environment variable is not set.');
+    if (serviceAccountString) {
+        try {
+            return JSON.parse(serviceAccountString) as ServiceAccount;
+        } catch (e) {
+            console.error("Error parsing FIREBASE_ADMIN_SDK_CONFIG:", e);
+            throw new Error('Could not parse the FIREBASE_ADMIN_SDK_CONFIG. Please ensure it is a valid JSON string.');
+        }
     }
-    try {
-        return JSON.parse(serviceAccountString) as ServiceAccount;
-    } catch (e) {
-        console.error("Error parsing FIREBASE_ADMIN_SDK_CONFIG:", e);
-        throw new Error('Could not parse the FIREBASE_ADMIN_SDK_CONFIG. Please ensure it is a valid JSON string.');
+
+    const projectId = process.env.FIREBASE_PROJECT_ID;
+    const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
+    const privateKey = process.env.FIREBASE_PRIVATE_KEY;
+
+    if (projectId && clientEmail && privateKey) {
+        return {
+            projectId,
+            clientEmail,
+            privateKey: privateKey.replace(/\\n/g, '\n'),
+        } as ServiceAccount;
     }
+
+    throw new Error('Firebase admin credentials missing. Set FIREBASE_ADMIN_SDK_CONFIG or FIREBASE_PROJECT_ID/FIREBASE_CLIENT_EMAIL/FIREBASE_PRIVATE_KEY.');
 }
 
 function initAdmin() {

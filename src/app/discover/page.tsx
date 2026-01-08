@@ -26,6 +26,7 @@ import type { ProjectData } from '@/lib/types';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useRouter } from 'next/navigation';
+import { ENTRESTATE_INVENTORY } from '@/data/entrestate-inventory';
 
 const PROJECTS_PER_PAGE = 12;
 
@@ -33,26 +34,30 @@ export default function DiscoverPage() {
   const router = useRouter();
   const [projects, setProjects] = useState<ProjectData[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchInput, setSearchInput] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCity, setSelectedCity] = useState("all");
   const [page, setPage] = useState(1);
   const [totalProjects, setTotalProjects] = useState(0);
+  const [showingSample, setShowingSample] = useState(false);
 
   // Database-Driven Insight State
   const [activeInsight, setActiveInsight] = useState("Yield");
 
   const INSIGHTS = [
-    { id: 'Yield', label: 'ROI Yield', desc: 'Highest rental returns currently in Dubai Marina.', stat: '8.4%', trend: '+1.2%' },
-    { id: 'Handover', label: '2026 Handover', desc: 'Projects scheduled for delivery in Q4 2026.', stat: '142', sub: 'Units' },
-    { id: 'Appreciation', label: 'Value Growth', desc: 'Capital appreciation spike in Creek Harbour.', stat: '14%', trend: '+3.5%' },
+    { id: 'Yield', label: 'ROI Yield', desc: 'Rental returns trending in Dubai Marina.', stat: 'High', trend: 'Trend' },
+    { id: 'Handover', label: 'Handover Window', desc: 'Projects delivering across 2026.', stat: 'Upcoming', sub: 'Timeline' },
+    { id: 'Appreciation', label: 'Value Growth', desc: 'Rising interest in Creek Harbour.', stat: 'Rising', trend: 'Trend' },
   ];
 
-  const fetchProjects = useCallback(async (pageParam: number, append: boolean) => {
+  const fetchProjects = useCallback(async (pageParam: number, overrides?: { query?: string; city?: string }) => {
     setLoading(true);
     try {
       const url = new URL('/api/projects/search', window.location.origin);
-      url.searchParams.set('query', searchQuery);
-      url.searchParams.set('city', selectedCity);
+      const queryValue = overrides?.query ?? searchQuery;
+      const cityValue = overrides?.city ?? selectedCity;
+      url.searchParams.set('query', queryValue);
+      url.searchParams.set('city', cityValue);
       url.searchParams.set('page', String(pageParam));
       url.searchParams.set('limit', String(PROJECTS_PER_PAGE));
 
@@ -60,8 +65,17 @@ export default function DiscoverPage() {
       if (!res.ok) throw new Error('Failed to fetch projects');
       const json = await res.json();
       
-      setTotalProjects(json.pagination.total || 0);
-      setProjects((prev) => append ? [...prev, ...json.data] : json.data);
+      const total = json.pagination?.total || 0;
+      const shouldShowSample = total === 0 && !queryValue && cityValue === 'all';
+      if (shouldShowSample) {
+        setProjects(ENTRESTATE_INVENTORY.slice(0, PROJECTS_PER_PAGE));
+        setTotalProjects(ENTRESTATE_INVENTORY.length);
+        setShowingSample(true);
+      } else {
+        setTotalProjects(total);
+        setProjects(json.data);
+        setShowingSample(false);
+      }
       setPage(pageParam);
     } catch (error) {
       console.error('Failed to load projects', error);
@@ -71,12 +85,29 @@ export default function DiscoverPage() {
   }, [searchQuery, selectedCity]);
 
   useEffect(() => {
-    fetchProjects(1, false);
+    fetchProjects(1);
   }, [fetchProjects]);
 
   const handleProjectClick = (projectId: string) => {
     router.push(`/discover/${projectId}`);
   };
+
+  const handleLoadSample = () => {
+    setProjects(ENTRESTATE_INVENTORY.slice(0, PROJECTS_PER_PAGE));
+    setTotalProjects(ENTRESTATE_INVENTORY.length);
+    setShowingSample(true);
+    setPage(1);
+  };
+
+  const handleSearch = () => {
+    const nextQuery = searchInput.trim();
+    setSearchQuery(nextQuery);
+  };
+
+  const totalPages = Math.max(1, Math.ceil(totalProjects / PROJECTS_PER_PAGE));
+  const showingCount = showingSample
+    ? projects.length
+    : Math.max(0, Math.min(PROJECTS_PER_PAGE, totalProjects - (page - 1) * PROJECTS_PER_PAGE));
 
   return (
     <main className="min-h-screen bg-black text-white flex flex-col font-sans selection:bg-blue-500/30">
@@ -90,14 +121,14 @@ export default function DiscoverPage() {
                   <div className="space-y-8">
                       <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50/10 text-blue-500 text-[10px] font-bold uppercase tracking-[0.3em] border border-blue-500/20">
                         <Activity className="h-3.5 w-3.5" />
-                        Live Intelligence Cluster
+                        Live Market Insights
                       </div>
                       <h1 className="text-6xl md:text-8xl font-black tracking-tighter leading-[0.9] text-white">
                           Market <br/>
-                          <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-indigo-600 uppercase italic">Truths.</span>
+                          <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-indigo-600 uppercase italic">Feed.</span>
                       </h1>
                       <p className="text-zinc-500 text-2xl font-light leading-relaxed max-w-xl">
-                          Beyond search. Access real-time facts from 3.5M+ property interactions and 3,750 verified projects.
+                          Browse project listings and market snapshots from your inventory sources.
                       </p>
 
                       <div className="relative group max-w-md">
@@ -106,11 +137,18 @@ export default function DiscoverPage() {
                               <Search className="h-6 w-6 text-zinc-600 ml-4" />
                               <input 
                                 type="text" 
-                                placeholder="Ask: 'Which projects handover in 2026?'"
+                                placeholder="Search projects, areas, or developers"
                                 className="flex-1 bg-transparent border-none text-white placeholder:text-zinc-700 focus:outline-none h-14 px-4 text-lg font-medium"
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
+                                value={searchInput}
+                                onChange={(e) => setSearchInput(e.target.value)}
+                                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                               />
+                              <Button
+                                onClick={handleSearch}
+                                className="h-10 px-5 rounded-xl bg-white text-black font-bold text-xs uppercase tracking-widest"
+                              >
+                                Search
+                              </Button>
                           </div>
                       </div>
                   </div>
@@ -149,7 +187,7 @@ export default function DiscoverPage() {
                       ))}
                       <div className="p-8 rounded-[2.5rem] bg-zinc-950 border border-white/5 flex flex-col justify-center items-center text-center group hover:border-blue-500/30 transition-all border-dashed text-zinc-500">
                           <Cpu className="h-8 w-8 text-zinc-700 group-hover:text-blue-500 transition-colors mb-4" />
-                          <p className="text-[10px] font-black uppercase tracking-widest">Master Node Analytics</p>
+                          <p className="text-[10px] font-black uppercase tracking-widest">Market Insights</p>
                       </div>
                   </div>
               </div>
@@ -160,20 +198,42 @@ export default function DiscoverPage() {
       <div className="flex-1 container mx-auto px-6 max-w-[1600px] py-20">
             <div className="flex flex-col md:flex-row justify-between items-end gap-6 mb-16 border-b border-white/5 pb-10">
                 <div>
-                    <p className="text-[10px] font-black text-blue-500 uppercase tracking-[0.4em] mb-2">Cluster Scan Result</p>
-                    <h2 className="text-4xl font-black italic uppercase tracking-tighter text-white">Project Inventory</h2>
+                    <p className="text-[10px] font-black text-blue-500 uppercase tracking-[0.4em] mb-2">Search Results</p>
+                    <h2 className="text-4xl font-black italic uppercase tracking-tighter text-white">Market Feed</h2>
                 </div>
                 <div className="flex items-center gap-4 text-xs font-bold text-zinc-500">
-                    <span className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse shadow-[0_0_10px_rgba(34,197,94,0.5)]" /> {totalProjects} Nodes Synced</span>
+                    <span className="flex items-center gap-2">
+                      <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse shadow-[0_0_10px_rgba(34,197,94,0.5)]" />
+                      {showingSample
+                        ? `Sample listings (${showingCount})`
+                        : totalProjects > 0
+                          ? `Showing ${showingCount} of ${totalProjects}`
+                          : 'Inventory setup needed'}
+                    </span>
                     <div className="w-px h-4 bg-white/10" />
-                    <span>Real-time Market Feed</span>
+                    <span>{showingSample ? 'Example feed' : `Page ${page} of ${totalPages}`}</span>
                 </div>
             </div>
+
+            {!loading && totalProjects === 0 && !showingSample && (
+                <div className="mb-12 rounded-[2rem] border border-dashed border-white/10 bg-white/5 p-8 text-center space-y-4">
+                    <p className="text-lg font-semibold text-white">No inventory connected yet.</p>
+                    <p className="text-sm text-zinc-500">Connect your feed or preview with sample listings.</p>
+                    <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+                        <Button asChild className="h-12 px-6 rounded-full bg-white text-black font-bold">
+                            <a href="/docs#inventory">Connect inventory feed</a>
+                        </Button>
+                        <Button onClick={handleLoadSample} variant="outline" className="h-12 px-6 rounded-full border-white/10 bg-white/5 text-white font-bold">
+                            Add sample listings
+                        </Button>
+                    </div>
+                </div>
+            )}
 
             {loading && projects.length === 0 ? (
                 <div className="h-96 flex flex-col items-center justify-center gap-6">
                     <Loader2 className="h-10 w-10 text-blue-500 animate-spin" />
-                    <p className="text-[10px] font-black text-zinc-700 uppercase tracking-[0.4em]">Querying Master Database...</p>
+                    <p className="text-[10px] font-black text-zinc-700 uppercase tracking-[0.4em]">Loading listings...</p>
                 </div>
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
@@ -186,6 +246,26 @@ export default function DiscoverPage() {
                     ))}
                 </div>
             )}
+
+            {!loading && !showingSample && totalProjects > PROJECTS_PER_PAGE && (
+                <div className="mt-12 flex flex-col sm:flex-row items-center justify-center gap-4">
+                    <Button
+                        variant="outline"
+                        className="h-12 px-6 rounded-full border-white/10 bg-white/5 text-white font-bold"
+                        disabled={page <= 1}
+                        onClick={() => fetchProjects(page - 1)}
+                    >
+                        Previous 12
+                    </Button>
+                    <Button
+                        className="h-12 px-6 rounded-full bg-white text-black font-bold"
+                        disabled={page >= totalPages}
+                        onClick={() => fetchProjects(page + 1)}
+                    >
+                        Load More
+                    </Button>
+                </div>
+            )}
       </div>
 
       {/* 3. FOOTER TRUST */}
@@ -195,22 +275,22 @@ export default function DiscoverPage() {
                   <div className="flex gap-4">
                       <div className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center text-blue-500 shrink-0"><ShieldCheck className="h-6 w-6" /></div>
                       <div>
-                          <h4 className="font-bold text-white mb-1 uppercase tracking-widest text-xs">Verified Nodes</h4>
-                          <p className="text-xs leading-relaxed">Every project is verified against official DLD records and developer inventory lists.</p>
+                          <h4 className="font-bold text-white mb-1 uppercase tracking-widest text-xs">Curated Listings</h4>
+                          <p className="text-xs leading-relaxed">Listings are sourced from your inventory feed and reviewed for clarity.</p>
                       </div>
                   </div>
                    <div className="flex gap-4">
                       <div className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center text-blue-500 shrink-0"><Globe className="h-6 w-6" /></div>
                       <div>
-                          <h4 className="font-bold text-white mb-1 uppercase tracking-widest text-xs">Global Delivery</h4>
-                          <p className="text-xs leading-relaxed">Access cross-border data for international investors looking at high-yield markets.</p>
+                          <h4 className="font-bold text-white mb-1 uppercase tracking-widest text-xs">Market Coverage</h4>
+                          <p className="text-xs leading-relaxed">Track areas your team focuses on with consistent formatting.</p>
                       </div>
                   </div>
                    <div className="flex gap-4">
                       <div className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center text-blue-500 shrink-0"><Zap className="h-6 w-6" /></div>
                       <div>
-                          <h4 className="font-bold text-white mb-1 uppercase tracking-widest text-xs">Instant Activation</h4>
-                          <p className="text-xs leading-relaxed">Turn any data point into a live campaign with our integrated Ads and Audience Architect.</p>
+                          <h4 className="font-bold text-white mb-1 uppercase tracking-widest text-xs">Ready to Share</h4>
+                          <p className="text-xs leading-relaxed">Turn listings into shareable links and quick follow-ups.</p>
                       </div>
                   </div>
               </div>
@@ -227,6 +307,13 @@ interface ProjectCardProps {
 }
 
 function ProjectCard({ project, onClick }: ProjectCardProps) {
+  const developerLabel = project.developer || 'Developer not shared';
+  const priceLabel = project.price?.label || 'Price on request';
+  const roiValue = project.performance?.roi;
+  const roiLabel = roiValue ? `${roiValue}%` : 'Not shared';
+  const appreciationValue = project.performance?.capitalAppreciation;
+  const appreciationLabel = appreciationValue ? `${appreciationValue}%` : 'Not shared';
+
   return (
     <Card 
       onClick={onClick}
@@ -239,7 +326,7 @@ function ProjectCard({ project, onClick }: ProjectCardProps) {
           <h3 className="text-2xl font-black text-white italic uppercase tracking-tighter">{project.name}</h3>
           <p className="text-zinc-400 font-medium text-sm flex items-center gap-2">
             <Building className="h-4 w-4" />
-            {project.developer || 'Verified Developer'}
+            {developerLabel}
           </p>
         </div>
       </div>
@@ -247,15 +334,15 @@ function ProjectCard({ project, onClick }: ProjectCardProps) {
         <div className="grid grid-cols-3 gap-4 text-center">
             <div>
                 <p className="text-[10px] font-black text-zinc-600 uppercase tracking-widest mb-1">Price</p>
-                <p className="text-lg font-black text-white tracking-tighter">{project.price?.label || 'AED 1.5M+'}</p>
+                <p className="text-lg font-black text-white tracking-tighter">{priceLabel}</p>
             </div>
             <div>
-                <p className="text-[10px] font-black text-zinc-600 uppercase tracking-widest mb-1">ROI</p>
-                <p className="text-lg font-black text-green-500">{project.performance?.roi || '--'}%</p>
+                <p className="text-[10px] font-black text-zinc-600 uppercase tracking-widest mb-1">Return</p>
+                <p className="text-lg font-black text-green-500">{roiLabel}</p>
             </div>
             <div>
-                <p className="text-[10px] font-black text-zinc-600 uppercase tracking-widest mb-1">Growth</p>
-                <p className="text-lg font-black text-green-500">{project.performance?.growth || '--'}%</p>
+                <p className="text-[10px] font-black text-zinc-600 uppercase tracking-widest mb-1">Appreciation</p>
+                <p className="text-lg font-black text-green-500">{appreciationLabel}</p>
             </div>
         </div>
         <Button variant="outline" className="w-full h-12 rounded-xl border-white/10 bg-white/5 text-zinc-300 hover:text-white font-bold gap-2 text-xs uppercase tracking-widest">

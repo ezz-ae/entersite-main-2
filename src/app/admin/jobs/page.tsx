@@ -56,7 +56,7 @@ export default function JobsDashboard() {
         
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 border-b border-white/5 pb-10">
           <div>
-            <h1 className="text-4xl font-black tracking-tighter uppercase italic text-white">Infrastructure Logs</h1>
+            <h1 className="text-4xl font-black tracking-tighter uppercase italic text-white">System Logs</h1>
             <p className="text-zinc-500 text-lg font-light">Monitor real-time AI workload and system orchestration.</p>
           </div>
           <div className="flex gap-3">
@@ -71,7 +71,7 @@ export default function JobsDashboard() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            <StatsCard label="Active Nodes" value={jobs.filter(j => j.status === 'running').length.toString()} icon={RefreshCw} color="blue" />
+            <StatsCard label="Active Jobs" value={jobs.filter(j => j.status === 'running').length.toString()} icon={RefreshCw} color="blue" />
             <StatsCard label="Queue Depth" value={jobs.filter(j => j.status === 'queued').length.toString()} icon={Terminal} color="zinc" />
             <StatsCard label="Completed" value={jobs.filter(j => j.status === 'done').length.toString()} icon={CheckCircle2} color="green" />
             <StatsCard label="System Faults" value={jobs.filter(j => j.status === 'error').length.toString()} icon={AlertCircle} color="red" />

@@ -37,11 +37,11 @@ export function AudienceBuilderTool() {
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 border-b border-white/5 pb-8">
         <div>
           <h2 className="text-4xl font-black tracking-tight text-white uppercase italic">Audience Architect</h2>
-          <p className="text-zinc-500 text-lg font-light">Deploy precision targeting using EntreSite's Master Investor Network.</p>
+          <p className="text-zinc-500 text-lg font-light">Launch precision targeting using EntreSite's Master Investor Network.</p>
         </div>
         <div className="flex gap-3">
              <Badge variant="outline" className="bg-blue-500/10 text-blue-500 border-blue-500/20 px-4 py-2 rounded-full">
-                <Database className="h-3 w-3 mr-2" /> Master Pool: 12,450 Verified Buyers
+                <Database className="h-3 w-3 mr-2" /> Master Pool: Pilot List
              </Badge>
         </div>
       </div>
@@ -67,7 +67,7 @@ export function AudienceBuilderTool() {
                             <h3 className="text-2xl font-bold text-white tracking-tight">Master Network Seeding</h3>
                             <Badge className="bg-blue-500/20 text-blue-400 border-0 text-[8px] font-black uppercase tracking-widest">Recommended</Badge>
                         </div>
-                        <p className="text-zinc-500 font-medium">Seed your Meta audience with our verified history of 3.5M+ property interactions.</p>
+                        <p className="text-zinc-500 font-medium">Seed your Meta audience with approved pilot segments or your own list.</p>
                     </div>
                     <Button 
                         onClick={() => setUseMasterNetwork(!useMasterNetwork)}
@@ -104,9 +104,9 @@ export function AudienceBuilderTool() {
                 <div className="space-y-4">
                     <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-600">Financial Profile</label>
                     <div className="space-y-3">
-                        <ProfileOption label="Liquid Capital > $1M" active />
-                        <ProfileOption label="Frequent Real Estate Search" active />
-                        <ProfileOption label="Luxury Brand Affinity" />
+                        <ProfileOption label="High-intent buyers" active />
+                        <ProfileOption label="Frequent real estate search" active />
+                        <ProfileOption label="Luxury brand interest" />
                     </div>
                 </div>
               </div>
@@ -130,7 +130,7 @@ export function AudienceBuilderTool() {
               <CardHeader className="p-8 pb-4">
                  <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-1">Projected Delivery</p>
                  <div className="flex items-baseline gap-2">
-                    <span className="text-5xl font-black tracking-tighter">184K</span>
+                    <span className="text-5xl font-black tracking-tighter">Estimate</span>
                     <span className="text-zinc-500 font-bold text-xs">REACH</span>
                  </div>
               </CardHeader>
@@ -148,7 +148,7 @@ export function AudienceBuilderTool() {
                     <div className="grid grid-cols-2 gap-4">
                        <div className="p-5 rounded-2xl bg-black border border-white/5">
                           <p className="text-[10px] text-zinc-500 uppercase font-black mb-1">CPL Range</p>
-                          <p className="text-2xl font-black text-green-500">$8 - $14</p>
+                          <p className="text-2xl font-black text-green-500">Estimate</p>
                        </div>
                        <div className="p-5 rounded-2xl bg-black border border-white/5">
                           <p className="text-[10px] text-zinc-500 uppercase font-black mb-1">Quality</p>

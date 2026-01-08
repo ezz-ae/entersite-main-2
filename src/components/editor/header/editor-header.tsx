@@ -41,7 +41,7 @@ export function EditorHeader({
           </Link>
           <div className="h-4 w-px bg-white/10" />
           <div className="flex flex-col">
-              <span className="text-xs font-bold text-zinc-500 uppercase tracking-widest leading-none mb-1">Editing Site</span>
+              <span className="text-xs font-bold text-zinc-500 uppercase tracking-widest leading-none mb-1">Editing Website</span>
               <h2 className="text-sm font-bold text-white leading-none">{page.title}</h2>
           </div>
       </div>
@@ -94,7 +94,7 @@ export function EditorHeader({
             disabled={isRefining}
           >
             <Sparkles className="h-4 w-4" />
-            {isRefining ? 'Refiner Running...' : 'Refiner AI'}
+            {isRefining ? 'Improving...' : 'Improve Copy'}
           </Button>
           <Button 
             size="sm" 
@@ -102,7 +102,7 @@ export function EditorHeader({
             onClick={onPublish}
           >
               <Rocket className="h-4 w-4"/>
-              Publish
+              Publish Link
           </Button>
           <div className="h-4 w-px bg-white/10 mx-1" />
           <UserNav />

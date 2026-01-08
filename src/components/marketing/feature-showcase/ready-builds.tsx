@@ -11,24 +11,24 @@ import { cn } from '@/lib/utils';
 const BLUEPRINTS = [
     {
         id: 'brochure-to-web',
-        title: "Brochure Architect",
-        type: "Conversion Engine",
-        focus: "PDF to Landing Page",
+        title: "Brochure Preview",
+        type: "Listing Page",
+        focus: "PDF to Page",
         color: "blue",
         isNew: true
     },
     {
         id: 'off-plan-brokerage',
-        title: "Lead Magnet",
-        type: "Multi-Listing",
-        focus: "High Lead Volume",
+        title: "Multi-Listing",
+        type: "Project Hub",
+        focus: "Share Multiple Projects",
         color: "orange"
     },
     {
         id: 'investor-roi-tracker',
-        title: "Yield Expert",
-        type: "ROI Dashboard",
-        focus: "Investor Conversion",
+        title: "Investor Overview",
+        type: "Performance View",
+        focus: "Clear Highlights",
         color: "purple"
     }
 ];
@@ -43,19 +43,19 @@ export function ReadyBuilds() {
         <div className="flex flex-col md:flex-row justify-between items-end mb-24 gap-12 border-b border-white/5 pb-16">
             <div className="max-w-4xl space-y-6">
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-500 text-[10px] font-bold uppercase tracking-widest">
-                    <Sparkles className="h-3 w-3" /> Industry First
+                    <Sparkles className="h-3 w-3" /> Early Access
                 </div>
                 <h2 className="text-6xl md:text-8xl font-bold tracking-tighter leading-none">
                     Brochure to <br/>
-                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-indigo-600">Lead Gen in Seconds.</span>
+                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-indigo-600">Listing Page.</span>
                 </h2>
                 <p className="text-2xl text-zinc-400 max-w-2xl font-light">
-                    Stop manually building sites. Upload your project PDF brochure, and Entrestate will architect a high-converting landing page automatically.
+                    Upload a brochure and we draft a clean project page you can share.
                 </p>
             </div>
             <Link href="/builder">
                 <Button className="h-16 px-10 rounded-full bg-white text-black font-bold text-lg hover:scale-105 transition-all gap-3 shadow-xl">
-                    Try Brochure Upload <UploadCloud className="h-5 w-5" />
+                    Request Brochure Preview <UploadCloud className="h-5 w-5" />
                 </Button>
             </Link>
         </div>
@@ -82,7 +82,7 @@ export function ReadyBuilds() {
                             </Badge>
                             {bp.isNew && (
                                 <div className="px-3 py-1 rounded-full bg-blue-600 text-[9px] font-black uppercase tracking-widest text-white">
-                                    AI Engine
+                                    Smart
                                 </div>
                             )}
                         </div>
@@ -101,7 +101,7 @@ export function ReadyBuilds() {
                             <div className="pt-8 border-t border-white/5">
                                 <Link href={`/builder?template=${bp.id}`}>
                                     <Button className="w-full h-16 rounded-2xl bg-white text-black font-bold group-hover:bg-blue-600 group-hover:text-white transition-all text-lg">
-                                        Launch Build <ArrowRight className="ml-2 h-5 w-5" />
+                                        View Preview <ArrowRight className="ml-2 h-5 w-5" />
                                     </Button>
                                 </Link>
                             </div>
@@ -115,23 +115,23 @@ export function ReadyBuilds() {
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-12 mt-32">
             <FeatureCard 
                 icon={FileText} 
-                title="Brochure Intelligence" 
-                desc="Extract floor plans, amenities, and pricing directly from your PDF documents." 
+                title="Brochure Details" 
+                desc="Pull floor plans, amenities, and pricing directly from your PDF." 
             />
             <FeatureCard 
                 icon={Zap} 
-                title="Instant Architect" 
-                desc="Generate a fully functional lead-gen site in under 10 seconds from any source." 
+                title="Quick Draft" 
+                desc="Generate a draft page in minutes from any brochure." 
             />
             <FeatureCard 
                 icon={ShieldCheck} 
-                title="Verified Data" 
-                desc="Cross-referenced with our 3,750+ project database for market accuracy." 
+                title="Your Data" 
+                desc="Built from the details you provide and upload." 
             />
             <FeatureCard 
                 icon={UploadCloud} 
                 title="Bulk Import" 
-                desc="Sync your entire inventory by simply dragging folders of brochures into the OS." 
+                desc="Import multiple brochures at once to save time." 
             />
         </div>
       </div>

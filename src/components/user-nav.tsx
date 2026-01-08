@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { CreditCard, LogOut, PlusCircle, Settings, User as UserIcon } from "lucide-react";
 import Link from "next/link";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -22,6 +23,7 @@ import { LoginDialog } from "./auth/login-dialog";
 
 export function UserNav() {
   const [user] = useAuthState(auth);
+  const [isLoginOpen, setIsLoginOpen] = useState(false);
 
   const handleLogout = () => {
     signOut(auth);
@@ -30,7 +32,14 @@ export function UserNav() {
   if (!user) {
     return (
         <ClientOnly>
-            <LoginDialog />
+            <Button
+              variant="ghost"
+              className="h-10 px-4 rounded-full border border-white/10 text-xs font-bold uppercase tracking-widest"
+              onClick={() => setIsLoginOpen(true)}
+            >
+              Log In
+            </Button>
+            <LoginDialog isOpen={isLoginOpen} onOpenChange={setIsLoginOpen} />
         </ClientOnly>
     )
   }
@@ -71,10 +80,10 @@ export function UserNav() {
                     <span>Billing</span>
                 </DropdownMenuItem>
             </Link>
-            <Link href="/dashboard/settings">
+            <Link href="/dashboard/brand">
                 <DropdownMenuItem className="rounded-lg cursor-pointer hover:bg-white/5">
                     <Settings className="mr-2 h-4 w-4 text-zinc-500" />
-                    <span>Settings</span>
+                    <span>Brand</span>
                 </DropdownMenuItem>
             </Link>
             </DropdownMenuGroup>

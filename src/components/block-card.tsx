@@ -133,7 +133,7 @@ export function BlockCard({ blockType, children, onDelete, onUpdate, onDuplicate
                             </TabsContent>
                             <TabsContent value="style" className="mt-0">
                                 <div className="h-40 flex items-center justify-center text-muted-foreground text-sm bg-muted/10 rounded-xl border border-dashed">
-                                    Style controls coming soon
+                                    Style options are managed in Brand settings.
                                 </div>
                             </TabsContent>
                         </Tabs>

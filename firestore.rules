@@ -26,6 +26,12 @@ service cloud.firestore {
       }
     }
 
+    // Builder sites are private to the owner.
+    match /sites/{siteId} {
+      allow read, update, delete: if request.auth != null && request.auth.uid == resource.data.ownerUid;
+      allow create: if request.auth != null && request.resource.data.ownerUid == request.auth.uid;
+    }
+
     // Published pages are public-read. They are only written by the backend.
     match /pages_public/{slug} {
       allow read: if true;

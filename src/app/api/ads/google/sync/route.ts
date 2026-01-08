@@ -9,6 +9,9 @@ const requestSchema = z.object({
   budget: z.number().nonnegative(),
   duration: z.number().positive(),
   location: z.string().min(1),
+  goal: z.string().optional(),
+  landingPage: z.string().url().optional(),
+  notes: z.string().optional(),
   variation: z
     .object({
       headlines: z.array(z.string()).optional(),
@@ -35,7 +38,7 @@ export async function POST(req: NextRequest) {
         const responsePayload = { 
             success: true, 
             campaignId: `ads_${Math.random().toString(36).substr(2, 9)}`,
-            status: 'Pending Review' 
+            status: 'Setup Requested' 
         };
 
         try {
@@ -55,9 +58,12 @@ export async function POST(req: NextRequest) {
                 campaignId: responsePayload.campaignId,
                 tenantId,
                 name: body.name,
-                status: 'Active',
+                status: responsePayload.status,
                 dailyBudget: body.budget,
                 scheduledSpend: body.budget * body.duration,
+                goal: body.goal || 'Lead Generation',
+                landingPage: body.landingPage || null,
+                notes: body.notes || null,
                 leadsCaptured: 0,
                 conversions: 0,
                 revenue: 0,

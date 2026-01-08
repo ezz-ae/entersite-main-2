@@ -3,7 +3,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Bot, Instagram, MessageSquare, Zap, Globe, Sparkles, Send, FileText, Download } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
@@ -16,7 +15,7 @@ interface Message {
 export function ChatAgentShowcase() {
   const [messages, setMessages] = useState<Message[]>([
     { side: 'left', text: 'Hi! I saw the post about the new launch in Creek Beach. Can you send me the floor plans for 2BR apartments?' },
-    { side: 'right', text: 'Certainly! Emaar just released the \'Creek Waters\' phase. 2BR apartments start from AED 2.1M. Here is the floor plan PDF.', isPdf: true },
+    { side: 'right', text: 'Absolutely. Here is the floor plan PDF for the 2BR options.', isPdf: true },
     { side: 'right', text: 'Would you like to schedule a private viewing or speak to an area specialist?' },
   ]);
   const [inputValue, setInputValue] = useState('');
@@ -30,7 +29,7 @@ export function ChatAgentShowcase() {
 
     // Simulate bot response
     setTimeout(() => {
-      setMessages(prev => [...prev, { side: 'right', text: 'I am a demo version. For full functionality, please sign up.' }]);
+      setMessages(prev => [...prev, { side: 'right', text: 'I can share availability, pricing ranges, or set up a viewing for you.' }]);
     }, 1000);
   };
 
@@ -44,27 +43,27 @@ export function ChatAgentShowcase() {
           {/* Left: Content */}
           <div className="space-y-10">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-500 text-xs font-bold uppercase tracking-widest">
-               <Sparkles className="h-3 w-3" /> Omnichannel Intelligence
+               <Sparkles className="h-3 w-3" /> Instant Replies
             </div>
             
             <h2 className="text-5xl md:text-7xl font-bold tracking-tighter leading-[1.1]">
-              Your 24/7 <br/>
-              <span className="text-blue-500">Expert Sales Agent.</span>
+              Your Always-On <br/>
+              <span className="text-blue-500">Sales Assistant.</span>
             </h2>
             
             <p className="text-xl text-zinc-400 leading-relaxed max-w-xl">
-              Trained on our database of 3,750+ UAE projects. Deploy it to your Instagram DMs, WhatsApp, or any website in seconds. It doesn't just chat—it sells.
+              Answer common questions and share listings on Instagram, WhatsApp, or your website to capture leads faster.
             </p>
 
             <div className="grid grid-cols-2 gap-6 pt-6">
                 <Feature icon={Instagram} title="Instagram Bio" desc="Automate lead capture from your bio link." />
                 <Feature icon={MessageSquare} title="WhatsApp Sync" desc="Share brochures and plans instantly." />
-                <Feature icon={Globe} title="Web Embed" desc="Add to your current site with one line of code." />
-                <Feature icon={Zap} title="Live Data" desc="Answers based on real-time price updates." />
+                <Feature icon={Globe} title="Website Chat" desc="We add it to your site for you." />
+                <Feature icon={Zap} title="Up-to-date Answers" desc="Uses your latest pricing and availability." />
             </div>
 
-            <Button size="lg" className="h-16 px-10 rounded-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-lg mt-8 shadow-xl shadow-blue-900/20">
-              Build Your Agent Now
+            <Button asChild size="lg" className="h-16 px-10 rounded-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-lg mt-8 shadow-xl shadow-blue-900/20">
+              <a href="/dashboard/chat-agent">Start Chat Assistant</a>
             </Button>
           </div>
 
@@ -79,7 +78,7 @@ export function ChatAgentShowcase() {
                          <Bot className="h-6 w-6 text-white" />
                       </div>
                       <div>
-                         <p className="font-bold text-white">Creek Expert AI</p>
+                         <p className="font-bold text-white">Creek Expert Assistant</p>
                          <p className="text-xs text-green-500 flex items-center gap-1">
                             <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" /> Online
                          </p>

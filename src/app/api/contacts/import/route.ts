@@ -5,9 +5,13 @@ import { promises as fs } from 'fs';
 import { parse } from 'csv-parse/sync';
 import { tmpdir } from 'os';
 import { join } from 'path';
+import { FieldValue } from 'firebase-admin/firestore';
+import { getAdminDb } from '@/server/firebase-admin';
+import { requireTenantScope, UnauthorizedError, ForbiddenError } from '@/server/auth';
 
 export async function POST(req: NextRequest) {
   try {
+    const { tenantId } = await requireTenantScope(req);
     const formData = await req.formData();
     const file = formData.get('file') as File | null;
 
@@ -30,7 +34,7 @@ export async function POST(req: NextRequest) {
     const records = parse(fileContent, {
       columns: true,
       skip_empty_lines: true,
-    });
+    }) as Array<Record<string, string>>;
 
     // Validate records
     if (!records.length || !records[0].hasOwnProperty('email')) {
@@ -38,17 +42,56 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: 'CSV must contain an \'email\' column.' }, { status: 400 });
     }
 
-    // Here you would typically save the contacts to your database
-    // For this example, we'll just count them
-    const importedCount = records.length;
+    const db = getAdminDb();
+    const batch = db.batch();
+    let importedCount = 0;
 
-    console.log(`Successfully parsed ${importedCount} contacts.`);
+    records.forEach((record) => {
+      const emailRaw = String(record.email || '').trim().toLowerCase();
+      if (!emailRaw || !emailRaw.includes('@')) {
+        return;
+      }
+
+      const nameParts = [
+        record.name,
+        record.first_name,
+        record.last_name,
+      ].filter(Boolean);
+      const name = nameParts.length ? String(nameParts.join(' ')).trim() : undefined;
+
+      const docId = `${tenantId}_${Buffer.from(emailRaw).toString('base64url')}`;
+      const docRef = db.collection('contacts').doc(docId);
+      batch.set(
+        docRef,
+        {
+          tenantId,
+          channel: 'email',
+          email: emailRaw,
+          name,
+          source: 'import',
+          updatedAt: FieldValue.serverTimestamp(),
+          createdAt: FieldValue.serverTimestamp(),
+        },
+        { merge: true }
+      );
+      importedCount += 1;
+    });
+
+    if (importedCount > 0) {
+      await batch.commit();
+    }
 
     await fs.unlink(tempFilePath);
 
     return NextResponse.json({ message: 'Import successful', count: importedCount });
 
   } catch (error) {
+    if (error instanceof UnauthorizedError) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+    if (error instanceof ForbiddenError) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
     console.error('Import API Error:', error);
     return NextResponse.json({ error: 'An unexpected error occurred during import.' }, { status: 500 });
   }

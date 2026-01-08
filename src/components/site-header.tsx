@@ -26,14 +26,14 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 import { EntrestateLogo } from './icons';
 import { Button } from './ui/button';
-import { useAuth } from '@/context/auth-context';
+import { useAuth } from '@/hooks/useAuth';
 
 const NAV_LINKS = [
-    { href: "/trending", label: "AI Agent", icon: Bot, description: "AI Sales Agents for Instagram" },
-    { href: "/google-ads", label: "Google Ads", icon: Search, description: "Your Ads, Amplified" },
-    { href: "/audience-network", label: "Data Pool", icon: Users, description: "12,450 Verified UAE Property Buyers" },
-    { href: "/discover", label: "Inventory", icon: Library, description: "3,750+ Real Estate Projects" },
-    { href: "/docs", label: "Support", icon: LifeBuoy, description: "Help Center & Operator Manual" },
+    { href: "/instagram-assistant", label: "Instagram Assistant", icon: Bot, description: "Reply faster to buyer inquiries" },
+    { href: "/google-ads", label: "Google Ads", icon: Search, description: "Run ads without the headache" },
+    { href: "/audience-network", label: "Buyer Audience", icon: Users, description: "Pilot audience tools for brokers" },
+    { href: "/discover", label: "Market Feed", icon: Library, description: "Project listings and market updates" },
+    { href: "/docs", label: "Support", icon: LifeBuoy, description: "Help center & guides" },
 ];
 
 export function SiteHeader() {
@@ -41,6 +41,14 @@ export function SiteHeader() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { user, logOut } = useAuth();
+
+  const handleLogOut = async () => {
+    try {
+      await logOut();
+    } catch (error) {
+      console.error('Sign out failed:', error);
+    }
+  };
   
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 20);
@@ -107,7 +115,7 @@ export function SiteHeader() {
               </Link>
             </>
           ) : (
-            <Link href="/dashboard" className="hidden sm:block">
+            <Link href="/start" className="hidden sm:block">
                 <Button className="h-10 px-6 rounded-full bg-white text-black font-bold text-[10px] uppercase tracking-widest hover:scale-105 transition-all shadow-xl shadow-white/10 group border-0">
                     Get Started <ArrowRight className="ml-2 h-3 w-3 group-hover:translate-x-1 transition-transform" />
                 </Button>
@@ -143,7 +151,7 @@ export function SiteHeader() {
                 <div className="flex-1 overflow-y-auto px-6 pt-24 pb-12">
                     <div className="space-y-10">
                         <div>
-                            <p className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest mb-6 px-1">Infrastructure</p>
+                            <p className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest mb-6 px-1">Explore</p>
                             <nav className="flex flex-col gap-4">
                                 {NAV_LINKS.map((link) => (
                                     <Link
@@ -172,14 +180,14 @@ export function SiteHeader() {
                         <div>
                             <p className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest mb-6 px-1">Quick Access</p>
                             <div className="space-y-3">
-                                <Link href={user ? "/dashboard" : "/dashboard"} className="block">
+                                <Link href={user ? "/dashboard" : "/start"} className="block">
                                     <div className="p-6 rounded-[1.5rem] bg-blue-600 text-white shadow-xl shadow-blue-600/20 group">
                                         <div className="flex items-center justify-between mb-3">
                                             <Target className="h-5 w-5" />
                                             <ArrowRight className="h-4 w-4 opacity-50" />
                                         </div>
                                         <h4 className="text-lg font-bold tracking-tight">{user ? "Dashboard" : "Get Started"}</h4>
-                                        <p className="text-blue-100/60 text-[10px] font-bold uppercase tracking-widest">Real-time Operations</p>
+                                        <p className="text-blue-100/60 text-[10px] font-bold uppercase tracking-widest">Your Workspace</p>
                                     </div>
                                 </Link>
                                 <div className="grid grid-cols-2 gap-3">
@@ -191,7 +199,7 @@ export function SiteHeader() {
                                     )}
                                     <Link href="/docs" className="p-4 rounded-xl bg-white/5 border border-white/5 flex flex-col gap-2">
                                         <LifeBuoy className="h-5 w-5 text-zinc-500" />
-                                        <span className="text-xs font-bold text-zinc-300">Manual</span>
+                                        <span className="text-xs font-bold text-zinc-300">Help Center</span>
                                     </Link>
                                 </div>
                             </div>
@@ -209,12 +217,12 @@ export function SiteHeader() {
                                 <p className="text-white font-bold text-xs truncate">{user.displayName || user.email?.split('@')[0]}</p>
                                 <p className="text-zinc-600 text-[10px] truncate">{user.email}</p>
                              </div>
-                             <Button variant="ghost" size="icon" className="h-8 w-8 text-zinc-600" onClick={logOut}>
+                             <Button variant="ghost" size="icon" className="h-8 w-8 text-zinc-600" onClick={handleLogOut}>
                                 <X className="h-4 w-4" />
                              </Button>
                         </div>
                     ) : (
-                        <Link href="/dashboard">
+                        <Link href="/start">
                             <Button className="w-full h-14 rounded-xl bg-white text-black font-bold text-sm uppercase tracking-widest shadow-xl border-0">
                                 Get Started Free
                             </Button>

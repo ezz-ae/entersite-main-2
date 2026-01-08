@@ -9,25 +9,25 @@ export const useAuth = () => {
   const [error, setError] = useState<string | null>(null);
   const auth = getAuth(app);
 
-  const signIn = async (email, password) => {
+  const signIn = async (email: string, password: string) => {
     setLoading(true);
     setError(null);
     try {
       await signInWithEmailAndPassword(auth, email, password);
-    } catch (error) {
-      setError(error.message);
+    } catch (error: unknown) {
+      setError(error instanceof Error ? error.message : 'Something went wrong.');
     } finally {
       setLoading(false);
     }
   };
 
-  const signUp = async (email, password) => {
+  const signUp = async (email: string, password: string) => {
     setLoading(true);
     setError(null);
     try {
       await createUserWithEmailAndPassword(auth, email, password);
-    } catch (error) {
-      setError(error.message);
+    } catch (error: unknown) {
+      setError(error instanceof Error ? error.message : 'Something went wrong.');
     } finally {
       setLoading(false);
     }

@@ -62,7 +62,7 @@ export function KnowledgeUploader({ onUploadSuccess }: KnowledgeUploaderProps) {
         setError(result.error || 'An unknown error occurred.');
       }
     } catch (e: any) {
-      setError("Failed to connect to the server. Please try again.");
+      setError("Couldn't connect right now. Please try again.");
       console.error(e);
     } finally {
       setUploading(false);
