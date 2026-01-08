@@ -21,6 +21,45 @@ export function ChatAgentBlock({
   theme = 'glass'
 }: ChatAgentBlockProps) {
   const [input, setInput] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [messages, setMessages] = useState([
+    { role: 'agent', text: "Hello! I'm your market advisor. Ask me anything about pricing, availability, or upcoming launches." },
+    { role: 'user', text: "What are the best options in Dubai Marina right now?" },
+    { role: 'agent', text: "There are a few strong options based on your budget and timeline. Want a quick shortlist to review?" },
+  ]);
+
+  const handleSend = async () => {
+    if (!input.trim() || isLoading) return;
+    const userText = input.trim();
+    setInput('');
+    setMessages((prev) => [...prev, { role: 'user', text: userText }]);
+    setIsLoading(true);
+
+    try {
+      const response = await fetch('/api/bot/preview/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message: userText,
+          history: messages.slice(-6),
+          context: `Agent: ${agentName}. Focus: ${headline}. ${subtext}`,
+        }),
+      });
+      const data = await response.json();
+      setMessages((prev) => [
+        ...prev,
+        { role: 'agent', text: data.reply || "I'm reviewing the latest listings. What area should I focus on?" },
+      ]);
+    } catch (error) {
+      console.error('Chat agent error', error);
+      setMessages((prev) => [
+        ...prev,
+        { role: 'agent', text: "I'm having trouble right now. Share your preferred area and budget and I'll follow up." },
+      ]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <div className="py-20 relative overflow-hidden">
@@ -77,21 +116,25 @@ export function ChatAgentBlock({
 
                         {/* Messages Area */}
                         <div className="flex-1 p-6 space-y-4 overflow-y-auto custom-scrollbar">
-                            <div className="flex justify-start">
-                                <div className="max-w-[80%] bg-zinc-800/80 rounded-2xl rounded-tl-none p-4 text-sm text-zinc-200">
-                                    Hello! I'm your market advisor. Ask me anything about pricing, availability, or upcoming launches.
+                            {messages.map((message, index) => (
+                                <div key={`${message.role}-${index}`} className={cn("flex", message.role === 'user' ? "justify-end" : "justify-start")}>
+                                    <div className={cn(
+                                        "max-w-[80%] rounded-2xl p-4 text-sm",
+                                        message.role === 'user'
+                                          ? "bg-blue-600 rounded-tr-none text-white shadow-lg shadow-blue-900/20"
+                                          : "bg-zinc-800/80 rounded-tl-none text-zinc-200"
+                                    )}>
+                                        {message.text}
+                                    </div>
                                 </div>
-                            </div>
-                            <div className="flex justify-end">
-                                <div className="max-w-[80%] bg-blue-600 rounded-2xl rounded-tr-none p-4 text-sm text-white shadow-lg shadow-blue-900/20">
-                                    What are the best options in Dubai Marina right now?
+                            ))}
+                            {isLoading && (
+                              <div className="flex justify-start">
+                                <div className="max-w-[80%] bg-zinc-800/80 rounded-2xl rounded-tl-none p-4 text-sm text-zinc-400">
+                                  Typing…
                                 </div>
-                            </div>
-                            <div className="flex justify-start">
-                                <div className="max-w-[80%] bg-zinc-800/80 rounded-2xl rounded-tl-none p-4 text-sm text-zinc-200">
-                                    There are a few strong options based on your budget and timeline. Want a quick shortlist to review?
-                                </div>
-                            </div>
+                              </div>
+                            )}
                         </div>
 
                         {/* Input Area */}
@@ -103,8 +146,13 @@ export function ChatAgentBlock({
                                     placeholder={placeholder}
                                     value={input}
                                     onChange={(e) => setInput(e.target.value)}
+                                    onKeyDown={(e) => e.key === 'Enter' && handleSend()}
                                 />
-                                <button className="absolute right-2 top-2 w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center text-white hover:bg-blue-700 transition-all group-hover:scale-105 active:scale-95 shadow-lg shadow-blue-900/20">
+                                <button
+                                  className="absolute right-2 top-2 w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center text-white hover:bg-blue-700 transition-all group-hover:scale-105 active:scale-95 shadow-lg shadow-blue-900/20"
+                                  onClick={handleSend}
+                                  disabled={isLoading}
+                                >
                                     <Send className="h-4 w-4" />
                                 </button>
                             </div>
