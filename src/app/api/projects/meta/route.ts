@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
-import { getAdminDb } from '@/server/firebase-admin';
 import { ENTRESTATE_INVENTORY } from '@/data/entrestate-inventory';
+import { loadInventoryProjects } from '@/server/inventory';
 
 function buildMetadata(projects: any[]) {
   const developerSet = new Set<string>();
@@ -35,12 +35,9 @@ function buildMetadata(projects: any[]) {
 
 export async function GET() {
   try {
-    const db = getAdminDb();
-    const snapshot = await db.collection('inventory_projects').select('developer', 'location').get();
-
-    if (!snapshot.empty) {
-      const docs = snapshot.docs.map((doc) => doc.data());
-      return NextResponse.json(buildMetadata(docs));
+    const projects = await loadInventoryProjects(8000);
+    if (projects.length) {
+      return NextResponse.json(buildMetadata(projects));
     }
   } catch (error) {
     console.error('[projects/meta] failed to load metadata', error);

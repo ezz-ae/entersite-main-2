@@ -3,6 +3,7 @@ import { generateText } from 'ai';
 import { z } from 'zod';
 import { getGoogleModel, PRO_MODEL } from '@/lib/ai/google';
 import { mainSystemPrompt } from '@/config/prompts';
+import { formatProjectContext, getRelevantProjects } from '@/server/inventory';
 
 const requestSchema = z.object({
   message: z.string().min(1),
@@ -17,20 +18,36 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const { message, history: incomingHistory } = requestSchema.parse(body);
 
-    const history = (incomingHistory || []).map(entry => ({
-      role: entry.role === 'agent' ? 'assistant' as const : 'user' as const,
-      content: entry.text,
-    }));
+    const historyText = (incomingHistory || [])
+      .map((entry) => `${entry.role === 'user' ? 'Client' : 'Agent'}: ${entry.text}`)
+      .join('\n');
 
-    const messages = [
-      ...history,
-      { role: 'user' as const, content: message },
-    ];
+    const relevantProjects = await getRelevantProjects(message, historyText, 8);
+    const projectContext = relevantProjects.length
+      ? `\nRelevant listings:\n${relevantProjects.map(formatProjectContext).join('\n')}`
+      : '';
+
+    const prompt = `
+Role & Context:
+You are Entrestate's real estate assistant for UAE brokers.
+Speak in simple, non-technical language and keep answers concise.
+Use the listing context below when available.
+If asked about Dubai/UAE investment topics (fees, visas, payment plans, ROI, financing), give high-level guidance and say details should be confirmed with the broker.
+If you mention pricing or returns, note they are estimates.
+If you are unsure, say so and offer a next step (brochure, viewing, or a call).
+${projectContext}
+
+Conversation History:
+${historyText}
+
+Client: ${message}
+Agent:
+`;
 
     const { text } = await generateText({
       model: getGoogleModel(PRO_MODEL),
-      system: mainSystemPrompt,
-      messages,
+      system: `${mainSystemPrompt}\nAlways be clear, helpful, and broker-friendly.`,
+      prompt,
     });
 
     return NextResponse.json({ reply: text });

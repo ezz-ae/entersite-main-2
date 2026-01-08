@@ -1,18 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getAdminDb } from '@/server/firebase-admin';
 import { filterProjects, paginateProjects } from '@/lib/projects/filter';
-import type { ProjectData } from '@/lib/types';
+import { loadInventoryProjects } from '@/server/inventory';
 
 const MAX_DATA_LOAD = 8000;
 
 function parseFilters(searchParams: URLSearchParams) {
   const limitParam = parseInt(searchParams.get('limit') || '12', 10);
   const safeLimit = Number.isFinite(limitParam) ? Math.min(Math.max(limitParam, 1), 12) : 12;
+  const minPriceParam = parseFloat(searchParams.get('minPrice') || '');
+  const maxPriceParam = parseFloat(searchParams.get('maxPrice') || '');
 
   return {
     query: searchParams.get('query')?.toLowerCase() ?? '',
     city: searchParams.get('city')?.toLowerCase() ?? 'all',
     status: searchParams.get('status')?.toLowerCase() ?? 'all',
+    developer: searchParams.get('developer')?.toLowerCase() ?? '',
+    minPrice: Number.isFinite(minPriceParam) ? minPriceParam : undefined,
+    maxPrice: Number.isFinite(maxPriceParam) ? maxPriceParam : undefined,
     page: Math.max(parseInt(searchParams.get('page') || '1', 10), 1),
     limit: safeLimit,
   };
@@ -25,46 +29,15 @@ export async function GET(req: NextRequest) {
   console.log("[projects/search] Incoming Request:", filters);
 
   try {
-    const db = getAdminDb();
+    const source = await loadInventoryProjects(MAX_DATA_LOAD);
     
-    const snapshot = await db.collection('inventory_projects').limit(MAX_DATA_LOAD).get();
-    
-    if (snapshot.empty) {
-        console.warn("[projects/search] Firestore collection 'inventory_projects' is empty.");
-        return NextResponse.json({ data: [], pagination: { total: 0, page: 1, limit: filters.limit, totalPages: 1 } });
+    if (!source.length) {
+      console.warn("[projects/search] inventory_projects is empty.");
+      return NextResponse.json({
+        data: [],
+        pagination: { total: 0, page: 1, limit: filters.limit, totalPages: 1 },
+      });
     }
-
-    const source: ProjectData[] = snapshot.docs.map((doc) => {
-        const data = doc.data();
-        const performance = {
-            roi: data.performance?.roi ?? 0,
-            capitalAppreciation: data.performance?.capitalAppreciation ?? 0,
-            rentalYield: data.performance?.rentalYield ?? 0,
-            marketTrend: data.performance?.marketTrend ?? 'stable',
-            priceHistory: Array.isArray(data.performance?.priceHistory) ? data.performance.priceHistory : [],
-        };
-
-        return {
-            id: doc.id,
-            ...data,
-            name: data.name || "Untitled Project",
-            developer: data.developer || "Unknown Developer",
-            availability: data.availability || data.status || "Available",
-            price: {
-                ...data.price,
-                label: data.price?.label || "Price on request",
-                from: data.price?.from ?? 0,
-            },
-            performance,
-            handover: data.handover ?? null,
-            location: {
-                ...data.location,
-                city: data.location?.city || "Unknown City",
-                area: data.location?.area || "Unknown Area",
-                mapQuery: data.location?.mapQuery || "",
-            }
-        } as ProjectData;
-    });
 
     const filtered = filterProjects(source, filters);
     console.log(`[projects/search] Database Match: ${filtered.length} projects found.`);

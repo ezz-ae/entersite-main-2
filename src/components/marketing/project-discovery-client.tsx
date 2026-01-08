@@ -28,6 +28,7 @@ export function ProjectDiscoveryClient({ initialProjects }: Props) {
   const [loading, setLoading] = useState(false);
   const [projects, setProjects] = useState<ProjectData[]>(initialProjects.slice(0, 12));
   const [totalResults, setTotalResults] = useState(initialProjects.length);
+  const [cityOptions, setCityOptions] = useState<string[]>(['Dubai', 'Abu Dhabi', 'Sharjah']);
 
   const fetchProjects = async () => {
     setLoading(true);
@@ -54,6 +55,25 @@ export function ProjectDiscoveryClient({ initialProjects }: Props) {
     fetchProjects();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [city, status]);
+
+  useEffect(() => {
+    const loadMeta = async () => {
+      try {
+        const res = await fetch('/api/projects/meta', { cache: 'no-store' });
+        if (!res.ok) return;
+        const data = await res.json();
+        const cities = Array.isArray(data.locations)
+          ? data.locations.map((item: { city: string }) => item.city).filter(Boolean)
+          : [];
+        if (cities.length) {
+          setCityOptions(cities);
+        }
+      } catch (error) {
+        console.error('Failed to load project metadata', error);
+      }
+    };
+    loadMeta();
+  }, []);
 
   const handleSearch = () => {
     fetchProjects();
@@ -112,9 +132,11 @@ export function ProjectDiscoveryClient({ initialProjects }: Props) {
                         </SelectTrigger>
                         <SelectContent className="bg-zinc-900 border-white/10 text-white">
                             <SelectItem value="all">All Cities</SelectItem>
-                            <SelectItem value="Dubai">Dubai</SelectItem>
-                            <SelectItem value="Abu Dhabi">Abu Dhabi</SelectItem>
-                            <SelectItem value="Sharjah">Sharjah</SelectItem>
+                            {cityOptions.map((cityName) => (
+                              <SelectItem key={cityName} value={cityName}>
+                                {cityName}
+                              </SelectItem>
+                            ))}
                         </SelectContent>
                     </Select>
 

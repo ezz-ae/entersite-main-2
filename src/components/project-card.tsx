@@ -253,7 +253,7 @@ export function ProjectCard({ project, index = 0 }: ProjectCardProps) {
                                     <div className="space-y-4">
                                         <h4 className="text-[10px] font-black uppercase tracking-[0.4em] text-zinc-500">Project Overview</h4>
                                         <p className="text-zinc-300 leading-relaxed text-xl font-light">
-                                            {project.description.full || project.description.short}
+                                            {project.description?.full || project.description?.short || 'Details coming soon.'}
                                         </p>
                                     </div>
                                     <div className="grid grid-cols-2 gap-8">

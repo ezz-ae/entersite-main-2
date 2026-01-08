@@ -3,6 +3,7 @@ import { generateText } from 'ai';
 import { z } from 'zod';
 import { getGoogleModel, FLASH_MODEL } from '@/lib/ai/google';
 import { getAdminDb } from '@/server/firebase-admin';
+import { formatProjectContext, getRelevantProjects } from '@/server/inventory';
 import { requireAuth, UnauthorizedError, ForbiddenError } from '@/server/auth';
 
 const requestSchema = z.object({
@@ -50,8 +51,16 @@ export async function POST(req: NextRequest, { params: paramsPromise }: { params
       .map((entry) => `${entry.role === 'user' ? 'User' : 'Agent'}: ${entry.text}`)
       .join('\n');
 
+    const relevantProjects = await getRelevantProjects(payload.message, payload.context, 8);
+    const projectContext = relevantProjects.length
+      ? `\nRelevant listings:\n${relevantProjects.map(formatProjectContext).join('\n')}`
+      : '';
+
     const prompt = `
 Context: ${payload.context || 'web_widget'}.
+Use simple, non-technical language. If details are missing, say so and offer next steps.
+${projectContext}
+
 Conversation so far:
 ${historyText}
 
@@ -60,7 +69,8 @@ User (${params.botId}): ${payload.message}
 
     const { text } = await generateText({
       model: getGoogleModel(FLASH_MODEL),
-      system: "You are EntreSite's AI sales concierge. Be concise, cite Dubai market data when possible, and always steer toward capturing name/contact if missing.",
+      system:
+        "You are EntreSite's AI sales concierge. Be concise, cite Dubai market data when possible, and always steer toward capturing name/contact if missing.",
       prompt,
     });
 

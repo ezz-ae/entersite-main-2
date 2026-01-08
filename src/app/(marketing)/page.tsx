@@ -1,21 +1,15 @@
-import { getAdminDb } from '@/server/firebase-admin';
 import { ProjectData } from '@/lib/types';
 import { HomeClient } from './home-client';
-import { ENTRESTATE_INVENTORY } from '@/data/entrestate-inventory';
+import { loadInventoryProjects } from '@/server/inventory';
+
+export const dynamic = 'force-dynamic';
 
 async function fetchInitialProjects(): Promise<ProjectData[]> {
   try {
-    const db = getAdminDb();
-    const snapshot = await db
-      .collection('inventory_projects')
-      .orderBy('name')
-      .limit(12)
-      .get();
-    return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })) as ProjectData[];
+    return await loadInventoryProjects(12);
   } catch (error) {
     console.error('[HomePage] Failed to fetch inventory_projects', error);
-    // In case of an error, return fallback data
-    return ENTRESTATE_INVENTORY.slice(0, 12);
+    return [];
   }
 }
 
