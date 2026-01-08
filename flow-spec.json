@@ -1,0 +1,183 @@
+
+{
+  "startState": "intentSelection",
+  "states": {
+    "intentSelection": {
+      "type": "CHOICE_SCREEN",
+      "title": "What do you want to do?",
+      "options": [
+        { "id": "website", "label": "Website", "nextState": "website_audienceGate" },
+        { "id": "smsCampaign", "label": "SMS Campaign", "nextState": "universalPath_minimumInputs" },
+        { "id": "aiMarketExpert", "label": "AI Market Expert", "nextState": "universalPath_minimumInputs" },
+        { "id": "emailCampaign", "label": "Email Campaign", "nextState": "universalPath_minimumInputs" },
+        { "id": "googleAds", "label": "Google Ads", "nextState": "googleAds_preCheck" },
+        { "id": "metaLeadGen", "label": "Meta Lead Generation", "nextState": "metaLeadGen_preCheck" },
+        { "id": "fullMarketData", "label": "Full Market Data", "nextState": "universalPath_minimumInputs" }
+      ]
+    },
+
+    "// ---------------- Website Path ---------------- //": {},
+    "website_audienceGate": {
+      "type": "CHOICE_SCREEN",
+      "title": "Who is this website for?",
+      "options": [
+        { "id": "broker", "label": "Broker", "nextState": "website_showBlueprints", "context": { "audience": "broker" } },
+        { "id": "developer", "label": "Developer", "nextState": "website_showBlueprints", "context": { "audience": "developer" } },
+        { "id": "individual", "label": "Individual", "nextState": "website_showBlueprints", "context": { "audience": "individual" } },
+        { "id": "marketing", "label": "Marketing Agency", "nextState": "website_showBlueprints", "context": { "audience": "marketing" } }
+      ]
+    },
+    "website_showBlueprints": {
+      "type": "BLUEPRINT_SELECTION_SCREEN",
+      "title": "Choose a Blueprint",
+      "description": "Select a pre-defined blueprint for your audience, or describe your own vision.",
+      "getBlueprintPack": {
+        "fromContext": "audience" 
+      },
+      "actions": {
+        "onSelectBlueprint": {
+          "runEngine": "universalPath_minimumInputs"
+        },
+        "onUseTemplate": {
+          "goToState": "website_templateLibrary"
+        }
+      }
+    },
+    "website_templateLibrary": {
+      "type": "TEMPLATE_LIBRARY_SCREEN",
+      "title": "Template Library",
+      "description": "Pick a template to open directly in the builder.",
+      "filters": [
+        { "id": "audience", "label": "Audience", "options": ["Broker", "Developer", "Individual", "Marketing"] },
+        { "id": "goal", "label": "Goal", "options": ["Leads", "WhatsApp", "Booking", "Download"] },
+        { "id": "style", "label": "Style", "options": ["Minimal", "Luxury", "Corporate", "Bold"] },
+        { "id": "language", "label": "Language", "options": ["EN", "AR", "Bilingual"] },
+        { "id": "pageType", "label": "Page Type", "options": ["Landing", "Hub", "Profile", "Toolkit", "Resources"] }
+      ],
+      "actions": {
+        "onSelectTemplate": {
+          "loadBuilder": true
+        }
+      }
+    },
+    "website_builder": {
+      "type": "BUILDER_SCREEN",
+      "primaryCtaRule": true,
+      "sectionStore": {
+        "hero": { "label": "Hero Blocks", "variants": ["Image BG", "Video BG", "Minimal"] },
+        "proof": { "label": "Proof Blocks", "variants": ["Reviews", "Stats", "Logos"] },
+        "offer": { "label": "Offer Blocks", "variants": ["Payment Plan", "Packages", "Features"] },
+        "tools": { "label": "Tools Blocks", "variants": ["ROI Calculator", "Valuation Request"] },
+        "contact": { "label": "Contact Blocks", "variants": ["WhatsApp", "Form", "Booking"] },
+        "compliance": { "label": "Compliance Blocks", "autoInsertByMarket": true }
+      },
+      "aiActions": [
+        "Rewrite for luxury / direct / formal", "Shorten", "Add proof", "Make bilingual", "Add WhatsApp CTA", "Add SEO-friendly headings + schema"
+      ],
+      "actions": {
+        "onPublish": {
+          "goToState": "website_finished"
+        }
+      }
+    },
+    "website_finished": {
+        "type": "FINAL_OUTPUT_SCREEN",
+        "title": "Your Website is Live!",
+        "outputs": [
+            { "type": "URL", "label": "Published URL" },
+            { "type": "TRACKING_SETUP", "label": "Tracking Setup", "details": "Meta Pixel, GA4, and conversion events have been configured." }
+        ],
+        "nextSteps": [
+            { "label": "Run Meta leads", "action": "goToState", "target": "metaLeadGen_preCheck" },
+            { "label": "Run Google ads", "action": "goToState", "target": "googleAds_preCheck" },
+            { "label": "Start email flow", "action": "goToState", "target": "universalPath_minimumInputs" },
+            { "label": "Launch SMS reactivation", "action": "goToState", "target": "universalPath_minimumInputs" },
+            { "label": "Pull market data insights", "action": "goToState", "target": "universalPath_minimumInputs" }
+        ]
+    },
+    
+    "// ---------------- Cross-Path Linking States ---------------- //": {},
+    "metaLeadGen_preCheck": {
+      "type": "CHOICE_SCREEN",
+      "title": "Do you have a landing page for your Meta campaign?",
+      "options": [
+        { "id": "yes", "label": "Yes, I have a URL", "nextState": "universalPath_minimumInputs" },
+        { "id": "no", "label": "No, I need to build one", "nextState": "website_audienceGate" }
+      ]
+    },
+    "googleAds_preCheck": {
+      "type": "CHOICE_SCREEN",
+      "title": "Do you have a landing page for your Google Ads?",
+      "options": [
+        { "id": "yes", "label": "Yes, I have a URL", "nextState": "universalPath_minimumInputs" },
+        { "id": "no", "label": "No, I need to build one", "nextState": "website_audienceGate" }
+      ]
+    },
+
+    "// ---------------- Universal Path Engine ---------------- //": {},
+    "universalPath_minimumInputs": {
+      "type": "INPUT_SCREEN",
+      "title": "Minimum Inputs",
+      "description": "Answer a few questions to generate your blueprint.",
+      "questions": [
+        { "id": "market", "label": "Market / Location", "type": "text" },
+        { "id": "industry", "label": "Industry", "type": "text", "default": "Real Estate" },
+        { "id": "audience", "label": "Audience", "type": "select", "options": ["B2C", "B2B"] },
+        { "id": "goal", "label": "Goal", "type": "select", "options": ["Leads", "Calls", "WhatsApp", "Bookings", "Downloads"] },
+        { "id": "language", "label": "Language", "type": "select", "options": ["EN", "AR", "Both"] }
+      ],
+      "nextState": "universalPath_generateOutput"
+    },
+    "universalPath_generateOutput": {
+      "type": "GENERATION_SCREEN",
+      "title": "Generating Your Blueprint...",
+      "outputs": [
+        "Blueprint (steps + copy + assets + targeting)",
+        "Execution checklist",
+        "Templates (if relevant)",
+        "Tracking plan (events + KPIs)"
+      ],
+      "nextState": "universalPath_launchExport"
+    },
+    "universalPath_launchExport": {
+      "type": "LAUNCH_EXPORT_SCREEN",
+      "title": "Launch or Export",
+      "options": [
+        { "id": "export", "label": "Export Files", "details": "copy / creatives / CSV / audiences" },
+        { "id": "pushLive", "label": "Push Live", "details": "if connected" },
+        { "id": "startTracking", "label": "Start Tracking", "details": "view dashboard" }
+      ]
+    }
+  },
+
+  "// ---------------- Data Definitions ---------------- //": {},
+  "blueprintPacks": {
+    "broker": {
+      "sitemap": "Broker sitemap blueprint",
+      "leadFunnel": "Lead funnel logic (WhatsApp / Call / Form)",
+      "areaPages": "Area pages plan",
+      "listings": "Listings strategy",
+      "agentMicroSites": "Agent micro-site structure"
+    },
+    "developer": {
+      "projectLaunch": "Project launch blueprint",
+      "paymentLogic": "Payment plan + floorplans logic",
+      "investorNarrative": "Investor narrative + credibility blocks",
+      "leadCapture": "Lead capture + brochure flow",
+      "partnerKit": "Partner kit structure (optional)"
+    },
+    "individual": {
+      "journey": "Simple journey (Buy / Invest / Sell)",
+      "tools": "Tools (ROI, affordability, valuation request)",
+      "copyStyle": "Trust-first copy style",
+      "pages": "Minimal pages but high conversion"
+    },
+    "marketing": {
+      "servicePackaging": "Service packaging blueprint",
+      "caseStudies": "Case study structure",
+      "auditFunnel": "Audit funnel",
+      "retainerTiers": "Retainer tier blocks",
+      "bookingSystem": "Booking + proof system"
+    }
+  }
+}

@@ -1,0 +1,128 @@
+'use client';
+
+import React from 'react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { cn } from "@/lib/utils";
+import { motion } from 'framer-motion';
+
+import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
+import { 
+  Bell, 
+  Home, 
+  Settings, 
+  Zap,
+  Search,
+  Users,
+  MessageSquare,
+  Mail,
+  Smartphone,
+  Globe,
+  Target,
+  LayoutDashboard
+} from 'lucide-react';
+import { Button } from "@/components/ui/button";
+import { UserNav } from "@/components/user-nav";
+import { EntrestateLogo } from "@/components/icons";
+
+const mainNavItems = [
+    { href: "/dashboard", icon: LayoutDashboard, label: "Overview" },
+    { href: "/dashboard/sites", icon: Globe, label: "Site Architect" },
+    { href: "/dashboard/chat-agent", icon: MessageSquare, label: "Expert Chat Agent" },
+    { href: "/dashboard/google-ads", icon: Search, label: "Google Ads Engine" },
+    { href: "/dashboard/meta-audience", icon: Users, label: "Audience Architect" },
+    { href: "/dashboard/sms-marketing", icon: Smartphone, label: "SMS VIP Broadcast" },
+    { href: "/dashboard/email-marketing", icon: Mail, label: "Email Marketing" },
+    { href: "/dashboard/leads", icon: Target, label: "Lead CRM" },
+];
+
+const secondaryNavItems = [
+    { href: "/dashboard/settings", icon: Settings, label: "Infrastructure" },
+];
+
+export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+    return (
+        <div className="flex min-h-screen w-full bg-[#030303] text-zinc-100">
+            {/* Master Sidebar */}
+            <aside className="fixed inset-y-0 left-0 z-50 hidden w-20 flex-col border-r border-white/5 bg-zinc-950 sm:flex">
+                <div className="flex h-20 items-center justify-center border-b border-white/5">
+                    <Link href="/">
+                        <EntrestateLogo showText={false} className="scale-75" />
+                    </Link>
+                </div>
+                
+                <nav className="flex flex-col items-center gap-4 py-8 overflow-y-auto no-scrollbar">
+                    <TooltipProvider delayDuration={0}>
+                        {mainNavItems.map(item => (
+                            <NavItem key={item.href} item={item} />
+                        ))}
+                    </TooltipProvider>
+                </nav>
+                
+                <nav className="mt-auto flex flex-col items-center gap-4 py-8 border-t border-white/5">
+                    <TooltipProvider delayDuration={0}>
+                         {secondaryNavItems.map(item => (
+                            <NavItem key={item.href} item={item} />
+                        ))}
+                    </TooltipProvider>
+                </nav>
+            </aside>
+
+            {/* Main Area */}
+            <div className="flex flex-1 flex-col sm:pl-20">
+                 <header className="sticky top-0 z-40 flex h-20 items-center gap-4 border-b border-white/5 bg-zinc-950/80 backdrop-blur-xl px-8">
+                    <div className="flex items-center gap-4">
+                        <span className="text-xs font-black uppercase tracking-[0.3em] text-white">Entrestate OS</span>
+                        <div className="h-4 w-px bg-white/10" />
+                        <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Active Cluster: DIFC-01</span>
+                    </div>
+                    
+                    <div className="ml-auto flex items-center gap-6">
+                        <div className="hidden lg:flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-500/5 border border-blue-500/10">
+                            <div className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
+                            <span className="text-[10px] font-bold text-blue-500 uppercase tracking-widest">System Optimal</span>
+                        </div>
+                        <Button variant="ghost" size="icon" className="h-10 w-10 text-zinc-400 hover:text-white hover:bg-white/5 rounded-full relative transition-colors">
+                            <Bell className="h-5 w-5" />
+                        </Button>
+                        <UserNav />
+                    </div>
+                </header>
+
+                <main className="flex-1 p-8 md:p-12 overflow-x-hidden">
+                    {children}
+                </main>
+            </div>
+        </div>
+    );
+}
+
+function NavItem({ item }: { item: typeof mainNavItems[0] }) {
+    const pathname = usePathname();
+    const isActive = pathname === item.href;
+
+    return (
+        <Tooltip>
+            <TooltipTrigger asChild>
+                <Link href={item.href} className={cn(
+                    "flex h-11 w-11 items-center justify-center rounded-xl transition-all duration-300 relative group", 
+                    isActive 
+                        ? "bg-blue-600 text-white shadow-lg shadow-blue-600/20" 
+                        : "text-zinc-500 hover:text-white hover:bg-white/5"
+                )}>
+                    <item.icon className="h-5 w-5" />
+                    {isActive && (
+                        <motion.div 
+                            layoutId="active-nav-indicator"
+                            className="absolute -left-2 w-1 h-6 bg-blue-600 rounded-r-full"
+                            transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                        />
+                    )}
+                </Link>
+            </TooltipTrigger>
+            <TooltipContent side="right" className="bg-zinc-900 border-white/10 text-white text-[10px] font-bold uppercase tracking-widest ml-2 px-3 py-1.5 rounded-lg shadow-2xl">
+                {item.label}
+            </TooltipContent>
+        </Tooltip>
+    );
+}

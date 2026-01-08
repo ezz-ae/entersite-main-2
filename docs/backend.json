@@ -1,0 +1,665 @@
+{
+  "entities": {
+    "User": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "User",
+      "type": "object",
+      "description": "Represents a user in the system.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the User entity."
+        },
+        "profile": {
+          "type": "string",
+          "description": "User profile information."
+        },
+        "brandKit": {
+          "type": "string",
+          "description": "Branding kit associated with the user."
+        },
+        "subscriptions": {
+          "type": "array",
+          "description": "List of subscriptions for the user.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "role": {
+          "type": "string",
+          "description": "The role of the user (developer, agent, or admin)."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp of when the user was created.",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Timestamp of when the user was last updated.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id"
+      ]
+    },
+    "Project": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Project",
+      "type": "object",
+      "description": "Represents a real estate project.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Project entity."
+        },
+        "title": {
+          "type": "string",
+          "description": "Name of the project."
+        },
+        "developer": {
+          "type": "string",
+          "description": "Name of the project developer."
+        },
+        "city": {
+          "type": "string",
+          "description": "City where the project is located."
+        },
+        "price": {
+          "type": "number",
+          "description": "Price of the project."
+        },
+        "currency": {
+          "type": "string",
+          "description": "Currency of the project price."
+        },
+        "address": {
+          "type": "string",
+          "description": "Address object, with street, lat, lng."
+        },
+        "features": {
+          "type": "string",
+          "description": "Features object, with beds, baths, area, type."
+        },
+        "images": {
+          "type": "array",
+          "description": "Array of image URLs for the project.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "brochureUrl": {
+          "type": "string",
+          "description": "URL to the project brochure.",
+          "format": "uri"
+        },
+        "marketScore": {
+          "type": "number",
+          "description": "Market score of the project."
+        },
+        "source": {
+          "type": "string",
+          "description": "Source of the project data (bayut, propertyfinder, dubizzle, manual)."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp of when the project was created.",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Timestamp of when the project was last updated.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id"
+      ]
+    },
+    "Block": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Block",
+      "type": "object",
+      "description": "Represents a modular block used in site building.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Block entity."
+        },
+        "type": {
+          "type": "string",
+          "description": "Type of the block (hero, listing, map, ctaForm, gallery, chatWidget, faq, testimonial, ad)."
+        },
+        "defaultContent": {
+          "type": "string",
+          "description": "Default content for the block (headline, subtext, images)."
+        },
+        "styles": {
+          "type": "string",
+          "description": "Styling information for the block (colors, fonts)."
+        },
+        "tokens": {
+          "type": "array",
+          "description": "List of tokens used in the block content (PROJECT_NAME, CITY, PRICE, DEVELOPER).",
+          "items": {
+            "type": "string"
+          }
+        },
+        "adsReady": {
+          "type": "boolean",
+          "description": "Indicates if the block is ready for ad integration."
+        },
+        "seoReady": {
+          "type": "boolean",
+          "description": "Indicates if the block is SEO-ready."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp of when the block was created.",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Timestamp of when the block was last updated.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id"
+      ]
+    },
+    "Template": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Template",
+      "type": "object",
+      "description": "Represents a site template.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Template entity."
+        },
+        "siteType": {
+          "type": "string",
+          "description": "Type of site the template is for (roadshow, developer, partnerLaunch, company, freelancer, map)."
+        },
+        "blocks": {
+          "type": "array",
+          "description": "List of block IDs included in the template.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "seoDefaults": {
+          "type": "string",
+          "description": "Default SEO settings for the template."
+        },
+        "adsReady": {
+          "type": "boolean",
+          "description": "Indicates if the template is ready for ad integration."
+        },
+        "allowedPages": {
+          "type": "array",
+          "description": "List of allowed pages for the template.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "defaultStyles": {
+          "type": "string",
+          "description": "Default styles for the template (colors, fonts)."
+        }
+      },
+      "required": [
+        "id"
+      ]
+    },
+    "Site": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Site",
+      "type": "object",
+      "description": "Represents a website.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Site entity."
+        },
+        "ownerUid": {
+          "type": "string",
+          "description": "Reference to the User who owns the site. (Relationship: User 1:N Site)"
+        },
+        "siteType": {
+          "type": "string",
+          "description": "Type of site (developer-launch)."
+        },
+        "templates": {
+          "type": "array",
+          "description": "List of template IDs used in the site.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "pages": {
+          "type": "array",
+          "description": "List of page IDs in the site.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "status": {
+          "type": "string",
+          "description": "Status of the site (draft, published)."
+        },
+        "adsEnabled": {
+          "type": "boolean",
+          "description": "Indicates if ads are enabled for the site."
+        },
+        "chatEnabled": {
+          "type": "boolean",
+          "description": "Indicates if chat is enabled for the site."
+        },
+        "seoSettings": {
+          "type": "string",
+          "description": "SEO settings for the site."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp of when the site was created.",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Timestamp of when the site was last updated.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id"
+      ]
+    },
+    "Page": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Page",
+      "type": "object",
+      "description": "Represents a page within a site.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Page entity."
+        },
+        "siteId": {
+          "type": "string",
+          "description": "Reference to the Site that contains this page. (Relationship: Site 1:N Page)"
+        },
+        "title": {
+          "type": "string",
+          "description": "Title of the page."
+        },
+        "blocks": {
+          "type": "array",
+          "description": "List of blocks in the page, with block ID and data.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "canonicalListings": {
+          "type": "array",
+          "description": "List of canonical listing IDs associated with the page.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "brochureUrl": {
+          "type": "string",
+          "description": "URL to the brochure associated with the page.",
+          "format": "uri"
+        },
+        "seo": {
+          "type": "string",
+          "description": "SEO settings for the page (title, description, keywords)."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp of when the page was created.",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Timestamp of when the page was last updated.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id"
+      ]
+    },
+    "Job": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Job",
+      "type": "object",
+      "description": "Represents an asynchronous job.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Job entity."
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to the User who initiated the job. (Relationship: User 1:N Job)"
+        },
+        "status": {
+          "type": "string",
+          "description": "Status of the job (queued, running, done, error)."
+        },
+        "plan": {
+          "type": "string",
+          "description": "Plan for the job execution (flowId, steps, params)."
+        },
+        "steps": {
+          "type": "array",
+          "description": "Array of steps in the job, with status, result, error, and timestamp.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp of when the job was created.",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Timestamp of when the job was last updated.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id"
+      ]
+    },
+    "Ad": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Ad",
+      "type": "object",
+      "description": "Represents a Google Ads campaign.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Ad entity."
+        },
+        "siteId": {
+          "type": "string",
+          "description": "Reference to the Site the ad is associated with. (Relationship: Site 1:N Ad)"
+        },
+        "campaignId": {
+          "type": "string",
+          "description": "ID of the campaign in Google Ads."
+        },
+        "budget": {
+          "type": "number",
+          "description": "Budget for the ad campaign."
+        },
+        "keywords": {
+          "type": "array",
+          "description": "List of keywords for the ad campaign.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "headlines": {
+          "type": "array",
+          "description": "List of headlines for the ad copy.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "descriptions": {
+          "type": "array",
+          "description": "List of descriptions for the ad copy.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "creatives": {
+          "type": "array",
+          "description": "List of creatives (image URLs) for the ad.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "status": {
+          "type": "string",
+          "description": "Status of the ad campaign (queued, running, done)."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp of when the ad was created.",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Timestamp of when the ad was last updated.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id"
+      ]
+    },
+    "Chat": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Chat",
+      "type": "object",
+      "description": "Represents an AI chat session.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Chat entity."
+        },
+        "siteId": {
+          "type": "string",
+          "description": "Reference to the Site the chat is associated with. (Relationship: Site 1:N Chat)"
+        },
+        "userContext": {
+          "type": "string",
+          "description": "Context about the user in the chat session."
+        },
+        "listingContext": {
+          "type": "string",
+          "description": "Context about the listing in the chat session."
+        },
+        "conversation": {
+          "type": "array",
+          "description": "List of messages in the conversation, with role, content, and timestamp.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp of when the chat session was created.",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Timestamp of when the chat session was last updated.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id"
+      ]
+    }
+  },
+  "auth": {
+    "providers": [
+      "password",
+      "anonymous"
+    ]
+  },
+  "firestore": {
+    "structure": [
+      {
+        "path": "/users/{userId}",
+        "definition": {
+          "entityName": "User",
+          "schema": {
+            "$ref": "#/backend/entities/User"
+          },
+          "description": "Stores user profiles, brand kits, subscriptions, and roles.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier for the user."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/projects/{projectId}",
+        "definition": {
+          "entityName": "Project",
+          "schema": {
+            "$ref": "#/backend/entities/Project"
+          },
+          "description": "Stores real estate project data, preloaded with 3750 projects.",
+          "params": [
+            {
+              "name": "projectId",
+              "description": "The unique identifier for the project."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/blocks/{blockId}",
+        "definition": {
+          "entityName": "Block",
+          "schema": {
+            "$ref": "#/backend/entities/Block"
+          },
+          "description": "Stores modular blocks for site building, preloaded with 300 blocks.",
+          "params": [
+            {
+              "name": "blockId",
+              "description": "The unique identifier for the block."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/templates/{templateId}",
+        "definition": {
+          "entityName": "Template",
+          "schema": {
+            "$ref": "#/backend/entities/Template"
+          },
+          "description": "Stores site templates.",
+          "params": [
+            {
+              "name": "templateId",
+              "description": "The unique identifier for the template."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/sites/{siteId}",
+        "definition": {
+          "entityName": "Site",
+          "schema": {
+            "$ref": "#/backend/entities/Site"
+          },
+          "description": "Stores site documents. Includes denormalized 'ownerUid' for authorization independence.",
+          "params": [
+            {
+              "name": "siteId",
+              "description": "The unique identifier for the site."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/sites/{siteId}/pages/{pageId}",
+        "definition": {
+          "entityName": "Page",
+          "schema": {
+            "$ref": "#/backend/entities/Page"
+          },
+          "description": "Stores pages within a site.",
+          "params": [
+            {
+              "name": "siteId",
+              "description": "The unique identifier for the site."
+            },
+            {
+              "name": "pageId",
+              "description": "The unique identifier for the page."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/jobs/{userId}/{jobId}",
+        "definition": {
+          "entityName": "Job",
+          "schema": {
+            "$ref": "#/backend/entities/Job"
+          },
+          "description": "Stores asynchronous job processing data. Jobs are path-based owned by User.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier for the user."
+            },
+            {
+              "name": "jobId",
+              "description": "The unique identifier for the job."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/ads/{siteId}/{adId}",
+        "definition": {
+          "entityName": "Ad",
+          "schema": {
+            "$ref": "#/backend/entities/Ad"
+          },
+          "description": "Stores Google Ads campaign data.",
+          "params": [
+            {
+              "name": "siteId",
+              "description": "The unique identifier for the site."
+            },
+            {
+              "name": "adId",
+              "description": "The unique identifier for the ad."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/chats/{siteId}/{sessionId}",
+        "definition": {
+          "entityName": "Chat",
+          "schema": {
+            "$ref": "#/backend/entities/Chat"
+          },
+          "description": "Stores AI chat session data.",
+          "params": [
+            {
+              "name": "siteId",
+              "description": "The unique identifier for the site."
+            },
+            {
+              "name": "sessionId",
+              "description": "The unique identifier for the chat session."
+            }
+          ]
+        }
+      }
+    ],
+    "reasoning": "The Firestore structure is designed to support a modular AI-assisted site builder with a focus on real estate. It prioritizes authorization independence by storing the `ownerUid` directly within the `/sites/{siteId}` documents. This eliminates the need for security rules to perform `get()` operations to determine site ownership. The structure uses hierarchical paths for user-owned data such as sites, pages, jobs, ads and chats. This facilitates simple path-based security rules. Segregation is used to ensure all documents in a collection share the same security posture. For instance, templates and blocks are global and stored in their own collections, separate from user-specific data. This segregation also allows for efficient listing operations, as security rules can be applied at the collection level. The structure uses explicit state modeling with a `status` field for sites and jobs. It avoids dynamic keys and uses consistent naming conventions. The following is an explicit breakdown of how Authorization Independence is achieved:\n\n*   **/sites/{siteId}**: The `ownerUid` field is included in the document to explicitly define site ownership, removing authorization dependencies. This denormalization is critical because it allows security rules to validate ownership directly without `get()` calls, which greatly simplifies security and avoids breaking atomic transactions.\n*   **/sites/{siteId}/pages/{pageId}**: The page document inherits authorization from the site via the path structure, which links back to the `ownerUid` of the site.\n*   **/jobs/{uid}/{jobId}**: Jobs are owned by the user and are stored under the user's ID, enabling path-based ownership rules.\n*   **/ads/{siteId}/{adId}**: Ads inherit their authorization from the site's `ownerUid` via the siteId.\n*   **/chats/{siteId}/{sessionId}**: Chats inherit their authorization from the site's `ownerUid` via the siteId.\n\nThe structure is also designed to easily secure `list` operations. Since each top-level collection has a clearly defined security scope, rules can restrict list operations to only allow users to access data they own or have permission to view. For example, listing sites would require the user to be the owner of those sites. Similarly, blocks and templates can be made publicly accessible via rules without affecting the security of the user-specific data. Denormalization of authorization data into the documents and the segregation of data with differing access control requirements into separate collections allows this data structure to satisfy the QAPs."
+  }
+}

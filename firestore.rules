@@ -1,0 +1,45 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Inventory projects are publicly readable
+    match /inventory_projects/{projectId} {
+      allow read: if true;
+      allow write: if false; // Can only be written by a trusted server process
+    }
+
+    // Projects are private to the user who owns them.
+    match /projects/{projectId} {
+      // A user must be logged in and the ownerUid must match their own UID.
+      allow read, update, delete: if request.auth != null && request.auth.uid == resource.data.ownerUid;
+      // On creation, the ownerUid in the new document must be the user's UID.
+      allow create: if request.auth != null && request.resource.data.ownerUid == request.auth.uid;
+
+      // The pages subcollection is also private to the owner.
+      match /pages/{pageId} {
+        allow read, create, update, delete: if request.auth != null && get(/databases/$(database)/documents/projects/$(projectId)).data.ownerUid == request.auth.uid;
+      }
+      
+      // The audiences subcollection is also private to the owner.
+      match /audiences/{audId} {
+        allow read, create, update, delete: if request.auth != null && get(/databases/$(database)/documents/projects/$(projectId)).data.ownerUid == request.auth.uid;
+      }
+    }
+
+    // Published pages are public-read. They are only written by the backend.
+    match /pages_public/{slug} {
+      allow read: if true;
+      allow write: if false; // Can only be written by a trusted server process
+    }
+
+    // Leads can only be created via the backend API. They are readable by the project owner.
+    match /leads/{leadId} {
+      allow read: if request.auth != null && get(/databases/$(database)/documents/projects/$(resource.data.projectId)).data.ownerUid == request.auth.uid;
+      allow write: if false; // Can only be written by a trusted server process
+
+      match /notes/{noteId} {
+        allow read, create: if request.auth != null && get(/databases/$(database)/documents/projects/$(get(/databases/$(database)/documents/leads/$(leadId)).data.projectId)).data.ownerUid == request.auth.uid;
+      }
+    }
+  }
+}

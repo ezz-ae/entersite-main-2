@@ -1,0 +1,3991 @@
+
+mahmoud
+The full Firebase + Gemini AI setup is ready. You now have a complete Firestore schema, job queue, AI micro-agent roles, prompts, and site-to-ads workflow—copying this into your new Firebase project lets you start building fully branded, data-rich real estate sites with automated Google Ads instantly.
+
+This document contains the complete JSON structure, Firestore schema, job queue setup, and AI worker flows required to deploy the full Entrestate AI-powered site builder with Google Ads integration.
+
+{
+  "profile": { "name": "", "email": "", "role": "developer|agent|admin" },
+  "brandKit": { "colors": {"primary": "#002F4B", "secondary": "#FFFFFF"}, "fonts": "Inter", "logoUrl": "" },
+  "subscriptions": [],
+  "createdAt": "", "updatedAt": ""
+}
+Preloaded 3750 real estate projects
+{
+  "title": "Project Name",
+  "developer": "Developer Name",
+  "city": "City Name",
+  "price": 0,
+  "currency": "AED",
+  "address": {"street": "", "lat": 0.0, "lng": 0.0},
+  "features": {"beds": 3, "baths": 2, "area": 1200, "type": "apartment"},
+  "images": [],
+  "brochureUrl": "",
+  "marketScore": 0,
+  "source": "bayut|propertyfinder|dubizzle|manual",
+  "createdAt": "", "updatedAt": ""
+}
+300 modular blocks
+{
+  "type": "hero|listing|map|ctaForm|gallery|chatWidget|faq|testimonial|ad",
+  "defaultContent": {"headline": "", "subtext": "", "images": []},
+  "styles": {"colors": "%PRIMARY_COLOR%", "fonts": "%BRAND_FONT%"},
+  "tokens": ["%PROJECT_NAME%","%CITY%","%PRICE%","%DEVELOPER%"],
+  "adsReady": true,
+  "seoReady": true,
+  "createdAt": "", "updatedAt": ""
+}
+{
+  "siteType": "roadshow|developer|partnerLaunch|company|freelancer|map",
+  "blocks": ["hero-01", "listing-grid-07", "cta-form-02"],
+  "seoDefaults": {},
+  "adsReady": true,
+  "allowedPages": [],
+  "defaultStyles": {"colors": "%PRIMARY_COLOR%", "fonts": "%BRAND_FONT%"}
+}
+{
+  "ownerUid": "uid",
+  "siteType": "developer-launch",
+  "templates": ["template-01"],
+  "pages": ["page-01"],
+  "status": "draft|published",
+  "adsEnabled": true,
+  "chatEnabled": true,
+  "seoSettings": {},
+  "createdAt": "", "updatedAt": ""
+}
+{
+  "title": "Landing Page",
+  "blocks": [
+    {"blockId": "hero-01", "data": {}, "order": 1},
+    {"blockId": "listing-grid-07", "data": {}, "order": 2},
+    {"blockId": "cta-form-02", "data": {}, "order": 3}
+  ],
+  "canonicalListings": ["listing-001"],
+  "brochureUrl": "",
+  "seo": {"title": "", "description": "", "keywords": []},
+  "createdAt": "", "updatedAt": ""
+}
+{
+  "status": "queued|running|done|error",
+  "plan": {"flowId": "site-build", "steps": ["renderBlocks","seoGenerate","adsGenerate"], "params": {}},
+  "steps": [{"name":"renderBlocks","status":"queu
+See more
+Gemini
+OK, here's a plan for how we'll prototype this app. Take a look below and customize as needed, or if you're ready, select Prototype this App.
+
+App Blueprint
+AI Template Orchestration
+ — Suggest optimal block sequences for high conversion, considering SEO and ads readiness. The system will use AI to analyze different block configurations to find the best tool for converting page viewers into leads.
+AI Content Design
+ — Generate marketing copy for projects, including headlines, descriptions, and meta tags.
+AI-Powered Ad Generation
+ — Generate Google Ads campaigns automatically from page content.
+AI Chat Assistant Builder
+ — Build a chat assistant with vector embeddings generated from page and project data.
+SEO Automation
+ — Auto-generate SEO metadata, OG, JSON-LD for real estate listings.
+Firebase Firestore Integration — Use Firestore as the primary database for storing project data, site configurations, and AI-generated content.
+Modular Site Building UI — Allow users to build sites using a drag-and-drop interface with AI-suggested blocks.
+Color
+Layout
+Employ a clean and structured layout with a focus on showcasing property images and key information.
+Typography
+Body and headline font: 'Inter' (sans-serif) for a modern and neutral aesthetic.
+Iconography
+Use clear, minimalist icons to represent various features and categories within the real estate listings.
+Animation
+Use subtle transitions and animations to enhance user experience without being distracting.
+AI
+Gemini, Genkit
+UI
+TypeScript, NextJS, Tailwind CSS
+
+Prototype this App
+OK, let's prototype this app!
+
+62061c5
++19 more files
+It appears that your app needs a Gemini API key!
+
+The first iteration of your app prototype is ready! Try it out in the preview window and describe the changes you'd like to make below.
+
+Want to make changes directly? Hit the </> button at the top to switch to the code editor, or click below.
+
+
+
+mahmoud
+Exactly—this is the modular AI-assisted site builder workflow. Here’s how it works, step by step, and how to structure it with 300 fully-populated blocks:
+
+⸻
+
+Block Library • 300 Blocks: Cover all types of content holders, fully populated with placeholder content for fast deployment: • Hero sections (image/video, headline, tagline, CTA) • Listings grids (single, multiple, featured) • Map + clusters + filters • Gallery / Carousel / Portfolio • Brochure / PDF embeds • Testimonials / Reviews / Partners • Agent / Developer profile • Blog / News snippets • CTAs / Lead forms / WhatsApp integration • FAQ / Accordion sections • Stats / Numbers / KPIs / Market trends • Ads-ready sections (headlines + image placeholders) • Metadata per block:
+{ "blockId": "uuid", "type": "hero|listing|map|cta|gallery|testimonial|faq|stats|ad", "defaultContent": { ... }, "styles": { "colors": "#000000,#FFFFFF", "fonts": "Inter" }, "tokens": ["%PROJECT_NAME%","%CITY%","%PRICE%","%DEVELOPER%"], "adsReady": true, "seoReady": true }
+
+⸻
+
+Brand-Based Rendering • User selects brand profile → system sets: • Primary / secondary colors • Font styles • Logo / favicon • Tone of copy • All blocks are rendered dynamically with brand style applied. • Blocks contain placeholders or tokenized data (%PROJECT_NAME%) that AI will replace later.
+⸻
+
+AI-Assisted Block Flow
+User picks first block (hero, listing, gallery, etc.).
+AI analyzes site type and block → suggests 5 options for the next block, fully compatible with layout and content flow. • Suggestions consider: page type, existing blocks, SEO, lead conversion potential.
+User picks one suggestion → AI pre-fills data with default content or project info.
+User edits or confirms data → e.g., choose project from pool, upload brochure, or select agent.
+Optional lead form → user picks a lead capture form block, AI maps it to WhatsApp/email integration, sets auto-reminders, and adds it into the block sequence.
+⸻
+
+Page Composition • Page JSON structure:
+{ "pageId": "uuid", "title": "Landing Page", "blocks": [ { "blockId": "hero-01", "data": { ... }, "order": 1 }, { "blockId": "listing-grid-07", "data": { ... }, "order": 2 }, { "blockId": "cta-form-02", "data": { ... }, "order": 3 } ], "seo": { "title": "...", "description": "...", "keywords": [] }, "createdAt": "...", "updatedAt": "..." }
+
+•	Dynamic AI flow ensures:
+•	Layout always looks good
+•	Blocks follow logical content progression
+•	SEO and ads-ready metadata auto-generated
+⸻
+
+User Journey Example
+User selects brand + colors.
+System shows first block options (hero, featured listing, map).
+User picks hero block → AI suggests 5 next block options (listing grid, gallery, CTA, testimonial, map).
+User selects listing grid → AI auto-populates with 3–5 project listings from the pool.
+User chooses lead capture form → AI configures form, WhatsApp flow, email notifications.
+See more
+Gemini
+This is an excellent and incredibly detailed plan. It lays out a clear vision for EntreSite AI. I'm ready to start building.
+
+Based on your plan, the first logical step is to set up the Firebase backend structure. This will create the foundation for user management, site data, listings, and all the AI features you've described.
+
+I will now provision the Firebase backend for you. This will involve setting up Firestore and Firebase Authentication according to the schema you provided.
+
+
+
+
+4e83fb5
++8 more files
+Excellent. The Firebase backend is now provisioned. To make Firebase available throughout your app, I'll wrap the main layout with the FirebaseClientProvider. This will initialize Firebase and handle user authentication state.
+
+212c961
+Now that Firebase is integrated, we can start building the UI. What would you like to work on first?
+
+
+
+mahmoud
+you are starting it perfectly right ... you got the idea 100% well ... im sure youb will build soomthing wow!!! lets dominate the real estate web creation and lead generation ads making running google ads 100000% easier than ever
+
+Gemini
+Thank you for the vote of confidence! I'm excited to build this with you. Let's make creating real estate websites and ads faster and smarter than ever before.
+
+Following your plan, the next logical step is to allow users to sign in. I'll create a simple and clean login page where users can sign up or sign in using their email and password. This is the gateway to the site builder.
+
+I will create a new login page and update the main page to redirect unauthenticated users to this new login page.
+
+40ebcda
+I've set up the login page and protected the main dashboard. You can now try signing up or logging in. What's next on our journey?
+
+
+
+mahmoud
+perfect dont add auth now at all no need for it in the beganing ---- build the work the blocks, the flow, the public pages --- make it wix but by Gemini which means 1--X
+
+Gemini
+Understood. We'll skip authentication for now and jump straight into the core site-building experience. Let's focus on the blocks and the public page flow.
+
+I'll remove the login requirement and the login page itself, so we can immediately start working with the page builder.
+
+fa2a25e
+The authentication flow has been removed. We now have a clean slate to build the page editor. Where shall we begin?
+
+
+
+mahmoud
+you got ALL YOU NEED ABOVE BUILD
+
+Gemini
+Of course. Let's begin building the core experience.
+
+Following your plan, I'll start by enhancing the PageBuilder to allow users to dynamically add new blocks to their page. I will introduce a gallery of available block types that appears when the user clicks "Add Block". For now, this gallery will show the existing block types we have: Hero, Listing Grid, and CTA Form.
+
+This is the first step toward the AI-assisted block flow you've designed.
+
+c24b4a7
+
+
+mahmoud
+EVERYTHING IS DRAG AND DROP TOTALLT
+
+Gemini
+You're absolutely right. A drag-and-drop interface is essential for a modern site builder. I'll implement that functionality right away.
+
+To enable drag-and-drop, I'll use the @dnd-kit library, a modern and powerful toolkit for React. This will allow you to reorder the blocks on the page seamlessly. I'll update the PageBuilder component to wrap the blocks in a draggable context.
+
+Here are the changes:
+
+a82c55e
+The page builder now supports drag-and-drop. You can reorder blocks to your liking. What should we build next?
+
+
+
+mahmoud
+WHEN USER HOVER ADD BLOCK THE AGET SHOULD SUGGESST BEST AFTER
+
+CREATE A PERFECT WAY TO FLOW THE BLOCKS AND ---- THE SIDE MENU NO NEED FOR IT WE NEED TO ADD A WAY THE USER FULL PAGE THEIR BUILD
+
+Gemini
+Of course. I will implement the AI-powered block suggestion flow and create a more immersive, full-page editing experience by removing the sidebar.
+
+First, I'll modify the UI to remove the main sidebar from the page, allowing the page builder to take up the full screen. This simplifies the interface and focuses on the core task of building the page.
+
+Next, I'll implement the AI suggestion feature. When you hover between blocks, a new "Add Block" button will appear. Clicking this will trigger an AI flow (suggestNextBlocks) that analyzes the existing page structure and suggests the most relevant blocks to add next. These suggestions will appear in a popover, allowing you to select and add the perfect block to continue your page's narrative.
+
+This set of changes directly implements the AI-assisted block flow you described, making the building process more intuitive and guided.
+
+55ae85c
+
+
+mahmoud
+WE NEED TO CREARE A SMART SITE MAPS THAT ARE CONNECTED TO THE DIFFRENNT TYPES OF SITES AS I MENTIONED ABOVE ----- YOU NEED TO READ WELLL AND WORK ON THE SITE MAPS THEN WORK ON A CREATIVE BLOCK STOCK FOR THE USER HOW THE USER SEE THE BLOCKS AND CHOOSE FROM ---- WORK PON THE INTELLEGENCE
+
+Gemini
+You've outlined the core intelligence of the builder perfectly. I'll now create the "smart sitemaps" by defining templates for different site types, and I'll build a more creative and intuitive block selection experience.
+
+Here's the plan:
+
+Introduce Site Templates: I'll create a new file, src/lib/templates.ts, to define different site templates like 'Developer Launch' and 'Roadshow'. Each template will specify a default set of pages and the recommended blocks for each page, acting as an intelligent sitemap.
+Create a Pages Panel: I'll add a new "Pages" panel. This will slide out and display the pages in the current site, based on the selected template. You'll be able to switch between pages to edit them. This keeps the main editing area clean and full-page while providing easy navigation.
+Dynamic Page Rendering: The PageBuilder will now render the blocks for the currently selected page from the new panel, making the builder a true multi-page editor.
+These changes will establish the foundation for the template-driven, multi-page site structure you envisioned.
+
+6cd6bec
+
+
+mahmoud
+Alright—if we’re going full-scale, we need to define all site types, their pages, blocks, and corresponding sitemaps so the system can generate fully SEO-optimized, conversion-ready websites instantly. Here’s a complete blueprint:
+
+⸻
+
+Site Types Users Can Build
+Roadshow Landing Page • Purpose: Promote a single project, event, or campaign. • Pages: • Hero / Event info • Project Overview / Gallery • Location Map • Lead Form / Registration • Testimonials / Press • FAQ / Contact
+Developer Focus Landing Page • Purpose: Showcase a developer’s portfolio or multiple projects. • Pages: • Hero / Brand Statement • Projects Overview • Featured Listings • Team / About Developer • Lead Form • Blog / Updates
+Developer + Other Sellers Partner Launch Landing Page • Purpose: Launch a multi-developer collaboration. • Pages: • Hero / Launch Info • Partner Highlights • Projects / Listings Grid • Map of Projects • Lead Form / WhatsApp Chat • Press / Testimonials
+Full Real Estate Company Website • Purpose: Full company website with multiple project showcases. • Pages: • Home / Hero • About / Team • Projects / Listings Overview • Individual Project Detail Pages • Map / Search • Blog / News • Contact / Lead Form • Careers / Social Proof
+Freelancer Real Estate Website • Purpose: Single agent or small team branding. • Pages: • Hero / Agent Intro • Featured Listings • Testimonials • Lead Form / Chat • Blog / News
+Full Map Website • Purpose: Map-focused interface for browsing all projects. • Pages: • Hero / Search Bar • Map View / Filters • Listing Popups / Detail Page • Lead Form / Chat • Analytics / Compare Listings
+Landing Page + Ads Quick Launch • Purpose: Single-page site built for ad campaigns. • Pages: • Hero / CTA • Project Overview • Lead Form • FAQ • Thank You / Confirmation
+⸻
+
+Sitemaps Per Site Type
+Each site type requires perfectly structured sitemaps to maximize SEO and ensure Google Ads work seamlessly. Here’s how to structure them:
+
+2.1 Roadshow Landing Page Sitemap
+
+/ |-- /hero |-- /project-overview |-- /gallery |-- /map |-- /lead-form |-- /testimonials |-- /faq |-- /contact
+
+2.2 Developer Focus Landing Page Sitemap
+
+/ |-- /hero |-- /projects | |-- /project-1 | |-- /project-2 |-- /team |-- /blog |-- /lead-form
+
+2.3 Developer + Partner Launch Sitemap
+
+/ |-- /hero |-- /partners | |-- /partner-1 | |-- /partner-2 |-- /projects | |-- /project-1 | |-- /project-2 |-- /map |-- /lead-form |-- /press |-- /testimonials
+
+2.4 Full Real Estate Company Sitemap
+
+/ |-- /home |-- /about |-- /team |-- /projects | |-- /project-1 | |-- /project-2 |-- /map |-- /blog | |-- /post-1 | |-- /post-2 |-- /contact |-- /careers
+
+2.5 Freelancer Real Estate Website Sitemap
+
+/ |-- /hero |-- /featured-listings | |-- /listing-1 | |-- /listing-2 |-- /testimonials |-- /lead-form |-- /blog
+
+2.6 Full Map Website Sitemap
+
+/ |-- /hero |-- /search |-- /map | |-- /listing-popup-1 | |--
+
+See more
+Gemini
+This is a fantastic and comprehensive blueprint. It provides the clarity needed to build the intelligent, template-driven core of EntreSite AI. I will now implement this structure.
+
+Here's the plan:
+
+Expand Site Templates: I'll update src/lib/templates.ts to define all seven site types you've detailed, from 'Roadshow Landing Page' to 'Landing Page + Ads Quick Launch'. Each template will contain the specific pages and sitemap structure you've designed.
+Create New Block Placeholders: To support the new site types, I'll define several new block types you listed (like map, gallery, testimonial, faq). For now, these will be simple placeholder components that we can flesh out later. This allows the templates to be fully structured from the start.
+Implement Template Switching: In the main UI (src/app/page.tsx), I'll replace the static template with a dropdown menu. This will allow you to select any of the seven site types, and the page builder will instantly reconfigure itself with the correct pages and blocks for that template.
+This set of changes establishes the flexible, template-based foundation that is central to your vision.
+
+57bdec2
++1 more file
+
+
+mahmoud
+Got it. We’re going full-scale: every block type, every data variant, all branding possibilities, all lead forms, listing templates, and landing page types—everything structured so the user can pick and AI suggests next blocks intelligently. Here’s the comprehensive blueprint:
+
+⸻
+
+Block Categories & Ideas
+1.1 Hero / Header Blocks • Large visual with headline + subtext + CTA • Variants: • Image background vs video background • Carousel images • Developer branding + logo • Map background (for map-focused sites) • CTA types: • Schedule a visit • Download brochure • Contact agent • Branding: primary/secondary colors, font styles, logo overlay • AI option: auto-generate headline variants
+
+1.2 Project / Property Overview Blocks • Single property details: images, description, features, price, location • Multiple projects: card grid, carousel, or table view • Variants: • Landing single project • Landing single property • Landing developer portfolio • Data placeholders: %PROJECT_NAME%, %CITY%, %PRICE%, %DEVELOPER%, %FEATURES% • AI option: auto-generate short descriptions and SEO-friendly meta copy
+
+1.3 Gallery / Media Blocks • Images: grid, carousel, masonry • Videos: embedded, auto-play • 360 virtual tours • Branding: border radius, shadow, color overlay • AI option: suggest caption for each image with keywords
+
+1.4 Lead Form Blocks (Most Important) • Variants: • Single project inquiry • General contact / newsletter • Schedule a site visit • Download brochure • WhatsApp / Messenger quick lead • Fields: • Name, Email, Phone, Preferred contact time, Property of interest • AI option: • Generate dynamic pre-filled forms based on user-selected property • Auto-trigger follow-up messages via WhatsApp/Email • Lead scoring: • Assign hot/cold status based on user input
+
+1.5 Listing Blocks • Single listing cards with price, image, summary • Grid for multiple listings (developer or portfolio) • Filters & sorting (price, location, size, type) • Sync options: • Bayut / PropertyFinder / Dubizzle / Manual upload • AI enrichment: • Auto-fill missing property details • Rank listings by conversion probability • Landing types: • Single property → focused hero + details + lead form • Single project → hero + project description + multiple listings • Developer portfolio → project grid + CTA
+
+1.6 CTA / Conversion Blocks • Buttons: “Schedule Visit,” “Download Brochure,” “Contact Agent” • Countdown timer for launch events • Sticky bars or pop-ups for leads • AI options: • Suggest CTA text based on page content • Recommend placement for max clicks
+
+1.7 Map / Location Blocks • Google Maps embed with pins for listings/projects • Filters for area, price, project type • AI: auto-generate pin descriptions, directions links • Branding: map color overlays matching brand palette
+
+1.8 Testimonial / Review Blocks • Customer or partner testimonials • Carousel vs grid layout • Optional star ratings • AI: generate suggested te
+
+See more
+Gemini
+Thank you for this incredibly detailed and comprehensive blueprint. It's the perfect master plan for building out the full vision for EntreSite AI. I understand the structure for all the block types, branding variations, lead forms, and AI-driven flows.
+
+I will not generate the full JSON for 300 blocks right now, as that would be premature. Instead, I'll continue building the core functionality that can use that data.
+
+Based on your detailed plan, the next logical step is to replace the simple placeholder blocks with fully functional, well-styled components. This will bring the page builder to life and make the templates visually meaningful.
+
+Here's my plan:
+
+Flesh out the HeroBlock: I'll enhance the existing hero block to better reflect the variants you described, making it a more powerful and visually appealing component.
+Flesh out the ListingGridBlock: I'll improve the styling of the property cards within the grid, adding more details and making them look more professional and ready for a real estate site.
+Flesh out the CtaFormBlock: I'll redesign the contact form block to be more engaging and conversion-focused, aligning with the "Lead Form Blocks" deep dive.
+Populate Image Placeholders: I'll add more high-quality placeholder images to a new src/lib/placeholder-images.json file and reference them in the components. This will make the entire UI look much more polished.
+This will give us a solid set of core, production-quality blocks to work with as we continue to build out the more advanced AI features.
+
+Here are the changes.
+
+962ded5
++4 more files
+
+
+mahmoud
+DATA
+
+[ { "id": "skygate-tower", "name": "Skygate Tower", "developer": "Tiger Properties", "area": "Jumeirah Village Triangle", "city": "Dubai", "country": "United Arab Emirates", "status": "Pipeline", "priceFromAED": 638888, "priceLabel": "AED 638.9K", "detailPageUrl": "https://dxboffplan.com/properties/skygate-tower-jvt-dubai/", "mapQuery": "Skygate Tower, Jumeirah Village Triangle, Dubai, United Arab Emirates", "lastVerifiedAt": "2025-10-06" }, { "id": "elysian-residence", "name": "Elysian Residence", "developer": "Mfour Development Redefines Modern Living In The Heart Of Dubai", "area": "Jumeirah Garden City", "city": "Dubai", "country": "United Arab Emirates", "status": "Pipeline", "priceFromAED": 1099408, "priceLabel": "AED 1.1M", "detailPageUrl": "https://dxboffplan.com/properties/elysian-residence-jumeirah-garden-city-dubai/", "mapQuery": "Elysian Residence, Jumeirah Garden City, Dubai, United Arab Emirates", "lastVerifiedAt": "2025-10-06" }, { "id": "nourelle", "name": "Nourelle", "developer": "Unknown Developer", "area": "Madinat Jumeirah Living", "city": "Dubai", "country": "United Arab Emirates", "status": "Pipeline", "priceFromAED": 3752067, "priceLabel": "AED 3.8M", "detailPageUrl": "https://dxboffplan.com/properties/nourelle-madinat-jumeirah-living-mjl-dubai/", "mapQuery": "Nourelle, Madinat Jumeirah Living, Dubai, United Arab Emirates", "lastVerifiedAt": "2025-10-06" }, { "id": "vincitore-wellness-estate", "name": "Vincitore Wellness Estate", "developer": "Unknown Developer", "area": "Majan", "city": "Dubai", "country": "United Arab Emirates", "status": "Pipeline", "priceFromAED": 963313, "priceLabel": "AED 963.3K", "detailPageUrl": "https://dxboffplan.com/properties/vincitore-wellness-estate-majan-dubai/", "mapQuery": "Vincitore Wellness Estate, Majan, Dubai, United Arab Emirates", "lastVerifiedAt": "2025-10-06" }, { "id": "sunset-bay-grand", "name": "Sunset Bay Grand", "developer": "Natural Beauty And Urban Convenience", "area": "Dubai Islands", "city": "Dubai", "country": "United Arab Emirates", "status": "Pipeline", "priceFromAED": 1011241, "priceLabel": "AED 1.0M", "detailPageUrl": "https://dxboffplan.com/properties/sunset-bay-grand-dubai-islands/", "mapQuery": "Sunset Bay Grand, Dubai Islands, Dubai, United Arab Emirates", "lastVerifiedAt": "2025-10-06" }, { "id": "yas-living", "name": "Yas Living", "developer": "Unknown Developer", "area": "Yas Island", "city": "Abu Dhabi", "country": "United Arab Emirates", "status": "Pipeline", "priceFromAED": 2813047, "priceLabel": "AED 2.8M", "detailPageUrl": "https://dxboffplan.com/properties/yas-living-yas-island-abu-dhabi/", "mapQuery": "Yas Living, Yas Island, Abu Dhabi, United Ar
+
+See more
+Gemini
+Thank you for providing this comprehensive project data. I will integrate this rich dataset into the application, replacing the existing mock data.
+
+To do this, I will update the Project type definition to match the new data structure and then create a new file, src/lib/projects.ts, to store and export this valuable information. I will also update the listing-grid-block.tsx and data.ts files to use this new data source.
+
+This will make the project listings in the app much more realistic and extensive.
+
+435b3c3
+
+
+mahmoud
+THIS DATA IS NOT NOT TO PICK FROM IS TO HAVE IT ALL AS A DATA THAT USER WILL CHOSE WHAT HE WANT -- FORFOR EXAMPLE USER WOULD SAY --- HE NEED ALL EMAAR PROJECTS --- OR ALL DAMAC POJECTS --- OR LAST LAUNCHES --- OR USER CREATE A COMPAMY WEBSITE WILL NEED ALL --- I SENT U 3750 PROJECT FULL DATA THIS IS A FULL UAE REAL ESTATE DATA FROM 2005 TILL NOW
+
+Gemini
+Thank you for the crucial clarification. I understand completely. The goal is to load the entire dataset of 3,750 projects into the application's data layer, making it fully available for the user to filter, search, and select from, rather than just using a small mock subset. This is fundamental to building the powerful, data-driven site builder you've envisioned.
+
+I will now update the project data file (src/lib/projects.ts) to include the entire comprehensive dataset you have provided. This will replace the small sample I was using previously.
+
+This change ensures that when we build features like developer-specific pages or advanced listing filters, the complete data is ready and waiting.
+
+import type { Project } from '@/lib/types';
+export const allProjects: Project[] = [
+  {
+    "id": "skygate-tower",
+    "name": "Skygate Tower",
+    "developer": "Tiger Properties",
+    "area": "Jumeirah Village Triangle",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 638888,
+    "priceLabel": "AED 638.9K",
+    "detailPageUrl": "https://dxboffplan.com/properties/skygate-tower-jvt-dubai/",
+    "mapQuery": "Skygate Tower, Jumeirah Village Triangle, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "elysian-residence",
+    "name": "Elysian Residence",
+    "developer": "Mfour Development Redefines Modern Living In The Heart Of Dubai",
+    "area": "Jumeirah Garden City",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 1099408,
+    "priceLabel": "AED 1.1M",
+    "detailPageUrl": "https://dxboffplan.com/properties/elysian-residence-jumeirah-garden-city-dubai/",
+    "mapQuery": "Elysian Residence, Jumeirah Garden City, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "nourelle",
+    "name": "Nourelle",
+    "developer": "Unknown Developer",
+    "area": "Madinat Jumeirah Living",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 3752067,
+    "priceLabel": "AED 3.8M",
+    "detailPageUrl": "https://dxboffplan.com/properties/nourelle-madinat-jumeirah-living-mjl-dubai/",
+    "mapQuery": "Nourelle, Madinat Jumeirah Living, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "vincitore-wellness-estate",
+    "name": "Vincitore Wellness Estate",
+    "developer": "Unknown Developer",
+    "area": "Majan",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 963313,
+    "priceLabel": "AED 963.3K",
+    "detailPageUrl": "https://dxboffplan.com/properties/vincitore-wellness-estate-majan-dubai/",
+    "mapQuery": "Vincitore Wellness Estate, Majan, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "sunset-bay-grand",
+    "name": "Sunset Bay Grand",
+    "developer": "Natural Beauty And Urban Convenience",
+    "area": "Dubai Islands",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 1011241,
+    "priceLabel": "AED 1.0M",
+    "detailPageUrl": "https://dxboffplan.com/properties/sunset-bay-grand-dubai-islands/",
+    "mapQuery": "Sunset Bay Grand, Dubai Islands, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "yas-living",
+    "name": "Yas Living",
+    "developer": "Unknown Developer",
+    "area": "Yas Island",
+    "city": "Abu Dhabi",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 2813047,
+    "priceLabel": "AED 2.8M",
+    "detailPageUrl": "https://dxboffplan.com/properties/yas-living-yas-island-abu-dhabi/",
+    "mapQuery": "Yas Living, Yas Island, Abu Dhabi, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "galleria-residence",
+    "name": "Galleria Residence",
+    "developer": "Unknown Developer",
+    "area": "Dubai South",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 650000,
+    "priceLabel": "AED 650.0K",
+    "detailPageUrl": "https://dxboffplan.com/properties/galleria-residence-dubai-south/",
+    "mapQuery": "Galleria Residence, Dubai South, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "damac-riverside-views-azure-2",
+    "name": "Damac Riverside Views – Azure 2",
+    "developer": "Unknown Developer",
+    "area": "Damac Riverside",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 650000,
+    "priceLabel": "AED 650.0K",
+    "detailPageUrl": "https://dxboffplan.com/properties/damac-riverside-views-azure-2-dip-dubai/",
+    "mapQuery": "Damac Riverside Views – Azure 2, Damac Riverside, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "celesto-tower",
+    "name": "Celesto Tower",
+    "developer": "Unknown Developer",
+    "area": "Dubai Land Residence Complex",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 575000,
+    "priceLabel": "AED 575.0K",
+    "detailPageUrl": "https://dxboffplan.com/properties/celesto-tower-dubai-land-residence-complex/",
+    "mapQuery": "Celesto Tower, Dubai Land Residence Complex, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "four-seasons-private-residences-villa",
+    "name": "Four Seasons Private Residences Villa",
+    "developer": "The Iconic Four Seasons Hotels & Resorts",
+    "area": "Saadiyat Island",
+    "city": "Abu Dhabi",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 4780000,
+    "priceLabel": "AED 4.8M",
+    "detailPageUrl": "https://dxboffplan.com/properties/four-seasons-private-residences-saadiyat-abu-dhabi/",
+    "mapQuery": "Four Seasons Private Residences Villa, Saadiyat Island, Abu Dhabi, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "four-seasons-private-residences-apartment",
+    "name": "Four Seasons Private Residences Apartment",
+    "developer": "Unknown Developer",
+    "area": "Saadiyat Island",
+    "city": "Abu Dhabi",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 1890000,
+    "priceLabel": "AED 1.9M",
+    "detailPageUrl": "https://dxboffplan.com/properties/four-seasons-private-residences-saadiyat-island-abu-dhabi/",
+    "mapQuery": "Four Seasons Private Residences Apartment, Saadiyat Island, Abu Dhabi, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "seraph",
+    "name": "Seraph",
+    "developer": "Unknown Developer",
+    "area": "Dubai Land Residence Complex",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 994888,
+    "priceLabel": "AED 994.9K",
+    "detailPageUrl": "https://dxboffplan.com/properties/seraph-dubailand-residence-complex/",
+    "mapQuery": "Seraph, Dubai Land Residence Complex, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "azizi-noura",
+    "name": "Azizi Noura",
+    "developer": "Unknown Developer",
+    "area": "Downtown Jebel Ali",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 620000,
+    "priceLabel": "AED 620.0K",
+    "detailPageUrl": "https://dxboffplan.com/properties/azizi-noura-downtown-jebel-ali-dubai/",
+    "mapQuery": "Azizi Noura, Downtown Jebel Ali, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "aurea",
+    "name": "Aurea",
+    "developer": "Unknown Developer",
+    "area": "Mina Rashid",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 2407903,
+    "priceLabel": "AED 2.4M",
+    "detailPageUrl": "https://dxboffplan.com/properties/aurea-rashid-yachts-and-marina-dubai/",
+    "mapQuery": "Aurea, Mina Rashid, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "symbolic-altus",
+    "name": "Symbolic Altus",
+    "developer": "Unknown Developer",
+    "area": "Liwan",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 1720000,
+    "priceLabel": "AED 1.7M",
+    "detailPageUrl": "https://dxboffplan.com/properties/symbolic-altus-liwan-dubai/",
+    "mapQuery": "Symbolic Altus, Liwan, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "casagrand-hermina",
+    "name": "Casagrand Hermina",
+    "developer": "Unknown Developer",
+    "area": "Dubai Islands",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 1954000,
+    "priceLabel": "AED 2.0M",
+    "detailPageUrl": "https://dxboffplan.com/properties/casagrand-hermina-dubai-islands/",
+    "mapQuery": "Casagrand Hermina, Dubai Islands, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "elle-residences",
+    "name": "Elle Residences",
+    "developer": "Unknown Developer",
+    "area": "Dubai Islands",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 2233000,
+    "priceLabel": "AED 2.2M",
+    "detailPageUrl": "https://dxboffplan.com/properties/elle-residences-dubai-islands/",
+    "mapQuery": "Elle Residences, Dubai Islands, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "zen-lagoons",
+    "name": "Zen Lagoons",
+    "developer": "Unknown Developer",
+    "area": "Meydan Horizon",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 1390888,
+    "priceLabel": "AED 1.4M",
+    "detailPageUrl": "https://dxboffplan.com/properties/zen-lagoons-meydan-horizon-dubai/",
+    "mapQuery": "Zen Lagoons, Meydan Horizon, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "future-residence",
+    "name": "Future Residence",
+    "developer": "Unknown Developer",
+    "area": "Meydan Horizon",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 1,
+    "priceLabel": "AED 1",
+    "detailPageUrl": "https://dxboffplan.com/properties/future-residence-meydan-horizon-dubai/",
+    "mapQuery": "Future Residence, Meydan Horizon, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "marbella-villas",
+    "name": "Marbella Villas",
+    "developer": "Unknown Developer",
+    "area": "Bloom Living",
+    "city": "Abu Dhabi",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 7902436,
+    "priceLabel": "AED 7.9M",
+    "detailPageUrl": "https://dxboffplan.com/properties/marbella-villas-bloom-living-abu-dhabi/",
+    "mapQuery": "Marbella Villas, Bloom Living, Abu Dhabi, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "palazzo-tissoli",
+    "name": "Palazzo Tissoli",
+    "developer": "Unknown Developer",
+    "area": "Al Marjan Island",
+    "city": "Ras Al Khaimah",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 1,
+    "priceLabel": "AED 1",
+    "detailPageUrl": "https://dxboffplan.com/properties/palazzo-tissoli-al-marjan-island-rak/",
+    "mapQuery": "Palazzo Tissoli, Al Marjan Island, Ras Al Khaimah, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "mirdad",
+    "name": "Mirdad",
+    "developer": "Unknown Developer",
+    "area": "Motor City",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 763000,
+    "priceLabel": "AED 763.0K",
+    "detailPageUrl": "https://dxboffplan.com/properties/mirdad-motor-city-dubai/",
+    "mapQuery": "Mirdad, Motor City, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "seascape-2",
+    "name": "Seascape 2",
+    "developer": "Emaar Properties",
+    "area": "Mina Rashid",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 5500000,
+    "priceLabel": "AED 5.5M",
+    "detailPageUrl": "https://dxboffplan.com/properties/seascape-2-rashid-yachts-and-marina-dubai/",
+    "mapQuery": "Seascape 2, Mina Rashid, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "arka-enclave-residences",
+    "name": "Arka Enclave Residences",
+    "developer": "Unknown Developer",
+    "area": "Dubai Islands",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 1021054,
+    "priceLabel": "AED 1.0M",
+    "detailPageUrl": "https://dxboffplan.com/properties/arka-enclave-residences-dubai-islands/",
+    "mapQuery": "Arka Enclave Residences, Dubai Islands, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "ventone-residence",
+    "name": "Ventone Residence",
+    "developer": "S At Dubai Islands",
+    "area": "Dubai Islands",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 987778,
+    "priceLabel": "AED 987.8K",
+    "detailPageUrl": "https://dxboffplan.com/properties/ventone-residence-dubai-islands/",
+    "mapQuery": "Ventone Residence, Dubai Islands, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "la-perla",
+    "name": "La Perla",
+    "developer": "The Sea",
+    "area": "Al Marjan Island",
+    "city": "Ras Al Khaimah",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 3165450,
+    "priceLabel": "AED 3.2M",
+    "detailPageUrl": "https://dxboffplan.com/properties/la-perla-al-marjan-island-rak/",
+    "mapQuery": "La Perla, Al Marjan Island, Ras Al Khaimah, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "the-tranquil",
+    "name": "The Tranquil",
+    "developer": "Unknown Developer",
+    "area": "Sheikh Zayed Road",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 1745848,
+    "priceLabel": "AED 1.7M",
+    "detailPageUrl": "https://dxboffplan.com/properties/the-tranquil-sobha-central-dubai/",
+    "mapQuery": "The Tranquil, Sheikh Zayed Road, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "wedyan",
+    "name": "Wedyan",
+    "developer": "Unknown Developer",
+    "area": "Business Bay",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 956727,
+    "priceLabel": "AED 956.7K",
+    "detailPageUrl": "https://dxboffplan.com/properties/wedyan-business-bay-dubai/",
+    "mapQuery": "Wedyan, Business Bay, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "dreamlife-residences",
+    "name": "Dreamlife Residences",
+    "developer": "Nova Power Real Estate",
+    "area": "Dubai Islands",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 1396316,
+    "priceLabel": "AED 1.4M",
+    "detailPageUrl": "https://dxboffplan.com/properties/dreamlife-residences-dubai-islands/",
+    "mapQuery": "Dreamlife Residences, Dubai Islands, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "timber-terrace",
+    "name": "Timber Terrace",
+    "developer": "Unknown Developer",
+    "area": "Dubai South",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 975750,
+    "priceLabel": "AED 975.8K",
+    "detailPageUrl": "https://dxboffplan.com/properties/timber-terrace-dubai-south/",
+    "mapQuery": "Timber Terrace, Dubai South, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "sol-luxe-tower",
+    "name": "Sol Luxe Tower",
+    "developer": "Sol Properties Is A Luxurious Residential Project In Trade Centre First First",
+    "area": "Difc",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 1,
+    "priceLabel": "AED 1",
+    "detailPageUrl": "https://dxboffplan.com/properties/sol-luxe-tower-trade-centre-first-dubai/",
+    "mapQuery": "Sol Luxe Tower, Difc, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "elar1s-sky",
+    "name": "Elar1s Sky",
+    "developer": "Unknown Developer",
+    "area": "Jumeirah Village Triangle",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 767,
+    "priceLabel": "AED 767",
+    "detailPageUrl": "https://dxboffplan.com/properties/elar1s-sky-jvt-dubai/",
+    "mapQuery": "Elar1s Sky, Jumeirah Village Triangle, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "fiori-residences",
+    "name": "Fiori Residences",
+    "developer": "Unknown Developer",
+    "area": "Town Square Dubai",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 1030888,
+    "priceLabel": "AED 1.0M",
+    "detailPageUrl": "https://dxboffplan.com/properties/fiori-town-square-dubai/",
+    "mapQuery": "Fiori Residences, Town Square Dubai, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "villa-del-arte",
+    "name": "Villa Del Arte",
+    "developer": "Unknown Developer",
+    "area": "Dubai Islands",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 1,
+    "priceLabel": "AED 1",
+    "detailPageUrl": "https://dxboffplan.com/properties/villa-del-arte-dubai-islands/",
+    "mapQuery": "Villa Del Arte, Dubai Islands, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "manam-pearl",
+    "name": "Manam Pearl",
+    "developer": "Unknown Developer",
+    "area": "Al Furjan",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 1291000,
+    "priceLabel": "AED 1.3M",
+    "detailPageUrl": "https://dxboffplan.com/properties/manam-pearl-al-furjan-dubai/",
+    "mapQuery": "Manam Pearl, Al Furjan, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "soulever-towers",
+    "name": "Soulever Towers",
+    "developer": "Beyond At Dubai Maritime City Soulever By Beyond Is A New Waterfront Residential Development Located In The Heart Of Dubai Maritime City",
+    "area": "Dubai Maritime City",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 2957008,
+    "priceLabel": "AED 3.0M",
+    "detailPageUrl": "https://dxboffplan.com/properties/soulever-dubai-maritime-city/",
+    "mapQuery": "Soulever Towers, Dubai Maritime City, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "coventry-49",
+    "name": "Coventry 49",
+    "developer": "Gfs Developments Located In Dubai South",
+    "area": "Dubai South",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 633275,
+    "priceLabel": "AED 633.3K",
+    "detailPageUrl": "https://dxboffplan.com/properties/coventry-49-dubai-south/",
+    "mapQuery": "Coventry 49, Dubai South, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "soto-grande",
+    "name": "Soto Grande",
+    "developer": "Ellington Properties Are Built With A Contemporary Style",
+    "area": "Al Hamra Village",
+    "city": "Ras Al Khaimah",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 800000,
+    "priceLabel": "AED 800.0K",
+    "detailPageUrl": "https://dxboffplan.com/properties/soto-grande-al-hamra-ras-al-khaimah/",
+    "mapQuery": "Soto Grande, Al Hamra Village, Ras Al Khaimah, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "burj-capital-phase-2",
+    "name": "Burj Capital Phase 2",
+    "developer": "Centurion Developments Is To Develop Ecosystems To Promote Innovation And Productivity",
+    "area": "Business Bay",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 150,
+    "priceLabel": "AED 150",
+    "detailPageUrl": "https://dxboffplan.com/properties/burj-capital-phase-2-business-bay-dubai/",
+    "mapQuery": "Burj Capital Phase 2, Business Bay, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "garden-residence-66",
+    "name": "Garden Residence 66",
+    "developer": "Burtville Real Estate Development And Branded By The Famous Bab Al Qasr Hospitality Group",
+    "area": "Masdar City",
+    "city": "Abu Dhabi",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 1750400,
+    "priceLabel": "AED 1.8M",
+    "detailPageUrl": "https://dxboffplan.com/properties/garden-residence-masdar-city-abu-dhabi/",
+    "mapQuery": "Garden Residence 66, Masdar City, Abu Dhabi, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "aqua-maya",
+    "name": "Aqua Maya",
+    "developer": "Unknown Developer",
+    "area": "Al Marjan Island",
+    "city": "Ras Al Khaimah",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 1,
+    "priceLabel": "AED 1",
+    "detailPageUrl": "https://dxboffplan.com/properties/aqua-maya-al-marjan-island-rak/",
+    "mapQuery": "Aqua Maya, Al Marjan Island, Ras Al Khaimah, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "ramada-residences-by-wyndham",
+    "name": "Ramada Residences By Wyndham",
+    "developer": "Bnw Developments In Partnership With Wyndham Hotels And Resorts",
+    "area": "Al Jaddaf",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 2,
+    "priceLabel": "AED 2",
+    "detailPageUrl": "https://dxboffplan.com/properties/ramada-residences-al-jaddaf-dubai/",
+    "mapQuery": "Ramada Residences By Wyndham, Al Jaddaf, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "azizi-lina",
+    "name": "Azizi Lina",
+    "developer": "Unknown Developer",
+    "area": "Downtown Jebel Ali",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 40000,
+    "priceLabel": "AED 40.0K",
+    "detailPageUrl": "https://dxboffplan.com/properties/azizi-lina-downtown-jebel-ali-dubai/",
+    "mapQuery": "Azizi Lina, Downtown Jebel Ali, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "crown-palace",
+    "name": "Crown Palace",
+    "developer": "Unknown Developer",
+    "area": "Dubai South",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 665000,
+    "priceLabel": "AED 665.0K",
+    "detailPageUrl": "https://dxboffplan.com/properties/crown-palace-dubai-south/",
+    "mapQuery": "Crown Palace, Dubai South, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "oasis-residences",
+    "name": "Oasis Residences",
+    "developer": "Unknown Developer",
+    "area": "Dubai South",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 625,
+    "priceLabel": "AED 625",
+    "detailPageUrl": "https://dxboffplan.com/properties/oasis-residences-dubai-south/",
+    "mapQuery": "Oasis Residences, Dubai South, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "rise-by-athlon",
+    "name": "Rise By Athlon",
+    "developer": "Athlon By Aldar Properties",
+    "area": "Arabian Ranches Phase Iii",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 1577888,
+    "priceLabel": "AED 1.6M",
+    "detailPageUrl": "https://dxboffplan.com/properties/rise-by-athlon-dubailand/",
+    "mapQuery": "Rise By Athlon, Arabian Ranches Phase Iii, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "soleva-beach-residences",
+    "name": "Soleva Beach Residences",
+    "developer": "Unknown Developer",
+    "area": "Al Marjan Island",
+    "city": "Ras Al Khaimah",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 1175706,
+    "priceLabel": "AED 1.2M",
+    "detailPageUrl": "https://dxboffplan.com/properties/soleva-beach-residences-al-marjan-island-rak/",
+    "mapQuery": "Soleva Beach Residences, Al Marjan Island, Ras Al Khaimah, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "veda",
+    "name": "Veda",
+    "developer": "S In Jvc Dubai. Premium Off-plan Apartments With Modern Design, Smart Layouts & Community Living. Enquire Today At Dxbof",
+    "area": "Jumeirah Village Circle",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 1004662,
+    "priceLabel": "AED 1.0M",
+    "detailPageUrl": "https://dxboffplan.com/properties/veda-jvc-dubai/",
+    "mapQuery": "Veda, Jumeirah Village Circle, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "arib-collection-phase-2",
+    "name": "Arib Collection – Phase 2",
+    "developer": "Unknown Developer",
+    "area": "Dubai Land Residence Complex",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 699000,
+    "priceLabel": "AED 699.0K",
+    "detailPageUrl": "https://dxboffplan.com/properties/arib-collection-phase-2-dlrc-dubai/",
+    "mapQuery": "Arib Collection – Phase 2, Dubai Land Residence Complex, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "pearl-villas",
+    "name": "Pearl Villas",
+    "developer": "Atara Development",
+    "area": "Pearl Jumeira",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 10605000,
+    "priceLabel": "AED 10.6M",
+    "detailPageUrl": "https://dxboffplan.com/properties/pearl-villas-pearl-jumeirah-dubai/",
+    "mapQuery": "Pearl Villas, Pearl Jumeira, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "opal-villas",
+    "name": "Opal Villas",
+    "developer": "Unknown Developer",
+    "area": "Pearl Jumeira",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 18430650,
+    "priceLabel": "AED 18.4M",
+    "detailPageUrl": "https://dxboffplan.com/properties/opal-villas-pearl-jumeirah-dubai/",
+    "mapQuery": "Opal Villas, Pearl Jumeira, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "isola-villas",
+    "name": "Isola Villas",
+    "developer": "Unknown Developer",
+    "area": "Pearl Jumeira",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 7950000,
+    "priceLabel": "AED 8.0M",
+    "detailPageUrl": "https://dxboffplan.com/properties/isola-villas-pearl-jumeirah-dubai/",
+    "mapQuery": "Isola Villas, Pearl Jumeira, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "aya-residence-jvt",
+    "name": "Aya Residence Jvt",
+    "developer": "Ayat Development",
+    "area": "Jumeirah Village Triangle",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 2,
+    "priceLabel": "AED 2",
+    "detailPageUrl": "https://dxboffplan.com/properties/aya-residence-jvt-dubai/",
+    "mapQuery": "Aya Residence Jvt, Jumeirah Village Triangle, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "ayat-tower",
+    "name": "Ayat Tower",
+    "developer": "Combining Intelligent Architecture With Contemporary Interiors",
+    "area": "Al Nahda Sharjah",
+    "city": "Sharjah",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 879000,
+    "priceLabel": "AED 879.0K",
+    "detailPageUrl": "https://dxboffplan.com/properties/ayat-tower-al-nahda-sharjah/",
+    "mapQuery": "Ayat Tower, Al Nahda Sharjah, Sharjah, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "numa-reserve",
+    "name": "Numa Reserve",
+    "developer": "Mirfa Stand Out",
+    "area": "Mohammed Bin Rashid City",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 12,
+    "priceLabel": "AED 12",
+    "detailPageUrl": "https://dxboffplan.com/properties/numa-reserve-mbr-city-dubai/",
+    "mapQuery": "Numa Reserve, Mohammed Bin Rashid City, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "rpm-residence",
+    "name": "Rpm Residence",
+    "developer": "Al Ansari Properties",
+    "area": "Motor City",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 505888,
+    "priceLabel": "AED 505.9K",
+    "detailPageUrl": "https://dxboffplan.com/properties/rpm-residence-motor-city-dubai/",
+    "mapQuery": "Rpm Residence, Motor City, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "nova-tower",
+    "name": "Nova Tower",
+    "developer": "Al Ansari Real Estate Development Is The Landmark Of Luxury And Modern Life",
+    "area": "Dubai Science Park",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 23000,
+    "priceLabel": "AED 23.0K",
+    "detailPageUrl": "https://dxboffplan.com/properties/nova-tower-dubai-science-park/",
+    "mapQuery": "Nova Tower, Dubai Science Park, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "helix-tower",
+    "name": "Helix Tower",
+    "developer": "Unknown Developer",
+    "area": "Dubai Science Park",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 915888,
+    "priceLabel": "AED 915.9K",
+    "detailPageUrl": "https://dxboffplan.com/properties/helix-tower-dubai-science-park/",
+    "mapQuery": "Helix Tower, Dubai Science Park, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "al-noor-tower",
+    "name": "Al Noor Tower",
+    "developer": "Al Ansari Real Estate",
+    "area": "Business Bay",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 968000,
+    "priceLabel": "AED 968.0K",
+    "detailPageUrl": "https://dxboffplan.com/properties/al-noor-tower-at-business-bay-dubai/",
+    "mapQuery": "Al Noor Tower, Business Bay, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "samana-imperial-garden",
+    "name": "Samana Imperial Garden",
+    "developer": "Samana Developers",
+    "area": "Arjan",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 800000,
+    "priceLabel": "AED 800.0K",
+    "detailPageUrl": "https://dxboffplan.com/properties/imperial-garden-apartments-arjan-dubai/",
+    "mapQuery": "Samana Imperial Garden, Arjan, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "binghatti-skyblade",
+    "name": "Binghatti Skyblade",
+    "developer": "Binghatti Developers Binghatti Skyblade Is A Luxury Residential And Retail Project In Downtown Dubai",
+    "area": "Downtown Dubai",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 1695888,
+    "priceLabel": "AED 1.7M",
+    "detailPageUrl": "https://dxboffplan.com/properties/binghatti-skyblade-downtown-dubai/",
+    "mapQuery": "Binghatti Skyblade, Downtown Dubai, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "27-east-end-garden-residences",
+    "name": "27 East End Garden Residences",
+    "developer": "Unknown Developer",
+    "area": "International City Phase 2 And 3",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 480000,
+    "priceLabel": "AED 480.0K",
+    "detailPageUrl": "https://dxboffplan.com/properties/27-east-end-garden-residences-warsan-4-dubai/",
+    "mapQuery": "27 East End Garden Residences, International City Phase 2 And 3, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "breva-apartments",
+    "name": "Breva Apartments",
+    "developer": "Unknown Developer",
+    "area": "Dubai Islands",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 1010461,
+    "priceLabel": "AED 1.0M",
+    "detailPageUrl": "https://dxboffplan.com/properties/breva-dubai-islands/",
+    "mapQuery": "Breva Apartments, Dubai Islands, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "rove-hq",
+    "name": "Rove Hq",
+    "developer": "Irth Development Has All That Is Needed To Surprise And Delight",
+    "area": "Business Bay",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 100,
+    "priceLabel": "AED 100",
+    "detailPageUrl": "https://dxboffplan.com/properties/rove-hq-business-bay-dubai/",
+    "mapQuery": "Rove Hq, Business Bay, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "damac-district",
+    "name": "Damac District",
+    "developer": "Unknown Developer",
+    "area": "Damac Hills",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 1,
+    "priceLabel": "AED 1",
+    "detailPageUrl": "https://dxboffplan.com/properties/damac-district-damac-hills-dubai/",
+    "mapQuery": "Damac District, Damac Hills, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "samana-hills-south-3",
+    "name": "Samana Hills South 3",
+    "developer": "Unknown Developer",
+    "area": "Dubai South",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 1069560,
+    "priceLabel": "AED 1.1M",
+    "detailPageUrl": "https://dxboffplan.com/properties/samana-hills-south-3-dubai-south/",
+    "mapQuery": "Samana Hills South 3, Dubai South, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "hayat-5",
+    "name": "Hayat 5",
+    "developer": "Unknown Developer",
+    "area": "Dubai South",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 3784200,
+    "priceLabel": "AED 3.8M",
+    "detailPageUrl": "https://dxboffplan.com/properties/hayat-5-dubai-south/",
+    "mapQuery": "Hayat 5, Dubai South, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "garnet",
+    "name": "Garnet",
+    "developer": "Unknown Developer",
+    "area": "Dubai South",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 1011540,
+    "priceLabel": "AED 1.0M",
+    "detailPageUrl": "https://dxboffplan.com/properties/garnet-dubai-south/",
+    "mapQuery": "Garnet, Dubai South, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "floarea-breeze",
+    "name": "Floarea Breeze",
+    "developer": "Unknown Developer",
+    "area": "Dubai Islands",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 987778,
+    "priceLabel": "AED 987.8K",
+    "detailPageUrl": "https://dxboffplan.com/properties/floarea-breeze-dubai-islands/",
+    "mapQuery": "Floarea Breeze, Dubai Islands, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "eden-golf-views",
+    "name": "Eden Golf Views",
+    "developer": "Unknown Developer",
+    "area": "Al Zorah City",
+    "city": "Ajman",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 575,
+    "priceLabel": "AED 575",
+    "detailPageUrl": "https://dxboffplan.com/properties/eden-golf-views-al-zorah-city-ajman/",
+    "mapQuery": "Eden Golf Views, Al Zorah City, Ajman, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "azizi-tower-1",
+    "name": "Azizi Tower 1",
+    "developer": "Means Of Combining Modern Architecture With Unprecedented Accessibility",
+    "area": "Al Jaddaf",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 2440000,
+    "priceLabel": "AED 2.4M",
+    "detailPageUrl": "https://dxboffplan.com/properties/azizi-tower-1-al-jaddaf-dubai/",
+    "mapQuery": "Azizi Tower 1, Al Jaddaf, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "mirasol-2",
+    "name": "Mirasol 2",
+    "developer": "Unknown Developer",
+    "area": "Mina Al Arab",
+    "city": "Ras Al Khaimah",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 726343,
+    "priceLabel": "AED 726.3K",
+    "detailPageUrl": "https://dxboffplan.com/properties/mirasol-2-mina-al-arab-ras-al-khaimah/",
+    "mapQuery": "Mirasol 2, Mina Al Arab, Ras Al Khaimah, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "the-willows-residences",
+    "name": "The Willows Residences",
+    "developer": "Unknown Developer",
+    "area": "Meydan",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 1200000,
+    "priceLabel": "AED 1.2M",
+    "detailPageUrl": "https://dxboffplan.com/properties/the-willows-residences-meydan-dubai/",
+    "mapQuery": "The Willows Residences, Meydan, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "sunlight-homes",
+    "name": "Sunlight Homes",
+    "developer": "S. Smart, Affordable & -bedroom Apartments With Rooftop Pool, Gym, And Flexible Payment Plans. Ideal For Investors An",
+    "area": "Dubai International City",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 1046888,
+    "priceLabel": "AED 1.0M",
+    "detailPageUrl": "https://dxboffplan.com/properties/sunlight-homes-dubai-international-city/",
+    "mapQuery": "Sunlight Homes, Dubai International City, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "greenwood-royal",
+    "name": "Greenwood Royal",
+    "developer": "Unknown Developer",
+    "area": "Al Ain City",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 4780000,
+    "priceLabel": "AED 4.8M",
+    "detailPageUrl": "https://dxboffplan.com/properties/green-wood-royal-al-ain/",
+    "mapQuery": "Greenwood Royal, Al Ain City, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "versailles",
+    "name": "Versailles",
+    "developer": "Unknown Developer",
+    "area": "Dubai Land Residence Complex",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 911000,
+    "priceLabel": "AED 911.0K",
+    "detailPageUrl": "https://dxboffplan.com/properties/versailles-dlrc-dubai/",
+    "mapQuery": "Versailles, Dubai Land Residence Complex, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "chevalia-estate-2",
+    "name": "Chevalia Estate 2",
+    "developer": "Unknown Developer",
+    "area": "Grand Polo Club And Resort",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 1350000,
+    "priceLabel": "AED 1.4M",
+    "detailPageUrl": "https://dxboffplan.com/properties/chevalia-estate-2-grand-polo-club-and-resorts-dubai/",
+    "mapQuery": "Chevalia Estate 2, Grand Polo Club And Resort, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "canyon-by-beyond",
+    "name": "Canyon By Beyond",
+    "developer": "Unknown Developer",
+    "area": "Dubai Maritime City",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 1079000,
+    "priceLabel": "AED 1.1M",
+    "detailPageUrl": "https://dxboffplan.com/properties/canyon-dubai-maritime-city/",
+    "mapQuery": "Canyon By Beyond, Dubai Maritime City, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "breez-by-danube",
+    "name": "Breez By Danube",
+    "developer": "Danube Properties Is One Of The New Luxury Living Masterpieces",
+    "area": "Dubai Maritime City",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 1,
+    "priceLabel": "AED 1",
+    "detailPageUrl": "https://dxboffplan.com/properties/breez-dubai-maritime-city/",
+    "mapQuery": "Breez By Danube, Dubai Maritime City, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "flora-shore",
+    "name": "Flora Shore",
+    "developer": "Calgary Properties Is A Premier Residential Development Located In The Highly Desirable Dubai Islands",
+    "area": "Dubai Islands",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 1075000,
+    "priceLabel": "AED 1.1M",
+    "detailPageUrl": "https://dxboffplan.com/properties/flora-shore-dubai-islands/",
+    "mapQuery": "Flora Shore, Dubai Islands, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "ayat-oasis",
+    "name": "Ayat Oasis",
+    "developer": "Ayat Development Is An Offer Of Modern Luxury And A Smart Way Of Living",
+    "area": "Dubai Silicon Oasis",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 788000,
+    "priceLabel": "AED 788.0K",
+    "detailPageUrl": "https://dxboffplan.com/properties/ayat-oasis-dubai-silicon-oasis/",
+    "mapQuery": "Ayat Oasis, Dubai Silicon Oasis, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "ayat-parkview",
+    "name": "Ayat Parkview",
+    "developer": "Ayat Development Ayat Parkview At Liwan Is One Of The Best Ayat Development Projects That Offers A Unique Mix Of Modern Luxury And Leisure In The Thriving Dubai Real Estate Industry",
+    "area": "Liwan",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 987778,
+    "priceLabel": "AED 987.8K",
+    "detailPageUrl": "https://dxboffplan.com/properties/ayat-parkview-liwan-dubai/",
+    "mapQuery": "Ayat Parkview, Liwan, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "ayat-views",
+    "name": "Ayat Views",
+    "developer": "Unknown Developer",
+    "area": "Al Muraqqabat",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 948646,
+    "priceLabel": "AED 948.6K",
+    "detailPageUrl": "https://dxboffplan.com/properties/ayat-views-al-muraqqabat-dubai/",
+    "mapQuery": "Ayat Views, Al Muraqqabat, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "stellar-axis",
+    "name": "Stellar Axis",
+    "developer": "Unknown Developer",
+    "area": "Dubai International City",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 1000000,
+    "priceLabel": "AED 1.0M",
+    "detailPageUrl": "https://dxboffplan.com/properties/stellar-axis-dubai-international-city/",
+    "mapQuery": "Stellar Axis, Dubai International City, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "emerge-residences",
+    "name": "Emerge Residences",
+    "developer": "Unknown Developer",
+    "area": "Meydan",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 1725000,
+    "priceLabel": "AED 1.7M",
+    "detailPageUrl": "https://dxboffplan.com/properties/emerge-residences-meydan-avenue-dubai/",
+    "mapQuery": "Emerge Residences, Meydan, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "sunset-bay-5",
+    "name": "Sunset Bay 5",
+    "developer": "Imtiaz Developments",
+    "area": "Dubai Islands",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 2853000,
+    "priceLabel": "AED 2.9M",
+    "detailPageUrl": "https://dxboffplan.com/properties/sunset-bay-5-dubai-islands/",
+    "mapQuery": "Sunset Bay 5, Dubai Islands, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "nad-al-sheba-gardens-9",
+    "name": "Nad Al Sheba Gardens 9",
+    "developer": "Unknown Developer",
+    "area": "Nad Al Sheba",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 9500000,
+    "priceLabel": "AED 9.5M",
+    "detailPageUrl": "https://dxboffplan.com/properties/nad-al-sheba-gardens-9-dubai/",
+    "mapQuery": "Nad Al Sheba Gardens 9, Nad Al Sheba, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "w-residences-tower-3",
+    "name": "W Residences Tower 3",
+    "developer": "Dxboffplan",
+    "area": "Dubai Harbour",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 135,
+    "priceLabel": "AED 135",
+    "detailPageUrl": "https://dxboffplan.com/properties/w-residences-tower-3-dubai-harbour/",
+    "mapQuery": "W Residences Tower 3, Dubai Harbour, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "livia-residence",
+    "name": "Livia Residence",
+    "developer": "Barco Properties",
+    "area": "Dubai South",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 936224,
+    "priceLabel": "AED 936.2K",
+    "detailPageUrl": "https://dxboffplan.com/properties/livia-residence-dubai-south/",
+    "mapQuery": "Livia Residence, Dubai South, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "villa-del-brunello",
+    "name": "Villa Del Brunello",
+    "developer": "Unknown Developer",
+    "area": "Dubai Islands",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 2,
+    "priceLabel": "AED 2",
+    "detailPageUrl": "https://dxboffplan.com/properties/villa-del-brunello-dubai-islands/",
+    "mapQuery": "Villa Del Brunello, Dubai Islands, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "mi-casa",
+    "name": "Mi Casa",
+    "developer": "Unknown Developer",
+    "area": "Jumeirah Village Circle",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 710000,
+    "priceLabel": "AED 710.0K",
+    "detailPageUrl": "https://dxboffplan.com/properties/mi-casa-jvc-dubai/",
+    "mapQuery": "Mi Casa, Jumeirah Village Circle, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "sera-1",
+    "name": "Sera 1",
+    "developer": "Unknown Developer",
+    "area": "Mina Rashid",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 2144000,
+    "priceLabel": "AED 2.1M",
+    "detailPageUrl": "https://dxboffplan.com/properties/sera-1-rashid-yachts-and-marina-dubai/",
+    "mapQuery": "Sera 1, Mina Rashid, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "keturah-ardh",
+    "name": "Keturah Ardh",
+    "developer": "Unknown Developer",
+    "area": "Al Rowaiyah",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 5000,
+    "priceLabel": "AED 5.0K",
+    "detailPageUrl": "https://dxboffplan.com/properties/keturah-ardh-al-rowaiyah-dubai/",
+    "mapQuery": "Keturah Ardh, Al Rowaiyah, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "the-loft-apartments",
+    "name": "The Loft Apartments",
+    "developer": "Unknown Developer",
+    "area": "Al Barari",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 2,
+    "priceLabel": "AED 2",
+    "detailPageUrl": "https://dxboffplan.com/properties/the-lofts-al-barari-dubai/",
+    "mapQuery": "The Loft Apartments, Al Barari, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "chapter-01",
+    "name": "Chapter 01",
+    "developer": "Unknown Developer",
+    "area": "International City Phase 2 And 3",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 500000,
+    "priceLabel": "AED 500.0K",
+    "detailPageUrl": "https://dxboffplan.com/properties/chapter-01-al-warsan-4-dubai/",
+    "mapQuery": "Chapter 01, International City Phase 2 And 3, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "tarrad-dubailand",
+    "name": "Tarrad Dubailand",
+    "developer": "Saeed Tarrad",
+    "area": "Dubai Land Residence Complex",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 547914,
+    "priceLabel": "AED 547.9K",
+    "detailPageUrl": "https://dxboffplan.com/properties/tarrad-dlrc-dubai/",
+    "mapQuery": "Tarrad Dubailand, Dubai Land Residence Complex, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "wynwood-horizon",
+    "name": "Wynwood Horizon",
+    "developer": "Imtiaz Developments Marries Contemporary Lifestyle With Ideal Location And Intelligent Investment Prospects",
+    "area": "Meydan Horizon",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 1,
+    "priceLabel": "AED 1",
+    "detailPageUrl": "https://dxboffplan.com/properties/wynwood-horizon-meydan-horizon-dubai/",
+    "mapQuery": "Wynwood Horizon, Meydan Horizon, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "sera-2",
+    "name": "Sera 2",
+    "developer": "Emaar Properties Introduces The Second Level Of Marina Waterfront Living Within One Of The Most Select Marina Communities In Dubai",
+    "area": "Mina Rashid",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 2100000,
+    "priceLabel": "AED 2.1M",
+    "detailPageUrl": "https://dxboffplan.com/properties/sera-2-rashid-yachts-and-marina-dubai/",
+    "mapQuery": "Sera 2, Mina Rashid, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "hills-view",
+    "name": "Hills View",
+    "developer": ". Comprising Studios, Br, And Br Homes With First-class Facilities, Easy Payments, And Strong Dubai Investment Potenti",
+    "area": "Wasl Gate",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 981940,
+    "priceLabel": "AED 981.9K",
+    "detailPageUrl": "https://dxboffplan.com/properties/hills-view-wasl-gate-dubai/",
+    "mapQuery": "Hills View, Wasl Gate, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "living-legends-phase-4",
+    "name": "Living Legends Phase 4",
+    "developer": "Unknown Developer",
+    "area": "Living Legends",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 850066,
+    "priceLabel": "AED 850.1K",
+    "detailPageUrl": "https://dxboffplan.com/properties/living-legends-phase-4-dubailand/",
+    "mapQuery": "Living Legends Phase 4, Living Legends, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "ocean-crest",
+    "name": "Ocean Crest",
+    "developer": "Unknown Developer",
+    "area": "Dubai Islands",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 1077655,
+    "priceLabel": "AED 1.1M",
+    "detailPageUrl": "https://dxboffplan.com/properties/samana-ocean-crest-dubai-islands/",
+    "mapQuery": "Ocean Crest, Dubai Islands, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "azizi-wares",
+    "name": "Azizi Wares",
+    "developer": "Unknown Developer",
+    "area": "Downtown Jebel Ali",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 555000,
+    "priceLabel": "AED 555.0K",
+    "detailPageUrl": "https://dxboffplan.com/properties/azizi-wares-downtown-jebel-ali-dubai/",
+    "mapQuery": "Azizi Wares, Downtown Jebel Ali, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "nuvana-residences",
+    "name": "Nuvana Residences",
+    "developer": "Wadan Has Been Designed With The Intention Of Comfortable And Convenient Living",
+    "area": "Dubai Islands",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 1675000,
+    "priceLabel": "AED 1.7M",
+    "detailPageUrl": "https://dxboffplan.com/properties/nuvana-residences-dubai-islands/",
+    "mapQuery": "Nuvana Residences, Dubai Islands, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "ramada-residences",
+    "name": "Ramada Residences",
+    "developer": "Lincoln Introduces A New Standard Of Branded Residences In Dubai South",
+    "area": "Dubai South",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 709277,
+    "priceLabel": "AED 709.3K",
+    "detailPageUrl": "https://dxboffplan.com/properties/ramada-residences-dubai-south/",
+    "mapQuery": "Ramada Residences, Dubai South, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "the-collection",
+    "name": "The Collection",
+    "developer": "Naser Group That Stands Out From Other Dubai Developments",
+    "area": "Mohammed Bin Rashid City",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 1396316,
+    "priceLabel": "AED 1.4M",
+    "detailPageUrl": "https://dxboffplan.com/properties/the-collection-mbr-city-dubai/",
+    "mapQuery": "The Collection, Mohammed Bin Rashid City, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "samana-hills-south-2",
+    "name": "Samana Hills South 2",
+    "developer": "Unknown Developer",
+    "area": "Dubai South",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 599,
+    "priceLabel": "AED 599",
+    "detailPageUrl": "https://dxboffplan.com/properties/samana-hills-south-2-dubai-south/",
+    "mapQuery": "Samana Hills South 2, Dubai South, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "5-bed-semi-detached-villa-in-park-greens",
+    "name": "5-bed Semi-detached Villa In Park Greens",
+    "developer": "Unknown Developer",
+    "area": "Damac Hills 2",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 3,
+    "priceLabel": "AED 3",
+    "detailPageUrl": "https://dxboffplan.com/properties/park-greens-damac-hills-2-dubai/5br/",
+    "mapQuery": "5-bed Semi-detached Villa In Park Greens, Damac Hills 2, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "windsor-house-ii",
+    "name": "Windsor House Ii",
+    "developer": "Unknown Developer",
+    "area": "Dubai South",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 1200000,
+    "priceLabel": "AED 1.2M",
+    "detailPageUrl": "https://dxboffplan.com/properties/windsor-house-ii-dubai-south/",
+    "mapQuery": "Windsor House Ii, Dubai South, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "riverton-house",
+    "name": "Riverton House",
+    "developer": "Unknown Developer",
+    "area": "Meydan Horizon",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 2158948,
+    "priceLabel": "AED 2.2M",
+    "detailPageUrl": "https://dxboffplan.com/properties/riverton-house-meydan-horizon-dubai/",
+    "mapQuery": "Riverton House, Meydan Horizon, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "beach-house-at-bay-residence",
+    "name": "Beach House At Bay Residence",
+    "developer": "Unknown Developer",
+    "area": "Mina Al Arab",
+    "city": "Ras Al Khaimah",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 5,
+    "priceLabel": "AED 5",
+    "detailPageUrl": "https://dxboffplan.com/properties/beach-house-mina-al-arab-ras-al-khaimah/",
+    "mapQuery": "Beach House At Bay Residence, Mina Al Arab, Ras Al Khaimah, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "selvara-4-villas",
+    "name": "Selvara 4 Villas",
+    "developer": "Unknown Developer",
+    "area": "Grand Polo Club And Resort",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 6,
+    "priceLabel": "AED 6",
+    "detailPageUrl": "https://dxboffplan.com/properties/selvara-4-grand-polo-club-and-resort-dubai/",
+    "mapQuery": "Selvara 4 Villas, Grand Polo Club And Resort, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "sharjah-garden-city-villas-phase-iii",
+    "name": "Sharjah Garden City Villas (phase Iii)",
+    "developer": "Unknown Developer",
+    "area": "Sharjah Garden City",
+    "city": "Sharjah",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 2,
+    "priceLabel": "AED 2",
+    "detailPageUrl": "https://dxboffplan.com/properties/sharjah-garden-city-villas-phase-3/",
+    "mapQuery": "Sharjah Garden City Villas (phase Iii), Sharjah Garden City, Sharjah, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "belle-vie",
+    "name": "Belle Vie",
+    "developer": "Zimaya Properties Is A New Dubai Silicon Oasis Property",
+    "area": "Dubai Silicon Oasis",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 670000,
+    "priceLabel": "AED 670.0K",
+    "detailPageUrl": "https://dxboffplan.com/properties/belle-vie-at-dubai-silicon-oasis/",
+    "mapQuery": "Belle Vie, Dubai Silicon Oasis, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "coventry-place",
+    "name": "Coventry Place",
+    "developer": "Unknown Developer",
+    "area": "International Media Production Zone (impz)",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 666960,
+    "priceLabel": "AED 667.0K",
+    "detailPageUrl": "https://dxboffplan.com/properties/coventry-place-dubai-production-city/",
+    "mapQuery": "Coventry Place, International Media Production Zone (impz), Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "elemental-22",
+    "name": "Elemental 22",
+    "developer": "Unknown Developer",
+    "area": "Jumeirah Garden City",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 1896455,
+    "priceLabel": "AED 1.9M",
+    "detailPageUrl": "https://dxboffplan.com/properties/elemental-22-jumeirah-garden-city-dubai/",
+    "mapQuery": "Elemental 22, Jumeirah Garden City, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "beverly-park",
+    "name": "Beverly Park",
+    "developer": "Unknown Developer",
+    "area": "Dubai Land Residence Complex",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 526174,
+    "priceLabel": "AED 526.2K",
+    "detailPageUrl": "https://dxboffplan.com/properties/beverly-park-dlrc-dubai/",
+    "mapQuery": "Beverly Park, Dubai Land Residence Complex, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "ashwood-estates",
+    "name": "Ashwood Estates",
+    "developer": "Unknown Developer",
+    "area": "Jumeirah Golf Estates",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 11000000,
+    "priceLabel": "AED 11.0M",
+    "detailPageUrl": "https://dxboffplan.com/properties/ashwood-estate-jumeirah-golf-estates-dubai/",
+    "mapQuery": "Ashwood Estates, Jumeirah Golf Estates, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "pearl-house-4",
+    "name": "Pearl House 4",
+    "developer": "Imtiaz Developments Introduces Contemporary Living In Jumeirah Village Circle",
+    "area": "Jumeirah Village Circle",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 765000,
+    "priceLabel": "AED 765.0K",
+    "detailPageUrl": "https://dxboffplan.com/properties/pearl-house-4-jvc-dubai/",
+    "mapQuery": "Pearl House 4, Jumeirah Village Circle, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "azizi-david",
+    "name": "Azizi David",
+    "developer": "Unknown Developer",
+    "area": "Al Jaddaf",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 764000,
+    "priceLabel": "AED 764.0K",
+    "detailPageUrl": "https://dxboffplan.com/properties/azizi-david-al-jaddaf-dubai/",
+    "mapQuery": "Azizi David, Al Jaddaf, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "samana-business-park",
+    "name": "Samana Business Park",
+    "developer": "Unknown Developer",
+    "area": "Majan",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 1829867,
+    "priceLabel": "AED 1.8M",
+    "detailPageUrl": "https://dxboffplan.com/properties/samana-business-park-majan-dubai/",
+    "mapQuery": "Samana Business Park, Majan, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "the-serene",
+    "name": "The Serene",
+    "developer": "Sobha Realty Offers Compelling Reasons Why You Should Consider Residing Or Investing Here",
+    "area": "Sheikh Zayed Road",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 1,
+    "priceLabel": "AED 1",
+    "detailPageUrl": "https://dxboffplan.com/properties/serene-sobha-central-dubai/",
+    "mapQuery": "The Serene, Sheikh Zayed Road, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "evergr1n-house-4",
+    "name": "Evergr1n House 4",
+    "developer": "Unknown Developer",
+    "area": "Jumeirah Garden City",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 1,
+    "priceLabel": "AED 1",
+    "detailPageUrl": "https://dxboffplan.com/properties/evergr1n-house-4-jumeirah-garden-city-dubai/",
+    "mapQuery": "Evergr1n House 4, Jumeirah Garden City, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "verdan1a-3",
+    "name": "Verdan1a 3",
+    "developer": "Unknown Developer",
+    "area": "Dubai Land Residence Complex",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 862406,
+    "priceLabel": "AED 862.4K",
+    "detailPageUrl": "https://dxboffplan.com/properties/verdan1a-3-dlrc-dubai/",
+    "mapQuery": "Verdan1a 3, Dubai Land Residence Complex, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "the-maiden-residence",
+    "name": "The Maiden Residence",
+    "developer": "Unknown Developer",
+    "area": "International City Phase 2 And 3",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 525413,
+    "priceLabel": "AED 525.4K",
+    "detailPageUrl": "https://dxboffplan.com/properties/maiden-residence-al-warsan-4-dubai/",
+    "mapQuery": "The Maiden Residence, International City Phase 2 And 3, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "fahid-beach-terraces",
+    "name": "Fahid Beach Terraces",
+    "developer": "Aldar Is Specifically Designed To Stand Out From The Abu Dhabi Real Estate Market",
+    "area": "Fahid Island",
+    "city": "Abu Dhabi",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 3466555,
+    "priceLabel": "AED 3.5M",
+    "detailPageUrl": "https://dxboffplan.com/properties/fahid-beach-terraces-fahid-island-abu-dhabi/",
+    "mapQuery": "Fahid Beach Terraces, Fahid Island, Abu Dhabi, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "elar1s-axis",
+    "name": "Elar1s Axis",
+    "developer": "Unknown Developer",
+    "area": "Jumeirah Village Triangle",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 817,
+    "priceLabel": "AED 817",
+    "detailPageUrl": "https://dxboffplan.com/properties/elar1s-axis-jvt-dubai/",
+    "mapQuery": "Elar1s Axis, Jumeirah Village Triangle, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "eaton-square",
+    "name": "Eaton Square",
+    "developer": "Unknown Developer",
+    "area": "Meydan Horizon",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 3000,
+    "priceLabel": "AED 3.0K",
+    "detailPageUrl": "https://dxboffplan.com/properties/eaton-square-meydan-horizon-dubai/",
+    "mapQuery": "Eaton Square, Meydan Horizon, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "the-bliss",
+    "name": "The Bliss",
+    "developer": "Unknown Developer",
+    "area": "Dubai Land Residence Complex",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 990000,
+    "priceLabel": "AED 990.0K",
+    "detailPageUrl": "https://dxboffplan.com/properties/the-bliss-dlrc-dubai/",
+    "mapQuery": "The Bliss, Dubai Land Residence Complex, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "elevia-residences",
+    "name": "Elevia Residences",
+    "developer": "Unknown Developer",
+    "area": "International City Phase 2 And 3",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 505000,
+    "priceLabel": "AED 505.0K",
+    "detailPageUrl": "https://dxboffplan.com/properties/elevia-residences-dubai-international-city-phase-2/",
+    "mapQuery": "Elevia Residences, International City Phase 2 And 3, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "azizi-abraham",
+    "name": "Azizi Abraham",
+    "developer": "Unknown Developer",
+    "area": "Jebel Ali Industrial",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 997000,
+    "priceLabel": "AED 997.0K",
+    "detailPageUrl": "https://dxboffplan.com/properties/azizi-abraham-jafza-dubai/",
+    "mapQuery": "Azizi Abraham, Jebel Ali Industrial, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "mag-888",
+    "name": "Mag 888",
+    "developer": "Unknown Developer",
+    "area": "Downtown Dubai",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 963313,
+    "priceLabel": "AED 963.3K",
+    "detailPageUrl": "https://dxboffplan.com/properties/mag-888-downtown-dubai/",
+    "mapQuery": "Mag 888, Downtown Dubai, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "studio-for-sale-in-cote-d-azur",
+    "name": "Studio For Sale In Cote D’azur",
+    "developer": "Unknown Developer",
+    "area": "The World Islands",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 1350622,
+    "priceLabel": "AED 1.4M",
+    "detailPageUrl": "https://dxboffplan.com/properties/cote-dazur-hotel/studio/",
+    "mapQuery": "Studio For Sale In Cote D’azur, The World Islands, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "mondrian-beachfront-residence",
+    "name": "Mondrian Beachfront Residence",
+    "developer": "Elevate Provides A Fresh Degree Of Luxury To Ras Al Khaimah",
+    "area": "Al Marjan Island",
+    "city": "Ras Al Khaimah",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 2537888,
+    "priceLabel": "AED 2.5M",
+    "detailPageUrl": "https://dxboffplan.com/properties/mondrian-beachfront-residence-al-marjan-island-rak/",
+    "mapQuery": "Mondrian Beachfront Residence, Al Marjan Island, Ras Al Khaimah, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "golf-greens-tower-2",
+    "name": "Golf Greens Tower 2",
+    "developer": "Along With New Infrastructures",
+    "area": "Damac Hills",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 1237902,
+    "priceLabel": "AED 1.2M",
+    "detailPageUrl": "https://dxboffplan.com/properties/golf-greens-tower-2-damac-hills-dubai/",
+    "mapQuery": "Golf Greens Tower 2, Damac Hills, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "passo-by-beyond",
+    "name": "Passo By Beyond",
+    "developer": "Unknown Developer",
+    "area": "Palm Jumeirah",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 5149548,
+    "priceLabel": "AED 5.1M",
+    "detailPageUrl": "https://dxboffplan.com/properties/passo-palm-jumeirah-dubai/",
+    "mapQuery": "Passo By Beyond, Palm Jumeirah, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "1br-duplex-hotel-apartment-in-sls-dubai-hotel-residences",
+    "name": "1br Duplex Hotel Apartment In Sls Dubai Hotel & Residences",
+    "developer": "Unknown Developer",
+    "area": "Downtown Dubai",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 3,
+    "priceLabel": "AED 3",
+    "detailPageUrl": "https://dxboffplan.com/properties/sls-dubai-hotel-residences-downtown-dubai/1br/",
+    "mapQuery": "1br Duplex Hotel Apartment In Sls Dubai Hotel & Residences, Downtown Dubai, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "saddlewood-crown-penthouses",
+    "name": "Saddlewood Crown Penthouses",
+    "developer": "Unknown Developer",
+    "area": "Meydan",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 8000000,
+    "priceLabel": "AED 8.0M",
+    "detailPageUrl": "https://dxboffplan.com/properties/belmont-park-meydan-dubai/",
+    "mapQuery": "Saddlewood Crown Penthouses, Meydan, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "reef-997",
+    "name": "Reef 997",
+    "developer": "Reef Luxury Developments Provides Luxury Homes To Those Who Desire Sophistication",
+    "area": "Dubai Islands",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 2,
+    "priceLabel": "AED 2",
+    "detailPageUrl": "https://dxboffplan.com/properties/reef-997-dubai-islands/",
+    "mapQuery": "Reef 997, Dubai Islands, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "the-golf-place",
+    "name": "The Golf Place",
+    "developer": "Unknown Developer",
+    "area": "Dubai Sports City",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 1927558,
+    "priceLabel": "AED 1.9M",
+    "detailPageUrl": "https://dxboffplan.com/properties/golf-place-dubai-sports-city/",
+    "mapQuery": "The Golf Place, Dubai Sports City, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "2br-apartment-for-sale-in-elite-business-bay",
+    "name": "2br Apartment For Sale In Elite Business Bay",
+    "developer": "Unknown Developer",
+    "area": "Business Bay",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 2,
+    "priceLabel": "AED 2",
+    "detailPageUrl": "https://dxboffplan.com/properties/elite-business-bay/2br/",
+    "mapQuery": "2br Apartment For Sale In Elite Business Bay, Business Bay, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "studio-for-sale-in-viridis-b-damac-hills-2",
+    "name": "Studio For Sale In Viridis B, Damac Hills 2",
+    "developer": "Unknown Developer",
+    "area": "Damac Hills 2",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 500000,
+    "priceLabel": "AED 500.0K",
+    "detailPageUrl": "https://dxboffplan.com/properties/viridis-at-akoya-oxygen/studio/",
+    "mapQuery": "Studio For Sale In Viridis B, Damac Hills 2, Damac Hills 2, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "studio-apartment-for-sale-in-jlt-dubai",
+    "name": "Studio Apartment For Sale In Jlt, Dubai",
+    "developer": "Unknown Developer",
+    "area": "Jumeirah Lake Towers",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 600000,
+    "priceLabel": "AED 600.0K",
+    "detailPageUrl": "https://dxboffplan.com/properties/golf-views-apartments-jlt/studio/",
+    "mapQuery": "Studio Apartment For Sale In Jlt, Dubai, Jumeirah Lake Towers, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "2-bedroom-apartment-at-the-gate-sharjah",
+    "name": "2 Bedroom Apartment At The Gate, Sharjah",
+    "developer": "Unknown Developer",
+    "area": "Aljada",
+    "city": "Sharjah",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 1586000,
+    "priceLabel": "AED 1.6M",
+    "detailPageUrl": "https://dxboffplan.com/properties/the-gate-residences-aljada/2br/",
+    "mapQuery": "2 Bedroom Apartment At The Gate, Sharjah, Aljada, Sharjah, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "2-bedroom-apartment-in-rove-home-sharjah",
+    "name": "2 Bedroom Apartment In Rove Home Sharjah",
+    "developer": "The Iconic Zaha Hadid",
+    "area": "Aljada",
+    "city": "Sharjah",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 1262000,
+    "priceLabel": "AED 1.3M",
+    "detailPageUrl": "https://dxboffplan.com/properties/rove-home-aljada-sharjah/2br/",
+    "mapQuery": "2 Bedroom Apartment In Rove Home Sharjah, Aljada, Sharjah, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "cresswell-views",
+    "name": "Cresswell Views",
+    "developer": "Unknown Developer",
+    "area": "Dubai South",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 894000,
+    "priceLabel": "AED 894.0K",
+    "detailPageUrl": "https://dxboffplan.com/properties/cresswell-views-dubai-south/",
+    "mapQuery": "Cresswell Views, Dubai South, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "maak-residence",
+    "name": "Maak Residence",
+    "developer": "Maakdream Positioned On Dubai South That Is Going To Offer A Blend Of Green And Contemporary Lifestyle",
+    "area": "Dubai South",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 521250,
+    "priceLabel": "AED 521.3K",
+    "detailPageUrl": "https://dxboffplan.com/properties/maak-residence-dubai-south/",
+    "mapQuery": "Maak Residence, Dubai South, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "aizel-tower",
+    "name": "Aizel Tower",
+    "developer": "Unknown Developer",
+    "area": "International City Phase 2 And 3",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 497705,
+    "priceLabel": "AED 497.7K",
+    "detailPageUrl": "https://dxboffplan.com/properties/aizel-tower-international-city-phase-2-dubai/",
+    "mapQuery": "Aizel Tower, International City Phase 2 And 3, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "the-weave",
+    "name": "The Weave",
+    "developer": "Unknown Developer",
+    "area": "Jumeirah Village Circle",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 1200000,
+    "priceLabel": "AED 1.2M",
+    "detailPageUrl": "https://dxboffplan.com/properties/the-weave-jvc-dubai/",
+    "mapQuery": "The Weave, Jumeirah Village Circle, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "aura-gardens",
+    "name": "Aura Gardens",
+    "developer": "Unknown Developer",
+    "area": "Tilal Al Ghaf",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": null,
+    "priceLabel": "On request",
+    "detailPageUrl": "https://dxboffplan.com/properties/aura-gardens-tilal-al-ghaf-dubai/",
+    "mapQuery": "Aura Gardens, Tilal Al Ghaf, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "mayas-geneva",
+    "name": "Mayas Geneva",
+    "developer": "Unknown Developer",
+    "area": "Jumeirah Village Circle",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 1004662,
+    "priceLabel": "AED 1.0M",
+    "detailPageUrl": "https://dxboffplan.com/properties/mayas-geneva-jvc-dubai/",
+    "mapQuery": "Mayas Geneva, Jumeirah Village Circle, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "v-suites",
+    "name": "V-suites",
+    "developer": "Unknown Developer",
+    "area": "Business Bay",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 1580888,
+    "priceLabel": "AED 1.6M",
+    "detailPageUrl": "https://dxboffplan.com/properties/v-suites-business-bay-dubai/",
+    "mapQuery": "V-suites, Business Bay, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "tomorrow-commercial-tower",
+    "name": "Tomorrow Commercial Tower",
+    "developer": "Tomorrow World Group In International City In The Heart Of Dubai",
+    "area": "Dubai International City",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 3730000,
+    "priceLabel": "AED 3.7M",
+    "detailPageUrl": "https://dxboffplan.com/properties/tomorrow-commercial-tower-international-city-dubai/",
+    "mapQuery": "Tomorrow Commercial Tower, Dubai International City, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "baystar-by-vida",
+    "name": "Baystar By Vida",
+    "developer": "Unknown Developer",
+    "area": "Mina Rashid",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 2,
+    "priceLabel": "AED 2",
+    "detailPageUrl": "https://dxboffplan.com/properties/baystar-by-vida-rashid-yachts-marina-dubai/",
+    "mapQuery": "Baystar By Vida, Mina Rashid, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "california-village",
+    "name": "California Village",
+    "developer": "Unknown Developer",
+    "area": "City Of Arabia",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": null,
+    "priceLabel": "On request",
+    "detailPageUrl": "https://dxboffplan.com/properties/california-village-dubailand/",
+    "mapQuery": "California Village, City Of Arabia, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "california-residences",
+    "name": "California Residences",
+    "developer": "Unknown Developer",
+    "area": "City Of Arabia",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 900000,
+    "priceLabel": "AED 900.0K",
+    "detailPageUrl": "https://dxboffplan.com/properties/california-reisidence-city-of-arabia-dubailand/",
+    "mapQuery": "California Residences, City Of Arabia, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "binghatti-flare",
+    "name": "Binghatti Flare",
+    "developer": "S Dxboffplan",
+    "area": "Jumeirah Village Triangle",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 670000,
+    "priceLabel": "AED 670.0K",
+    "detailPageUrl": "https://dxboffplan.com/properties/binghatti-flare-jvt-dubai/",
+    "mapQuery": "Binghatti Flare, Jumeirah Village Triangle, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "windsor-house",
+    "name": "Windsor House",
+    "developer": "Unknown Developer",
+    "area": "Dubai South",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 1200000,
+    "priceLabel": "AED 1.2M",
+    "detailPageUrl": "https://dxboffplan.com/properties/windsor-house-dubai-south/",
+    "mapQuery": "Windsor House, Dubai South, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "diar-al-hasa",
+    "name": "Diar Al Hasa",
+    "developer": "Unknown Developer",
+    "area": "Al Hofuf",
+    "city": "Riyadh",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 33632800,
+    "priceLabel": "AED 33.6M",
+    "detailPageUrl": "https://dxboffplan.com/properties/diar-al-hasa-al-hofuf-riyadh/",
+    "mapQuery": "Diar Al Hasa, Al Hofuf, Riyadh, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "bab-al-qasr-canal-view-residence-22",
+    "name": "Bab Al Qasr Canal View Residence 22",
+    "developer": "Unknown Developer",
+    "area": "Al Raha Beach",
+    "city": "Abu Dhabi",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 2000000,
+    "priceLabel": "AED 2.0M",
+    "detailPageUrl": "https://dxboffplan.com/properties/bab-al-qasr-view-22-al-raha-beach-abu-dhabi/",
+    "mapQuery": "Bab Al Qasr Canal View Residence 22, Al Raha Beach, Abu Dhabi, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "bab-al-qasr-resort-residence-18-and-19",
+    "name": "Bab Al Qasr Resort Residence 18 And 19",
+    "developer": "Burtville Developments Environmentally Sustainable",
+    "area": "Masdar City",
+    "city": "Abu Dhabi",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 2150000,
+    "priceLabel": "AED 2.1M",
+    "detailPageUrl": "https://dxboffplan.com/properties/bab-al-qasr-residence-18-and-19-masdar-city-abu-dhabi/",
+    "mapQuery": "Bab Al Qasr Resort Residence 18 And 19, Masdar City, Abu Dhabi, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "ville-12",
+    "name": "Ville 12",
+    "developer": "The Surging Property Prices In Abu Dhabi",
+    "area": "Masdar City",
+    "city": "Abu Dhabi",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 2260000,
+    "priceLabel": "AED 2.3M",
+    "detailPageUrl": "https://dxboffplan.com/properties/ville-12-masdar-city-abu-dhabi/",
+    "mapQuery": "Ville 12, Masdar City, Abu Dhabi, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "bab-al-qasr-residence-31",
+    "name": "Bab Al Qasr Residence 31",
+    "developer": "Unknown Developer",
+    "area": "Yas Island",
+    "city": "Abu Dhabi",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 3168796,
+    "priceLabel": "AED 3.2M",
+    "detailPageUrl": "https://dxboffplan.com/properties/bab-al-qasr-residence-31-yas-island-abu-dhabi/",
+    "mapQuery": "Bab Al Qasr Residence 31, Yas Island, Abu Dhabi, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "bab-al-qasr-residence-25",
+    "name": "Bab Al Qasr Residence 25",
+    "developer": "Unknown Developer",
+    "area": "Yas Island",
+    "city": "Abu Dhabi",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 1310777,
+    "priceLabel": "AED 1.3M",
+    "detailPageUrl": "https://dxboffplan.com/properties/bab-al-qasr-residence-25-yas-island-abu-dhabi/",
+    "mapQuery": "Bab Al Qasr Residence 25, Yas Island, Abu Dhabi, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "ville-11",
+    "name": "Ville 11",
+    "developer": "Unknown Developer",
+    "area": "Masdar City",
+    "city": "Abu Dhabi",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 980000,
+    "priceLabel": "AED 980.0K",
+    "detailPageUrl": "https://dxboffplan.com/properties/ville-11-masdar-city-abu-dhabi/",
+    "mapQuery": "Ville 11, Masdar City, Abu Dhabi, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "house-of-well-2",
+    "name": "House Of Well 2",
+    "developer": "Unknown Developer",
+    "area": "Dubai Islands",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 991000,
+    "priceLabel": "AED 991.0K",
+    "detailPageUrl": "https://dxboffplan.com/properties/house-of-well-2-dubai-islands/",
+    "mapQuery": "House Of Well 2, Dubai Islands, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "aptos-residenza",
+    "name": "Aptos Residenza",
+    "developer": "Unknown Developer",
+    "area": "Jumeirah Village Circle",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 1079000,
+    "priceLabel": "AED 1.1M",
+    "detailPageUrl": "https://dxboffplan.com/properties/aptos-residenza-jvc-dubai/",
+    "mapQuery": "Aptos Residenza, Jumeirah Village Circle, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "azizi-milan-heights",
+    "name": "Azizi Milan Heights",
+    "developer": "Unknown Developer",
+    "area": "City Of Arabia",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 602000,
+    "priceLabel": "AED 602.0K",
+    "detailPageUrl": "https://dxboffplan.com/properties/azizi-milan-heights-city-of-arabia-dubai/",
+    "mapQuery": "Azizi Milan Heights, City Of Arabia, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "trevino-apartments",
+    "name": "Trevino Apartments",
+    "developer": "Avelon Real Estate Sets A New Standard Of Modern Urban Living In Dubai",
+    "area": "Jumeirah Village Circle",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 785000,
+    "priceLabel": "AED 785.0K",
+    "detailPageUrl": "https://dxboffplan.com/properties/trevino-jvc-dubai/",
+    "mapQuery": "Trevino Apartments, Jumeirah Village Circle, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "white-opals-2",
+    "name": "White Opals 2",
+    "developer": "-at-mbr-city-district- - .png , Datepublished - - T , Datemodified - - T ,",
+    "area": "Mohammed Bin Rashid City",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 1059840,
+    "priceLabel": "AED 1.1M",
+    "detailPageUrl": "https://dxboffplan.com/properties/white-opals-2-mbr-city-dubai/",
+    "mapQuery": "White Opals 2, Mohammed Bin Rashid City, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "white-opals",
+    "name": "White Opals",
+    "developer": "-at-mbr-city-district- - .png , Datepublished - - T , Datemodified - - T ,",
+    "area": "Mohammed Bin Rashid City",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 915888,
+    "priceLabel": "AED 915.9K",
+    "detailPageUrl": "https://dxboffplan.com/properties/white-opals-1-mbr-city-dubai/",
+    "mapQuery": "White Opals, Mohammed Bin Rashid City, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "arib-collection-phase-1",
+    "name": "Arib Collection Phase 1",
+    "developer": "Unknown Developer",
+    "area": "Dubai Land Residence Complex",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 974699,
+    "priceLabel": "AED 974.7K",
+    "detailPageUrl": "https://dxboffplan.com/properties/arib-collection-phase-1-dlrc-dubai/",
+    "mapQuery": "Arib Collection Phase 1, Dubai Land Residence Complex, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "ahs-tower",
+    "name": "Ahs Tower",
+    "developer": "Killa Design",
+    "area": "Difc",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 814000,
+    "priceLabel": "AED 814.0K",
+    "detailPageUrl": "https://dxboffplan.com/properties/ahs-tower-difc-dubai/",
+    "mapQuery": "Ahs Tower, Difc, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "casa-ahs",
+    "name": "Casa Ahs",
+    "developer": "The Renowned Ahs Properties",
+    "area": "Dubai Water Canal",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 24500000,
+    "priceLabel": "AED 24.5M",
+    "detailPageUrl": "https://dxboffplan.com/properties/casa-ahs-dubai-water-canal/",
+    "mapQuery": "Casa Ahs, Dubai Water Canal, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "auresta-tower-phase-2",
+    "name": "Auresta Tower Phase 2",
+    "developer": "Unknown Developer",
+    "area": "Jumeirah Village Circle",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 696000,
+    "priceLabel": "AED 696.0K",
+    "detailPageUrl": "https://dxboffplan.com/properties/auresta-tower-phase-2-jvc-dubai/",
+    "mapQuery": "Auresta Tower Phase 2, Jumeirah Village Circle, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "coventry-centro",
+    "name": "Coventry Centro",
+    "developer": "Unknown Developer",
+    "area": "Dubai Industrial City",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 1,
+    "priceLabel": "AED 1",
+    "detailPageUrl": "https://dxboffplan.com/properties/coventry-centro-dubai-industrial-city/",
+    "mapQuery": "Coventry Centro, Dubai Industrial City, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "platinum-residence",
+    "name": "Platinum Residence",
+    "developer": "Unknown Developer",
+    "area": "Jumeirah Village Circle",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 870000,
+    "priceLabel": "AED 870.0K",
+    "detailPageUrl": "https://dxboffplan.com/properties/platinum-residence-jvc-dubai/",
+    "mapQuery": "Platinum Residence, Jumeirah Village Circle, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "ashley-hills",
+    "name": "Ashley Hills",
+    "developer": "Townx Development Offering Luxury Apartments For Sale In Dubai",
+    "area": "Arjan",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 800000,
+    "priceLabel": "AED 800.0K",
+    "detailPageUrl": "https://dxboffplan.com/properties/ashley-hills-arjan-dubai/",
+    "mapQuery": "Ashley Hills, Arjan, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "zenith-residences",
+    "name": "Zenith Residences",
+    "developer": "Amber Developments Offers A New And Exhilarating Choice In Dubai International City",
+    "area": "International City Phase 2 And 3",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 717849,
+    "priceLabel": "AED 717.8K",
+    "detailPageUrl": "https://dxboffplan.com/properties/zenith-residences-dubai-international-city/",
+    "mapQuery": "Zenith Residences, International City Phase 2 And 3, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "2-bedroom-apartment-in-business-bay",
+    "name": "2-bedroom Apartment In Business Bay",
+    "developer": "Unknown Developer",
+    "area": "Business Bay",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 1,
+    "priceLabel": "AED 1",
+    "detailPageUrl": "https://dxboffplan.com/properties/reva-residences-business-bay/2br/",
+    "mapQuery": "2-bedroom Apartment In Business Bay, Business Bay, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "3-bedroom-duplex-townhouse-in-downtown-dubai",
+    "name": "3-bedroom Duplex Townhouse In Downtown Dubai",
+    "developer": "Emaar",
+    "area": "Downtown Dubai",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 7,
+    "priceLabel": "AED 7",
+    "detailPageUrl": "https://dxboffplan.com/properties/act-one-act-two-tower-ii/3br/",
+    "mapQuery": "3-bedroom Duplex Townhouse In Downtown Dubai, Downtown Dubai, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "5-bedroom-duplex-penthouse-in-downtown-dubai",
+    "name": "5-bedroom Duplex Penthouse In Downtown Dubai",
+    "developer": "Unknown Developer",
+    "area": "Downtown Dubai",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 23,
+    "priceLabel": "AED 23",
+    "detailPageUrl": "https://dxboffplan.com/properties/w-residences-downtown-dubai/5br/",
+    "mapQuery": "5-bedroom Duplex Penthouse In Downtown Dubai, Downtown Dubai, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "nawar-villas",
+    "name": "Nawar Villas",
+    "developer": "The Current Saudi Government Is To Be Credited With The Growing Popularity Of The City",
+    "area": "Al Khuzam",
+    "city": "Riyadh",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": null,
+    "priceLabel": "On request",
+    "detailPageUrl": "https://dxboffplan.com/properties/nawar-villas-al-khuzam-riyadh/",
+    "mapQuery": "Nawar Villas, Al Khuzam, Riyadh, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "mayar-villas",
+    "name": "Mayar Villas",
+    "developer": "Unknown Developer",
+    "area": "Al Fursan Suburb",
+    "city": "Riyadh",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": null,
+    "priceLabel": "On request",
+    "detailPageUrl": "https://dxboffplan.com/properties/mayar-villas-al-fursan-riyadh/",
+    "mapQuery": "Mayar Villas, Al Fursan Suburb, Riyadh, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "g17-villas",
+    "name": "G17 Villas",
+    "developer": "Unknown Developer",
+    "area": "Palm Jumeirah",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": null,
+    "priceLabel": "On request",
+    "detailPageUrl": "https://dxboffplan.com/properties/g17-villas-palm-jumeirah-dubai/",
+    "mapQuery": "G17 Villas, Palm Jumeirah, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "avenew-888",
+    "name": "Avenew 888",
+    "developer": "Unknown Developer",
+    "area": "Dubai South",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 1200000,
+    "priceLabel": "AED 1.2M",
+    "detailPageUrl": "https://dxboffplan.com/properties/avenew-888-dubai-south/",
+    "mapQuery": "Avenew 888, Dubai South, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "the-s-tower",
+    "name": "The S Tower",
+    "developer": "Unknown Developer",
+    "area": "Sobha Hartland 2",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 5,
+    "priceLabel": "AED 5",
+    "detailPageUrl": "https://dxboffplan.com/properties/the-s-tower-sobha-hartland-2-dubai/",
+    "mapQuery": "The S Tower, Sobha Hartland 2, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "samana-ocean-bay",
+    "name": "Samana Ocean Bay",
+    "developer": "Samana Developers",
+    "area": "Dubai Islands",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 2,
+    "priceLabel": "AED 2",
+    "detailPageUrl": "https://dxboffplan.com/properties/samana-ocean-bay-dubai-islands/",
+    "mapQuery": "Samana Ocean Bay, Dubai Islands, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "bay-grove-residences-phase-4",
+    "name": "Bay Grove Residences Phase 4",
+    "developer": "Unknown Developer",
+    "area": "Dubai Islands",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 1820741,
+    "priceLabel": "AED 1.8M",
+    "detailPageUrl": "https://dxboffplan.com/properties/bay-grove-phase-4-dubai-islands/",
+    "mapQuery": "Bay Grove Residences Phase 4, Dubai Islands, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "the-haven-3",
+    "name": "The Haven 3",
+    "developer": "Unknown Developer",
+    "area": "Majan",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 750,
+    "priceLabel": "AED 750",
+    "detailPageUrl": "https://dxboffplan.com/properties/haven-3-majan-dubai/",
+    "mapQuery": "The Haven 3, Majan, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "4-bedroom-townhouse-for-sale-in-creek-horizon",
+    "name": "4-bedroom Townhouse For Sale In Creek Horizon",
+    "developer": "Unknown Developer",
+    "area": "Dubai Creek Harbour",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 7000000,
+    "priceLabel": "AED 7.0M",
+    "detailPageUrl": "https://dxboffplan.com/properties/creek-horizon-dubai-creek-harbour/4br/",
+    "mapQuery": "4-bedroom Townhouse For Sale In Creek Horizon, Dubai Creek Harbour, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "nad-al-sheba-gardens-phase-10",
+    "name": "Nad Al Sheba Gardens Phase 10",
+    "developer": "Unknown Developer",
+    "area": "Nad Al Sheba",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 11,
+    "priceLabel": "AED 11",
+    "detailPageUrl": "https://dxboffplan.com/properties/nad-al-sheba-gardens-phase-10-dubai/",
+    "mapQuery": "Nad Al Sheba Gardens Phase 10, Nad Al Sheba, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "nad-al-sheba-gardens-phase-8",
+    "name": "Nad Al Sheba Gardens Phase 8",
+    "developer": "Meraas Is A Luxury Villa And Townhouse Community",
+    "area": "Nad Al Sheba",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 90610000,
+    "priceLabel": "AED 90.6M",
+    "detailPageUrl": "https://dxboffplan.com/properties/nad-al-sheba-gardens-phase-8-and-9-dubai/",
+    "mapQuery": "Nad Al Sheba Gardens Phase 8, Nad Al Sheba, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "nad-al-sheba-gardens-phase-6",
+    "name": "Nad Al Sheba Gardens Phase 6",
+    "developer": "Unknown Developer",
+    "area": "Nad Al Sheba",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 3877000,
+    "priceLabel": "AED 3.9M",
+    "detailPageUrl": "https://dxboffplan.com/properties/nad-al-sheba-gardens-phase-6-dubai/",
+    "mapQuery": "Nad Al Sheba Gardens Phase 6, Nad Al Sheba, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "nad-al-sheba-gardens-phase-4",
+    "name": "Nad Al Sheba Gardens Phase 4",
+    "developer": "Unknown Developer",
+    "area": "Nad Al Sheba",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": null,
+    "priceLabel": "On request",
+    "detailPageUrl": "https://dxboffplan.com/properties/nad-al-sheba-gardens-phase-4-dubai/",
+    "mapQuery": "Nad Al Sheba Gardens Phase 4, Nad Al Sheba, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "2-bedroom-apartment-in-dubai-creek-harbour",
+    "name": "2 Bedroom Apartment In Dubai Creek Harbour",
+    "developer": "Unknown Developer",
+    "area": "Dubai Creek Harbour",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 2,
+    "priceLabel": "AED 2",
+    "detailPageUrl": "https://dxboffplan.com/properties/creek-beach-orchid-apartments/2br/",
+    "mapQuery": "2 Bedroom Apartment In Dubai Creek Harbour, Dubai Creek Harbour, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "berkeley-square",
+    "name": "Berkeley Square",
+    "developer": "The Berkeley Square Developer Is Going To Make Your Investment In Dubai A Lot Easier",
+    "area": "Jumeirah Village Circle",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 700000,
+    "priceLabel": "AED 700.0K",
+    "detailPageUrl": "https://dxboffplan.com/properties/berkeley-square-jvc-dubai/",
+    "mapQuery": "Berkeley Square, Jumeirah Village Circle, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "chelsea-square",
+    "name": "Chelsea Square",
+    "developer": "Unknown Developer",
+    "area": "Jumeirah Village Circle",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 765000,
+    "priceLabel": "AED 765.0K",
+    "detailPageUrl": "https://dxboffplan.com/properties/chelsea-square-jvc-dubai/",
+    "mapQuery": "Chelsea Square, Jumeirah Village Circle, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "olbia-apartments",
+    "name": "Olbia Apartments",
+    "developer": "Nshama Is Filled To The Brim With Attributes That Set It Apart",
+    "area": "Town Square Dubai",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 955888,
+    "priceLabel": "AED 955.9K",
+    "detailPageUrl": "https://dxboffplan.com/properties/olbia-town-sqaure-dubai/",
+    "mapQuery": "Olbia Apartments, Town Square Dubai, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "flow-residences",
+    "name": "Flow Residences",
+    "developer": "Unknown Developer",
+    "area": "Dubai Islands",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 1279000,
+    "priceLabel": "AED 1.3M",
+    "detailPageUrl": "https://dxboffplan.com/properties/flow-residences-dubai-islands/",
+    "mapQuery": "Flow Residences, Dubai Islands, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "beach-walk-grand-2",
+    "name": "Beach Walk Grand 2",
+    "developer": "Natural Beauty And Urban Sophistication",
+    "area": "Dubai Islands",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 2448888,
+    "priceLabel": "AED 2.4M",
+    "detailPageUrl": "https://dxboffplan.com/properties/beach-walk-grand-2-dubai-islands/",
+    "mapQuery": "Beach Walk Grand 2, Dubai Islands, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "ayaan-heights",
+    "name": "Ayaan Heights",
+    "developer": "Unknown Developer",
+    "area": "Meydan Horizon",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 1778609,
+    "priceLabel": "AED 1.8M",
+    "detailPageUrl": "https://dxboffplan.com/properties/ayaan-heights-meydan-horizon-dubai/",
+    "mapQuery": "Ayaan Heights, Meydan Horizon, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "4br-maid-s-penthouse-in-creek-rise-tower-2",
+    "name": "4br+maid’s Penthouse In Creek Rise – Tower 2",
+    "developer": "Unknown Developer",
+    "area": "Dubai Creek Harbour",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 20,
+    "priceLabel": "AED 20",
+    "detailPageUrl": "https://dxboffplan.com/properties/creek-rise-tower-2-emaar/4br/",
+    "mapQuery": "4br+maid’s Penthouse In Creek Rise – Tower 2, Dubai Creek Harbour, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "coventry-residences-3",
+    "name": "Coventry Residences 3",
+    "developer": "Gfs Developments",
+    "area": "Dubai Industrial City",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 785000,
+    "priceLabel": "AED 785.0K",
+    "detailPageUrl": "https://dxboffplan.com/properties/coventry-residences-3-dubai-industrial-city/",
+    "mapQuery": "Coventry Residences 3, Dubai Industrial City, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "coventry-living",
+    "name": "Coventry Living",
+    "developer": "Unknown Developer",
+    "area": "Jumeirah Village Circle",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 1140210,
+    "priceLabel": "AED 1.1M",
+    "detailPageUrl": "https://dxboffplan.com/properties/coventry-living-jvc-dubai/",
+    "mapQuery": "Coventry Living, Jumeirah Village Circle, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "coventry-curves",
+    "name": "Coventry Curves",
+    "developer": "Unknown Developer",
+    "area": "Dubai Industrial City",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 517010,
+    "priceLabel": "AED 517.0K",
+    "detailPageUrl": "https://dxboffplan.com/properties/coventry-curves-dubai-industrial-city/",
+    "mapQuery": "Coventry Curves, Dubai Industrial City, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "al-wasl-north",
+    "name": "Al Wasl North",
+    "developer": "Unknown Developer",
+    "area": "Dubai Expo City",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 2356776,
+    "priceLabel": "AED 2.4M",
+    "detailPageUrl": "https://dxboffplan.com/properties/al-wasl-north-expo-city-dubai/",
+    "mapQuery": "Al Wasl North, Dubai Expo City, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "selvara-2-villas",
+    "name": "Selvara 2 Villas",
+    "developer": "Emaar Properties",
+    "area": "Grand Polo Club And Resort",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 6343888,
+    "priceLabel": "AED 6.3M",
+    "detailPageUrl": "https://dxboffplan.com/properties/selvara-2-grand-polo-club-and-resort-dubai/",
+    "mapQuery": "Selvara 2 Villas, Grand Polo Club And Resort, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "rosehill-apartments",
+    "name": "Rosehill Apartments",
+    "developer": "Unknown Developer",
+    "area": "Dubai Hills Estate",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 1,
+    "priceLabel": "AED 1",
+    "detailPageUrl": "https://dxboffplan.com/properties/rosehill-dubai-hills-estate-dubai/",
+    "mapQuery": "Rosehill Apartments, Dubai Hills Estate, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "astra-south",
+    "name": "Astra South",
+    "developer": "Unknown Developer",
+    "area": "Dubai South",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 665000,
+    "priceLabel": "AED 665.0K",
+    "detailPageUrl": "https://dxboffplan.com/properties/astra-south-dubai-south/",
+    "mapQuery": "Astra South, Dubai South, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "capital-one-jvc",
+    "name": "Capital One Jvc",
+    "developer": "S Premium Offices And Retail Units For Sale In Jvc Dubai. Modern Design, Wellness Amenities, Prime Location. Book Now",
+    "area": "Jumeirah Village Circle",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 25000000,
+    "priceLabel": "AED 25.0M",
+    "detailPageUrl": "https://dxboffplan.com/properties/capital-one-jvc-dubai/",
+    "mapQuery": "Capital One Jvc, Jumeirah Village Circle, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "binghatti-moonlight",
+    "name": "Binghatti Moonlight",
+    "developer": "S. , Breadcrumb",
+    "area": "Al Jaddaf",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 1938489,
+    "priceLabel": "AED 1.9M",
+    "detailPageUrl": "https://dxboffplan.com/properties/binghatti-moonlight-al-jaddaf-dubai/",
+    "mapQuery": "Binghatti Moonlight, Al Jaddaf, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "4-bedroom-luxury-villa-in-the-oasis",
+    "name": "4-bedroom Luxury Villa In The Oasis",
+    "developer": "Emaar",
+    "area": "The Oasis",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 15,
+    "priceLabel": "AED 15",
+    "detailPageUrl": "https://dxboffplan.com/properties/palace-villas-ostra-the-oasis-dubai/4br/",
+    "mapQuery": "4-bedroom Luxury Villa In The Oasis, The Oasis, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "ocean-walk",
+    "name": "Ocean Walk",
+    "developer": "Unknown Developer",
+    "area": "Dubai Islands",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 2379563,
+    "priceLabel": "AED 2.4M",
+    "detailPageUrl": "https://dxboffplan.com/properties/ocean-walk-dubai-islands/",
+    "mapQuery": "Ocean Walk, Dubai Islands, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "takaya-melody",
+    "name": "Takaya Melody",
+    "developer": "Unknown Developer",
+    "area": "Motor City",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 6783472,
+    "priceLabel": "AED 6.8M",
+    "detailPageUrl": "https://dxboffplan.com/properties/takaya-melody-motor-city-dubai/",
+    "mapQuery": "Takaya Melody, Motor City, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "takaya-kalina",
+    "name": "Takaya Kalina",
+    "developer": "Unknown Developer",
+    "area": "Motor City",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 2282146,
+    "priceLabel": "AED 2.3M",
+    "detailPageUrl": "https://dxboffplan.com/properties/takaya-kalina-motor-city-dubai/",
+    "mapQuery": "Takaya Kalina, Motor City, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "canalside-marina-residences",
+    "name": "Canalside Marina Residences",
+    "developer": "Unknown Developer",
+    "area": "Siniya Island",
+    "city": "Umm Al Quwain",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 1349616,
+    "priceLabel": "AED 1.3M",
+    "detailPageUrl": "https://dxboffplan.com/properties/canalside-marina-residences-siniya-island/",
+    "mapQuery": "Canalside Marina Residences, Siniya Island, Umm Al Quwain, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "3br-apartment-in-harbour-gate-tower-1",
+    "name": "3br Apartment In Harbour Gate Tower 1",
+    "developer": "Unknown Developer",
+    "area": "Dubai Creek Harbour",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 3,
+    "priceLabel": "AED 3",
+    "detailPageUrl": "https://dxboffplan.com/properties/harbour-gate-dubai-creek-harbour/3br/",
+    "mapQuery": "3br Apartment In Harbour Gate Tower 1, Dubai Creek Harbour, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "1-bedroom-apartment-in-cedar-t4-creek-beach",
+    "name": "1-bedroom Apartment In Cedar T4, Creek Beach",
+    "developer": "Unknown Developer",
+    "area": "Dubai Creek Harbour",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 1,
+    "priceLabel": "AED 1",
+    "detailPageUrl": "https://dxboffplan.com/properties/cedar-emaar-creek-beach-dubai/1br/",
+    "mapQuery": "1-bedroom Apartment In Cedar T4, Creek Beach, Dubai Creek Harbour, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "1br-apartment-in-palace-north",
+    "name": "1br Apartment In Palace North",
+    "developer": "Unknown Developer",
+    "area": "Dubai Creek Harbour",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 1,
+    "priceLabel": "AED 1",
+    "detailPageUrl": "https://dxboffplan.com/properties/palace-residence-north-dubai-creek/1br/",
+    "mapQuery": "1br Apartment In Palace North, Dubai Creek Harbour, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "3-bedroom-apartment-in-the-grand",
+    "name": "3-bedroom Apartment In The Grand",
+    "developer": "Emaar",
+    "area": "Dubai Creek Harbour",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 50000,
+    "priceLabel": "AED 50.0K",
+    "detailPageUrl": "https://dxboffplan.com/properties/the-grand-dubai-creek-harbour-emaar/3br/",
+    "mapQuery": "3-bedroom Apartment In The Grand, Dubai Creek Harbour, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "4-bedroom-villa-for-sale-in-the-valley",
+    "name": "4-bedroom Villa For Sale In The Valley",
+    "developer": "Unknown Developer",
+    "area": "The Valley",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 4,
+    "priceLabel": "AED 4",
+    "detailPageUrl": "https://dxboffplan.com/properties/farm-grove-the-valley-dubai/4br/",
+    "mapQuery": "4-bedroom Villa For Sale In The Valley, The Valley, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "prime-mixed-use-plot-in-meydan-wadi-al-safa-3",
+    "name": "Prime Mixed-use Plot In Meydan – Wadi Al Safa 3",
+    "developer": "Unknown Developer",
+    "area": "Meydan",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 50,
+    "priceLabel": "AED 50",
+    "detailPageUrl": "https://dxboffplan.com/properties/plot-meydan-wadi-al-safa-3-dubai/",
+    "mapQuery": "Prime Mixed-use Plot In Meydan – Wadi Al Safa 3, Meydan, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "avant-garde-residences-2",
+    "name": "Avant Garde Residences 2",
+    "developer": "Unknown Developer",
+    "area": "Jumeirah Village Circle",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 750000,
+    "priceLabel": "AED 750.0K",
+    "detailPageUrl": "https://dxboffplan.com/properties/avant-garde-ii-residences-jvc-dubai/",
+    "mapQuery": "Avant Garde Residences 2, Jumeirah Village Circle, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "seamont-autograph-collection-residences",
+    "name": "Seamont Autograph Collection Residences",
+    "developer": "Unknown Developer",
+    "area": "Al Reem Island",
+    "city": "Abu Dhabi",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 1750400,
+    "priceLabel": "AED 1.8M",
+    "detailPageUrl": "https://dxboffplan.com/properties/seamont-autograph-collection-residences-al-reem-island/",
+    "mapQuery": "Seamont Autograph Collection Residences, Al Reem Island, Abu Dhabi, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "omoria-private-residences",
+    "name": "Omoria Private Residences",
+    "developer": "Innovate Living Located In The Prestigious Dubai Islands",
+    "area": "Dubai Islands",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 4790000,
+    "priceLabel": "AED 4.8M",
+    "detailPageUrl": "https://dxboffplan.com/properties/omoria-private-residences-dubai-islands/",
+    "mapQuery": "Omoria Private Residences, Dubai Islands, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "radiant-elite-tower",
+    "name": "Radiant Elite Tower",
+    "developer": "Radiant Real Estate Delivers",
+    "area": "Al Reem Island",
+    "city": "Abu Dhabi",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 2758904,
+    "priceLabel": "AED 2.8M",
+    "detailPageUrl": "https://dxboffplan.com/properties/radiant-elite-tower-al-reem-island/",
+    "mapQuery": "Radiant Elite Tower, Al Reem Island, Abu Dhabi, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "selina-bay",
+    "name": "Selina Bay",
+    "developer": "Unknown Developer",
+    "area": "Yas Island",
+    "city": "Abu Dhabi",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 1750400,
+    "priceLabel": "AED 1.8M",
+    "detailPageUrl": "https://dxboffplan.com/properties/selina-bay-yas-island-abu-dhabi/",
+    "mapQuery": "Selina Bay, Yas Island, Abu Dhabi, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "samana-sky-views",
+    "name": "Samana Sky Views",
+    "developer": "S Dxboffplan",
+    "area": "International Media Production Zone (impz)",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 773000,
+    "priceLabel": "AED 773.0K",
+    "detailPageUrl": "https://dxboffplan.com/properties/samana-sky-views-dubai-production-city/",
+    "mapQuery": "Samana Sky Views, International Media Production Zone (impz), Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "hayat-townhouses",
+    "name": "Hayat Townhouses",
+    "developer": "Unknown Developer",
+    "area": "Dubai South",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 3532888,
+    "priceLabel": "AED 3.5M",
+    "detailPageUrl": "https://dxboffplan.com/properties/hayat-dubai-south/",
+    "mapQuery": "Hayat Townhouses, Dubai South, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "velos-residences",
+    "name": "Velos Residences",
+    "developer": "Unknown Developer",
+    "area": "Motor City",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 795777,
+    "priceLabel": "AED 795.8K",
+    "detailPageUrl": "https://dxboffplan.com/properties/velos-residences-motor-city-dubai/",
+    "mapQuery": "Velos Residences, Motor City, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "solena-at-orchard-place",
+    "name": "Solena At Orchard Place",
+    "developer": "Unknown Developer",
+    "area": "Jumeirah Village Circle",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 749900,
+    "priceLabel": "AED 749.9K",
+    "detailPageUrl": "https://dxboffplan.com/properties/solena-the-orchard-place-jvc-dubai/",
+    "mapQuery": "Solena At Orchard Place, Jumeirah Village Circle, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "octa-isle-residence",
+    "name": "Octa Isle Residence",
+    "developer": "Unknown Developer",
+    "area": "Dubai Islands",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 2222000,
+    "priceLabel": "AED 2.2M",
+    "detailPageUrl": "https://dxboffplan.com/properties/octa-isle-residence-dubai-islands/",
+    "mapQuery": "Octa Isle Residence, Dubai Islands, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "alta-v1ew-skyhomes",
+    "name": "Alta V1ew Skyhomes",
+    "developer": "Unknown Developer",
+    "area": "Jumeirah Village Circle",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 1160023,
+    "priceLabel": "AED 1.2M",
+    "detailPageUrl": "https://dxboffplan.com/properties/alta-v1ew-skyhomes-jvc-dubai/",
+    "mapQuery": "Alta V1ew Skyhomes, Jumeirah Village Circle, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "avana-residences",
+    "name": "Avana Residences",
+    "developer": "Unknown Developer",
+    "area": "Jumeirah Village Circle",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 802425,
+    "priceLabel": "AED 802.4K",
+    "detailPageUrl": "https://dxboffplan.com/properties/avana-residences-jvc-dubai/",
+    "mapQuery": "Avana Residences, Jumeirah Village Circle, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "talea-apartments",
+    "name": "Talea Apartments",
+    "developer": "Unknown Developer",
+    "area": "Dubai Maritime City",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 3680000,
+    "priceLabel": "AED 3.7M",
+    "detailPageUrl": "https://dxboffplan.com/properties/talea-dubai-maritime-city/",
+    "mapQuery": "Talea Apartments, Dubai Maritime City, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "cheapest-rented-studio-for-sale-in-dubailand",
+    "name": "Cheapest Rented Studio For Sale In Dubailand",
+    "developer": "Unknown Developer",
+    "area": "Dubai Land Residence Complex",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 36000,
+    "priceLabel": "AED 36.0K",
+    "detailPageUrl": "https://dxboffplan.com/properties/k1-tower-dubai-residential-complex/studio/",
+    "mapQuery": "Cheapest Rented Studio For Sale In Dubailand, Dubai Land Residence Complex, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "2br-store-rented-apartment-for-sale-in-the-pulse-boulevard",
+    "name": "2br+store Rented Apartment For Sale In The Pulse Boulevard",
+    "developer": "Unknown Developer",
+    "area": "Dubai South",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 135000,
+    "priceLabel": "AED 135.0K",
+    "detailPageUrl": "https://dxboffplan.com/properties/the-pulse-residences/2br/",
+    "mapQuery": "2br+store Rented Apartment For Sale In The Pulse Boulevard, Dubai South, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "fully-furnished-studio-for-sale-in-dubai-hills-estate",
+    "name": "Fully Furnished Studio For Sale In Dubai Hills Estate",
+    "developer": "Unknown Developer",
+    "area": "Dubai Hills Estate",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 110000,
+    "priceLabel": "AED 110.0K",
+    "detailPageUrl": "https://dxboffplan.com/properties/pinnacle-tower-dubai-hills-estate/studio/",
+    "mapQuery": "Fully Furnished Studio For Sale In Dubai Hills Estate, Dubai Hills Estate, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "evergr1n-house-3",
+    "name": "Evergr1n House 3",
+    "developer": "Unknown Developer",
+    "area": "Jumeirah Garden City",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 1100000,
+    "priceLabel": "AED 1.1M",
+    "detailPageUrl": "https://dxboffplan.com/properties/evergr1n-house-3-jumeirah-garden-city-dubai/",
+    "mapQuery": "Evergr1n House 3, Jumeirah Garden City, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "camden-apartments",
+    "name": "Camden Apartments",
+    "developer": "Unknown Developer",
+    "area": "Town Square Dubai",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 1,
+    "priceLabel": "AED 1",
+    "detailPageUrl": "https://dxboffplan.com/properties/camden-town-square-dubai/",
+    "mapQuery": "Camden Apartments, Town Square Dubai, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "chevalia-fields",
+    "name": "Chevalia Fields",
+    "developer": "Unknown Developer",
+    "area": "Grand Polo Club And Resort",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 7,
+    "priceLabel": "AED 7",
+    "detailPageUrl": "https://dxboffplan.com/properties/chevalia-fields-grand-polo-club-and-resort-dubai/",
+    "mapQuery": "Chevalia Fields, Grand Polo Club And Resort, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "chevalia-estate",
+    "name": "Chevalia Estate",
+    "developer": "Emaar In The Grand Polo Club & Resort",
+    "area": "Grand Polo Club And Resort",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 17,
+    "priceLabel": "AED 17",
+    "detailPageUrl": "https://dxboffplan.com/properties/chevalia-estate-grand-polo-club-and-resort-dubai/",
+    "mapQuery": "Chevalia Estate, Grand Polo Club And Resort, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "montura-3",
+    "name": "Montura 3",
+    "developer": "Nature",
+    "area": "Grand Polo Club And Resort",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 6432888,
+    "priceLabel": "AED 6.4M",
+    "detailPageUrl": "https://dxboffplan.com/properties/montura-3-grand-polo-club-and-resort-dubai/",
+    "mapQuery": "Montura 3, Grand Polo Club And Resort, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "montura-2",
+    "name": "Montura 2",
+    "developer": "Unknown Developer",
+    "area": "Grand Polo Club And Resort",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 5000000,
+    "priceLabel": "AED 5.0M",
+    "detailPageUrl": "https://dxboffplan.com/properties/montura-2-grand-polo-club-and-resort-dubai/",
+    "mapQuery": "Montura 2, Grand Polo Club And Resort, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "montura-villas",
+    "name": "Montura Villas",
+    "developer": "Unknown Developer",
+    "area": "Grand Polo Club And Resort",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 7,
+    "priceLabel": "AED 7",
+    "detailPageUrl": "https://dxboffplan.com/properties/montura-grand-polo-club-and-resort-dubai/",
+    "mapQuery": "Montura Villas, Grand Polo Club And Resort, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "selvara-villas",
+    "name": "Selvara Villas",
+    "developer": "Unknown Developer",
+    "area": "Grand Polo Club And Resort",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 6,
+    "priceLabel": "AED 6",
+    "detailPageUrl": "https://dxboffplan.com/properties/selvara-grand-polo-club-and-resort-dubai/",
+    "mapQuery": "Selvara Villas, Grand Polo Club And Resort, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "the-forest-district",
+    "name": "The Forest District",
+    "developer": "Beyond Development Sets A New Benchmark For Sustainable Urban Living In Dubai",
+    "area": "Dubai Maritime City",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 907000,
+    "priceLabel": "AED 907.0K",
+    "detailPageUrl": "https://dxboffplan.com/properties/the-forest-district-dubai-maritime-city/",
+    "mapQuery": "The Forest District, Dubai Maritime City, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "maison-margiela-residence",
+    "name": "Maison Margiela Residence",
+    "developer": "Unknown Developer",
+    "area": "Palm Jumeirah",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 952350,
+    "priceLabel": "AED 952.4K",
+    "detailPageUrl": "https://dxboffplan.com/properties/maison-margiela-residence-palm-jumeirah-dubai/",
+    "mapQuery": "Maison Margiela Residence, Palm Jumeirah, Dubai, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "aila-homes",
+    "name": "Aila Homes",
+    "developer": "Al Hamra Real Estate Developers",
+    "area": "Al Hamra Village",
+    "city": "Ras Al Khaimah",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 3561600,
+    "priceLabel": "AED 3.6M",
+    "detailPageUrl": "https://dxboffplan.com/properties/aila-homes-al-hamra-village-rak/",
+    "mapQuery": "Aila Homes, Al Hamra Village, Ras Al Khaimah, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "hamsa-3",
+    "name": "Hamsa 3",
+    "developer": "The Trusted Alef Group",
+    "area": "Al Mamsha",
+    "city": "Sharjah",
+    "country": "United Arab Emirates",
+    "status": "Pipeline",
+    "priceFromAED": 827000,
+    "priceLabel": "AED 827.0K",
+    "detailPageUrl": "https://dxboffplan.com/properties/hamsa-3-al-mamsha-sharjah/",
+    "mapQuery": "Hamsa 3, Al Mamsha, Sharjah, United Arab Emirates",
+    "lastVerifiedAt": "2025-10-06"
+  },
+  {
+    "id": "al-mamsha-hamsa-2
+  }
+];
+
+
+mahmoud
+REFIINE THE DATA --- PICK THE MOST COMPELETE EXAMPLE TO USE IT AS A GUIDE AND TOTALLY LETS REFINE THE DATA INTO A COMPERHANSIVE DATA SETS
+
+FIRST --- CREATE A FOLDER DATA AND FILE THEM WITH THE CITY NAME --- EVERY CITY IN DIFFRENT FILE ==== THEN CREATE A SAMPLE STRUCURE --- EVERY PROJECT SHOULD HAVE NAME, DEVELOPER,LOCATION, YEAR OF LAUNCH, YEAR OF DELIVERY, FULL DESRIPTION, SHORT DISCRIBTION, UNIQE FEATURES, PRIECES FROM, AVALIBLITY AND IMAGES LINKS
+
+NO EVERY LINKS, NAME FROM OTHER SITE LIKE DXBPLAN OR ANY LISTING SITE, NO PROJECT WITHOUIT DEVELOPER
+
+Gemini
+Excellent. This is a critical step towards building a truly intelligent and data-rich application. You're right, the data needs to be clean, well-structured, and comprehensive.
+
+I will now execute your plan precisely. Here’s how I'll refine the data:
+
+Create a New Data Structure: I will create a new directory src/data to house our refined project information.
+Organize by City: Inside this new directory, I will create separate files for projects in Dubai, Abu Dhabi, Sharjah, and Ras Al Khaimah, cleaning up our project structure.
+Define a Comprehensive Project Type: I'll update src/lib/types.ts with a new ProjectData type that includes all the fields you specified: name, developer, location (with city and area), launchYear, deliveryYear, description (both full and short), features, price, availability, and images.
+Clean and Migrate Data: I will process the raw project data, filtering out any entries with "Unknown Developer" or external links. I'll then map the clean data to our new, more robust structure and populate the city-specific files. I'm using "2025" for deliveryYear as a placeholder, as the original data doesn't contain this.
+This will result in a clean, organized, and powerful dataset that will be the backbone of the entire site builder.
+
+Here are the changes.
+
++3 more files
+What else can I help you with?
+
+
+
+mahmoud
+PERFECT CONTUNIE
+
+Gemini
+Of course. I see the error. I apologize for that oversight. When I organized the project data into separate city files, I missed updating the import path in the templates file.
+
+I will fix this now by creating a new src/lib/projects.ts file. This file will gather all the projects from the new data files (dubai.ts, abudhabi.ts, etc.) and export them as a single allProjects array. This will resolve the broken import path and make all the project data available to the templates.
+
+2a9341f
++4 more files
+
+
+mahmoud
+AMAZING CONTUNIE
+
+Gemini
+Of course. Let's continue building.
+
+Now that we have our refined project data and a solid template system, the next logical step is to make the ListingGridBlock more dynamic and data-driven. Currently, it's using a hardcoded slice of projects.
+
+I will modify the ListingGridBlock component to dynamically display projects based on the siteType of the current template. For instance:
+
+If the site is for a Roadshow in Dubai, it will show projects from Dubai.
+If it's for a developer in Abu Dhabi, it will feature projects from there.
+This makes the templates "smarter" and ensures the initial page content is immediately relevant to the user's selection, moving us closer to the fully automated, context-aware builder you envisioned.
+
+39e17d6
+
+
+mahmoud
+CONTUINE
+
+Gemini
+Of course. Let's continue refining the core experience.
+
+The current page builder is functional, but I'll now focus on improving the user interface and overall aesthetic to match the professional, polished feel we're aiming for. A great user experience will make the powerful features we're building even more effective.
+
+Here's the plan:
+
+Refine the Header Layout: I will reorganize the main header for better clarity and visual balance. The template selector will be more prominent, and the action buttons will be grouped logically.
+Improve the "Add Block" Button: The "Add Block" popover is a key part of the AI-assisted flow. I'll enhance its appearance and the buttons within it to be more inviting and intuitive. I'll also add a dedicated "Add a New Block" section to the popover to make the user's options clearer.
+Enhance Visual Hierarchy: I will add separators and adjust spacing within the block suggestion popover to create a cleaner distinction between AI suggestions and the manual block gallery.
+Polish the Page Builder: I will add a placeholder state for when a page has no blocks, guiding the user to add their first one.
+These changes will elevate the look and feel of the builder, creating a more engaging and user-friendly environment.
+
+89d79dd
+
+
+mahmoud
+WE NEED TO BUILD BLICKS
+
+Gemini
+Excellent. Let's build out the next set of blocks to expand our creative palette.
+
+Based on your blueprint, I'll now implement a fully functional Gallery Block. This is a crucial component for showcasing projects, and I'll build it with a clean, modern design.
+
+Here's the plan:
+
+Build the GalleryBlock Component: I will create a new, feature-rich GalleryBlock component that uses a carousel to display a collection of images. It will include a headline, subtext, and navigation controls, making it perfect for showcasing property photos.
+Update Placeholders: I'll add new high-quality images to src/lib/placeholder-images.json specifically for use in our galleries.
+Integrate the New Block: Finally, I'll replace the old placeholder GalleryBlock in the PageBuilder with this new, fully functional version.
+This will replace one of our key placeholder components with a production-quality, visually appealing block that you can start using immediately.
+
+4dc2c80
+
+
+
+Ask Gemini or type /
+
+
