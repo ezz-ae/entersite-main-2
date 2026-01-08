@@ -282,10 +282,10 @@ export function DocsPageContent() {
           <h4 className="text-2xl font-bold">Still need help?</h4>
           <p className="text-zinc-500">We answer quickly and guide you step by step.</p>
           <Link
-            href="mailto:support@entrestate.com"
+            href="/support"
             className="h-14 px-10 rounded-full border border-blue-500/30 bg-blue-600/20 text-blue-200 font-bold uppercase tracking-widest inline-flex items-center gap-2 hover:bg-blue-600/30 transition-all"
           >
-            Email Support <ArrowRight className="h-4 w-4" />
+            Contact Support <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
       </div>

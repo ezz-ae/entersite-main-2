@@ -13,7 +13,8 @@ const PLATFORM_LINKS = [
 
 const RESOURCE_LINKS = [
     { href: "/discover", label: "Market Feed" },
-    { href: "/docs", label: "Help Center" },
+    { href: "/support", label: "Support" },
+    { href: "/docs", label: "Guides" },
     { href: "/status", label: "System Status" },
     { href: "/start", label: "Get Started" },
 ];

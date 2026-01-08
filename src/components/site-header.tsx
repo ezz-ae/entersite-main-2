@@ -33,7 +33,7 @@ const NAV_LINKS = [
     { href: "/google-ads", label: "Google Ads", icon: Search, description: "Run ads without the headache" },
     { href: "/audience-network", label: "Buyer Audience", icon: Users, description: "Pilot audience tools for brokers" },
     { href: "/discover", label: "Market Feed", icon: Library, description: "Project listings and market updates" },
-    { href: "/docs", label: "Support", icon: LifeBuoy, description: "Help center & guides" },
+    { href: "/support", label: "Support", icon: LifeBuoy, description: "Message our support team" },
 ];
 
 export function SiteHeader() {
