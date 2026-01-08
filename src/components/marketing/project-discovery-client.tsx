@@ -28,15 +28,23 @@ export function ProjectDiscoveryClient({ initialProjects }: Props) {
   const [loading, setLoading] = useState(false);
   const [projects, setProjects] = useState<ProjectData[]>(initialProjects.slice(0, 12));
   const [totalResults, setTotalResults] = useState(initialProjects.length);
+  const [page, setPage] = useState(1);
   const [cityOptions, setCityOptions] = useState<string[]>(['Dubai', 'Abu Dhabi', 'Sharjah']);
 
-  const fetchProjects = async () => {
+  const fetchProjects = async (
+    nextPage = 1,
+    overrides?: { query?: string; city?: string; status?: string }
+  ) => {
     setLoading(true);
     try {
+      const queryValue = overrides?.query ?? query;
+      const cityValue = overrides?.city ?? city;
+      const statusValue = overrides?.status ?? status;
       const qs = buildQueryString({
-        query,
-        city,
-        status,
+        query: queryValue,
+        city: cityValue,
+        status: statusValue,
+        page: nextPage,
         limit: 12,
       });
       const res = await fetch(`/api/projects/search?${qs}`);
@@ -44,6 +52,7 @@ export function ProjectDiscoveryClient({ initialProjects }: Props) {
       const json = await res.json();
       setProjects(json.data || []);
       setTotalResults(json.pagination?.total || 0);
+      setPage(nextPage);
     } catch (error) {
       console.error('Failed to fetch discovery projects', error);
     } finally {
@@ -52,7 +61,7 @@ export function ProjectDiscoveryClient({ initialProjects }: Props) {
   };
 
   useEffect(() => {
-    fetchProjects();
+    fetchProjects(1);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [city, status]);
 
@@ -76,8 +85,12 @@ export function ProjectDiscoveryClient({ initialProjects }: Props) {
   }, []);
 
   const handleSearch = () => {
-    fetchProjects();
+    const nextQuery = query.trim();
+    setQuery(nextQuery);
+    fetchProjects(1, { query: nextQuery });
   };
+
+  const totalPages = Math.max(1, Math.ceil(totalResults / 12));
 
   return (
     <section className="bg-black text-white py-40 border-y border-white/5 relative overflow-hidden">
@@ -176,8 +189,41 @@ export function ProjectDiscoveryClient({ initialProjects }: Props) {
             <div className="h-60 flex flex-col items-center justify-center border border-dashed border-white/10 rounded-[3rem] bg-white/5">
                 <MapPin className="h-10 w-10 text-zinc-800 mb-4" />
                 <p className="text-zinc-500 font-medium text-lg">No matches found in the current inventory.</p>
-                <button onClick={() => { setQuery(''); setCity('all'); setStatus('all'); fetchProjects(); }} className="mt-4 text-blue-500 font-bold uppercase tracking-widest text-[10px] hover:underline">Reset Filters</button>
+                <button
+                  onClick={() => {
+                    setQuery('');
+                    setCity('all');
+                    setStatus('all');
+                    fetchProjects(1, { query: '', city: 'all', status: 'all' });
+                  }}
+                  className="mt-4 text-blue-500 font-bold uppercase tracking-widest text-[10px] hover:underline"
+                >
+                  Reset Filters
+                </button>
             </div>
+        )}
+
+        {!loading && totalResults > 12 && (
+          <div className="mt-12 flex flex-col sm:flex-row items-center justify-center gap-4">
+            <Button
+              variant="outline"
+              className="h-12 px-6 rounded-full border-white/10 bg-white/5 text-white font-bold"
+              disabled={page <= 1}
+              onClick={() => fetchProjects(page - 1)}
+            >
+              Previous 12
+            </Button>
+            <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">
+              Page {page} of {totalPages}
+            </span>
+            <Button
+              className="h-12 px-6 rounded-full bg-blue-600 hover:bg-blue-700 text-white font-bold"
+              disabled={page >= totalPages}
+              onClick={() => fetchProjects(page + 1)}
+            >
+              Load More
+            </Button>
+          </div>
         )}
       </div>
     </section>

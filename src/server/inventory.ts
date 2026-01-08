@@ -6,12 +6,15 @@ import type { ProjectData } from '@/lib/types';
 const CACHE_TTL_MS = 5 * 60 * 1000;
 const DEFAULT_MAX = 8000;
 const PUBLIC_PROJECT_ID =
-  process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || firebaseConfig.projectId;
+  process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID ||
+  process.env.FIREBASE_PROJECT_ID ||
+  process.env.project_id ||
+  firebaseConfig.projectId;
 const PUBLIC_API_KEY =
   process.env.NEXT_PUBLIC_FIREBASE_API_KEY || firebaseConfig.apiKey;
 const ADMIN_PROJECT_ID = (() => {
-  if (process.env.FIREBASE_PROJECT_ID) {
-    return process.env.FIREBASE_PROJECT_ID;
+  if (process.env.FIREBASE_PROJECT_ID || process.env.project_id) {
+    return process.env.FIREBASE_PROJECT_ID || process.env.project_id;
   }
   const adminConfig = process.env.FIREBASE_ADMIN_SDK_CONFIG;
   if (!adminConfig) return undefined;
@@ -22,7 +25,7 @@ const ADMIN_PROJECT_ID = (() => {
     return undefined;
   }
 })();
-const SHOULD_SKIP_ADMIN =
+const ADMIN_PROJECT_MISMATCH =
   ADMIN_PROJECT_ID && PUBLIC_PROJECT_ID && ADMIN_PROJECT_ID !== PUBLIC_PROJECT_ID;
 
 let cachedProjects: ProjectData[] = [];
@@ -316,6 +319,30 @@ async function loadPublicInventory(max: number): Promise<ProjectData[]> {
   return projects;
 }
 
+async function loadPublicProjectById(projectId: string): Promise<ProjectData | null> {
+  if (!PUBLIC_PROJECT_ID || !PUBLIC_API_KEY || !projectId) {
+    return null;
+  }
+
+  const url = new URL(
+    `https://firestore.googleapis.com/v1/projects/${PUBLIC_PROJECT_ID}/databases/(default)/documents/inventory_projects/${encodeURIComponent(projectId)}`
+  );
+  url.searchParams.set('key', PUBLIC_API_KEY);
+
+  const res = await fetch(url.toString(), { cache: 'no-store' });
+  if (!res.ok) {
+    return null;
+  }
+
+  const data = await res.json();
+  if (!data?.fields) {
+    return null;
+  }
+
+  const raw = decodeFirestoreFields(data.fields);
+  return normalizeProjectData(raw, projectId);
+}
+
 export async function loadInventoryProjects(max = DEFAULT_MAX, forceRefresh = false) {
   const now = Date.now();
   if (!forceRefresh && cachedProjects.length && now - cachedAt < CACHE_TTL_MS) {
@@ -324,16 +351,20 @@ export async function loadInventoryProjects(max = DEFAULT_MAX, forceRefresh = fa
 
   let projects: ProjectData[] = [];
 
-  if (!SHOULD_SKIP_ADMIN) {
-    try {
-      const db = getAdminDb();
-      const snapshot = await db.collection('inventory_projects').limit(max).get();
-      if (!snapshot.empty) {
-        projects = snapshot.docs.map((doc) => normalizeProjectData(doc.data(), doc.id));
-      }
-    } catch (error) {
-      console.error('[inventory] admin load failed', error);
+  if (ADMIN_PROJECT_MISMATCH) {
+    console.warn(
+      `[inventory] Admin project (${ADMIN_PROJECT_ID}) differs from public project (${PUBLIC_PROJECT_ID}). Using admin source first.`
+    );
+  }
+
+  try {
+    const db = getAdminDb();
+    const snapshot = await db.collection('inventory_projects').limit(max).get();
+    if (!snapshot.empty) {
+      projects = snapshot.docs.map((doc) => normalizeProjectData(doc.data(), doc.id));
     }
+  } catch (error) {
+    console.error('[inventory] admin load failed', error);
   }
 
   if (!projects.length) {
@@ -351,6 +382,30 @@ export async function loadInventoryProjects(max = DEFAULT_MAX, forceRefresh = fa
   cachedProjects = projects;
   cachedAt = now;
   return projects.slice(0, max);
+}
+
+export async function loadInventoryProjectById(projectId: string) {
+  if (!projectId) return null;
+
+  try {
+    const db = getAdminDb();
+    const snapshot = await db.collection('inventory_projects').doc(projectId).get();
+    if (snapshot.exists) {
+      return normalizeProjectData(snapshot.data(), snapshot.id);
+    }
+  } catch (error) {
+    console.error('[inventory] admin project lookup failed', error);
+  }
+
+  try {
+    const project = await loadPublicProjectById(projectId);
+    if (project) return project;
+  } catch (error) {
+    console.error('[inventory] public project lookup failed', error);
+  }
+
+  const fallback = await loadInventoryProjects();
+  return fallback.find((project) => project.id === projectId) ?? null;
 }
 
 export async function getRelevantProjects(message: string, context?: string, max = 8) {

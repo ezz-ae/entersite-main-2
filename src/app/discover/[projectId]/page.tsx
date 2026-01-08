@@ -3,8 +3,6 @@
 import React, { useState, useEffect } from 'react';
 import { NextPage } from 'next';
 import { useParams } from 'next/navigation';
-import { doc, getDoc } from 'firebase/firestore';
-import { db } from '@/firebase';
 import { ProjectData } from '@/lib/types';
 import { 
     Loader2, 
@@ -52,15 +50,17 @@ const ProjectDetailPage: NextPage = () => {
       if (!projectId) return;
       setLoading(true);
       try {
-        const docRef = doc(db, 'inventory_projects', projectId as string);
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists()) {
-          setProject({ id: docSnap.id, ...docSnap.data() } as ProjectData);
-        } else {
-          console.log("No such document!");
+        const resolvedId = Array.isArray(projectId) ? projectId[0] : projectId;
+        const res = await fetch(`/api/projects/${resolvedId}`);
+        if (!res.ok) {
+          setProject(null);
+          return;
         }
+        const data = await res.json();
+        setProject(data.data as ProjectData);
       } catch (error) {
         console.error("Error fetching project:", error);
+        setProject(null);
       } finally {
         setLoading(false);
       }
