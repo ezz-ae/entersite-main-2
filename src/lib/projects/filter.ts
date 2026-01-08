@@ -13,9 +13,13 @@ function normalizeValue(value?: string | null) {
   return (value ?? '').trim().toLowerCase();
 }
 
+function normalizeKey(value?: string | null) {
+  return (value ?? '').toLowerCase().replace(/[^a-z0-9]+/g, '');
+}
+
 export function filterProjects(projects: ProjectData[], filters: ProjectSearchFilters) {
   const query = normalizeValue(filters.query);
-  const city = normalizeValue(filters.city);
+  const city = normalizeKey(filters.city);
   const developer = normalizeValue(filters.developer);
   const status = normalizeValue(filters.status);
   const minPrice = filters.minPrice && filters.minPrice > 0 ? filters.minPrice : undefined;
@@ -33,7 +37,7 @@ export function filterProjects(projects: ProjectData[], filters: ProjectSearchFi
       }
     }
 
-    if (filters.city && city !== 'all' && project.location.city.toLowerCase() !== city) {
+    if (filters.city && city !== 'all' && normalizeKey(project.location.city) !== city) {
       return false;
     }
 

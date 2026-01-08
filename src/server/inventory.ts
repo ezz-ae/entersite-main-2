@@ -51,6 +51,35 @@ const normalizeString = (value: unknown, fallback = '') => {
   return fallback;
 };
 
+const normalizeKey = (value: string) =>
+  value.toLowerCase().replace(/[^a-z0-9]+/g, '');
+
+const CITY_LABELS: Record<string, string> = {
+  dubai: 'Dubai',
+  abudhabi: 'Abu Dhabi',
+  rasalkhaimah: 'Ras Al Khaimah',
+  sharjah: 'Sharjah',
+  ajman: 'Ajman',
+  ummalquwain: 'Umm Al Quwain',
+  fujairah: 'Fujairah',
+  alain: 'Al Ain',
+};
+
+const toTitleCase = (value: string) =>
+  value
+    .toLowerCase()
+    .split(/[\s-]+/)
+    .filter(Boolean)
+    .map((part) => (part.length > 2 ? part[0].toUpperCase() + part.slice(1) : part.toUpperCase()))
+    .join(' ');
+
+const normalizeCityLabel = (value: string, fallback: string) => {
+  if (!value) return fallback;
+  const key = normalizeKey(value);
+  if (CITY_LABELS[key]) return CITY_LABELS[key];
+  return toTitleCase(value.replace(/_/g, ' ')) || fallback;
+};
+
 const normalizeArray = (value: unknown) => {
   if (Array.isArray(value)) {
     return value.filter(Boolean);
@@ -104,7 +133,8 @@ function decodeFirestoreFields(fields: Record<string, FirestoreValue>) {
 
 function normalizeProjectData(raw: any, id: string): ProjectData {
   const locationRaw = raw.location || {};
-  const city = normalizeString(locationRaw.city || raw.city || raw.market, 'UAE');
+  const cityRaw = normalizeString(locationRaw.city || raw.city || raw.market, 'UAE');
+  const city = normalizeCityLabel(cityRaw, 'UAE');
   const area = normalizeString(locationRaw.area || raw.area || raw.community, city);
   const mapQuery = normalizeString(
     locationRaw.mapQuery || raw.mapQuery,
