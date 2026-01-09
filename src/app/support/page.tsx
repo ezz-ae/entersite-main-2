@@ -58,21 +58,21 @@ export default function SupportPage() {
   };
 
   return (
-    <main className="min-h-screen bg-black text-white py-28">
-      <div className="container mx-auto px-6 max-w-6xl space-y-12">
-        <div className="text-center space-y-6">
+    <main className="min-h-screen bg-black text-white py-20 sm:py-28">
+      <div className="container mx-auto px-5 sm:px-6 max-w-6xl space-y-10 sm:space-y-12">
+        <div className="text-center space-y-5 sm:space-y-6">
           <Badge className="bg-white/5 border-white/10 text-zinc-400">Support</Badge>
-          <h1 className="text-5xl md:text-7xl font-black tracking-tighter">
+          <h1 className="text-4xl sm:text-5xl md:text-7xl font-black tracking-tighter">
             We are here <br />
             <span className="text-zinc-600">to help.</span>
           </h1>
-          <p className="text-lg text-zinc-400 max-w-2xl mx-auto">
+          <p className="text-base sm:text-lg text-zinc-400 max-w-2xl mx-auto">
             Tell us what you need and we will get back to you with clear, simple steps.
           </p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <Card className="lg:col-span-2 bg-zinc-950 border-white/10 rounded-[2.5rem]">
+          <Card className="lg:col-span-2 bg-zinc-950 border-white/10 rounded-[2rem] sm:rounded-[2.5rem]">
             <CardHeader>
               <CardTitle>Send a message</CardTitle>
               <CardDescription>We reply quickly during Dubai business hours.</CardDescription>
@@ -84,7 +84,7 @@ export default function SupportPage() {
                   <Input
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    className="h-12 bg-black/40 border-white/10 text-white"
+                    className="h-11 sm:h-12 bg-black/40 border-white/10 text-white"
                     placeholder="Your full name"
                   />
                 </div>
@@ -93,7 +93,7 @@ export default function SupportPage() {
                   <Input
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="h-12 bg-black/40 border-white/10 text-white"
+                    className="h-11 sm:h-12 bg-black/40 border-white/10 text-white"
                     placeholder="you@company.com"
                   />
                 </div>
@@ -101,7 +101,7 @@ export default function SupportPage() {
               <div className="space-y-2">
                 <label className="text-xs font-bold uppercase tracking-widest text-zinc-500">Topic</label>
                 <select
-                  className="w-full h-12 bg-black/40 border border-white/10 rounded-xl px-4 text-sm text-zinc-200 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  className="w-full h-11 sm:h-12 bg-black/40 border border-white/10 rounded-xl px-4 text-sm text-zinc-200 focus:outline-none focus:ring-1 focus:ring-blue-500"
                   value={topic}
                   onChange={(e) => setTopic(e.target.value)}
                 >
@@ -115,12 +115,12 @@ export default function SupportPage() {
                 <Textarea
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
-                  className="min-h-[160px] bg-black/40 border-white/10 text-white"
+                  className="min-h-[140px] sm:min-h-[160px] bg-black/40 border-white/10 text-white"
                   placeholder="Tell us what you need help with..."
                 />
               </div>
               <Button
-                className="h-12 rounded-full bg-white text-black font-bold"
+                className="h-11 sm:h-12 rounded-full bg-white text-black font-bold"
                 onClick={handleSubmit}
                 disabled={sending}
               >
@@ -131,7 +131,7 @@ export default function SupportPage() {
           </Card>
 
           <div className="space-y-6">
-            <Card className="bg-zinc-900/60 border-white/10 rounded-[2.5rem]">
+            <Card className="bg-zinc-900/60 border-white/10 rounded-[2rem] sm:rounded-[2.5rem]">
               <CardHeader>
                 <CardTitle>Direct contact</CardTitle>
                 <CardDescription>Prefer email? Reach us here.</CardDescription>
@@ -150,7 +150,7 @@ export default function SupportPage() {
               </CardContent>
             </Card>
 
-            <div className="rounded-[2.5rem] border border-white/10 bg-black/40 p-6 text-sm text-zinc-400">
+            <div className="rounded-[2rem] sm:rounded-[2.5rem] border border-white/10 bg-black/40 p-5 sm:p-6 text-sm text-zinc-400">
               Share your project name, preferred area, and budget to help us reply faster.
             </div>
           </div>

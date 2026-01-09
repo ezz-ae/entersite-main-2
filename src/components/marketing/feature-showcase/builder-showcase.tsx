@@ -16,12 +16,12 @@ import {
 
 export function BuilderShowcase() {
   return (
-    <section className="py-24 bg-muted/10 border-y border-border/50 overflow-hidden">
-      <div className="container mx-auto px-4">
+    <section className="py-16 sm:py-24 bg-muted/10 border-y border-border/50 overflow-hidden">
+      <div className="container mx-auto px-4 sm:px-6">
         
-        <div className="text-center max-w-3xl mx-auto mb-16 space-y-4">
-          <h2 className="text-3xl md:text-5xl font-bold tracking-tight">A Professional Studio, <br/>Simplified.</h2>
-          <p className="text-lg text-muted-foreground">
+        <div className="text-center max-w-3xl mx-auto mb-12 sm:mb-16 space-y-4">
+          <h2 className="text-2xl sm:text-3xl md:text-5xl font-bold tracking-tight">A Professional Studio, <br/>Simplified.</h2>
+          <p className="text-base sm:text-lg text-muted-foreground">
             Experience a builder that feels like a creative tool, not a form. Drag, drop, and design with unprecedented freedom.
           </p>
         </div>
@@ -29,14 +29,14 @@ export function BuilderShowcase() {
         {/* The "Screenshot" UI Mockup */}
         <div className="relative max-w-6xl mx-auto">
             <div className="absolute -inset-1 bg-gradient-to-r from-primary/20 to-purple-500/20 rounded-2xl blur-2xl opacity-50" />
-            <div className="relative bg-background border border-border/50 rounded-xl shadow-2xl overflow-hidden aspect-[16/9] group">
+            <div className="relative bg-background border border-border/50 rounded-xl shadow-2xl overflow-hidden aspect-[4/5] sm:aspect-[16/9] group">
                 {/* Fake Window Controls */}
-                <div className="h-10 border-b bg-muted/30 flex items-center px-4 gap-2">
+                <div className="h-8 sm:h-10 border-b bg-muted/30 flex items-center px-4 gap-2">
                     <div className="w-3 h-3 rounded-full bg-red-400/80" />
                     <div className="w-3 h-3 rounded-full bg-yellow-400/80" />
                     <div className="w-3 h-3 rounded-full bg-green-400/80" />
                     <div className="ml-4 flex-1 flex justify-center">
-                        <div className="bg-muted/50 h-6 w-64 rounded-md flex items-center justify-center text-[10px] text-muted-foreground">
+                        <div className="bg-muted/50 h-6 w-32 sm:w-64 rounded-md flex items-center justify-center text-[10px] text-muted-foreground">
                             entresite.ai/builder
                         </div>
                     </div>
@@ -45,16 +45,16 @@ export function BuilderShowcase() {
                 {/* UI Composition */}
                 <div className="flex h-full">
                     {/* Left Sidebar */}
-                    <div className="w-16 border-r bg-muted/10 flex flex-col items-center py-4 gap-4">
+                    <div className="w-12 sm:w-16 border-r bg-muted/10 flex flex-col items-center py-3 sm:py-4 gap-3 sm:gap-4">
                         {[Layout, Palette, Search, BarChart3].map((Icon, i) => (
-                            <div key={i} className="w-10 h-10 rounded-lg flex items-center justify-center text-muted-foreground hover:bg-muted/50 hover:text-foreground transition-colors">
-                                <Icon className="h-5 w-5" />
+                            <div key={i} className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center text-muted-foreground hover:bg-muted/50 hover:text-foreground transition-colors">
+                                <Icon className="h-4 w-4 sm:h-5 sm:w-5" />
                             </div>
                         ))}
                     </div>
                     
                     {/* Center Canvas */}
-                    <div className="flex-1 bg-muted/5 p-8 flex items-center justify-center relative overflow-hidden">
+                    <div className="flex-1 bg-muted/5 p-4 sm:p-6 md:p-8 flex items-center justify-center relative overflow-hidden">
                         <div className="absolute inset-0 opacity-20 bg-[radial-gradient(#000_1px,transparent_1px)] [background-size:16px_16px] dark:bg-[radial-gradient(#fff_1px,transparent_1px)]" />
                         
                         {/* The "Site" being built */}
@@ -62,7 +62,7 @@ export function BuilderShowcase() {
                             initial={{ y: 20, opacity: 0 }}
                             whileInView={{ y: 0, opacity: 1 }}
                             transition={{ duration: 0.8 }}
-                            className="w-[80%] h-[90%] bg-background rounded-lg shadow-lg border flex flex-col overflow-hidden relative z-10"
+                            className="w-[88%] sm:w-[80%] h-[88%] sm:h-[90%] bg-background rounded-lg shadow-lg border flex flex-col overflow-hidden relative z-10"
                         >
                             {/* Hero Block Mock */}
                             <div className="h-[60%] bg-zinc-900 relative flex items-center justify-center">
@@ -93,7 +93,7 @@ export function BuilderShowcase() {
                             animate={{ x: [0, 100, 100, 0], y: [0, 50, 0, 0] }}
                             transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
                         >
-                            <MousePointerClick className="h-6 w-6 text-primary fill-primary/20" />
+                            <MousePointerClick className="h-5 w-5 sm:h-6 sm:w-6 text-primary fill-primary/20" />
                             <div className="ml-3 mt-1 bg-primary text-primary-foreground text-[10px] font-bold px-2 py-1 rounded-full shadow-sm">
                                 Sarah is editing...
                             </div>
@@ -101,7 +101,7 @@ export function BuilderShowcase() {
                     </div>
 
                     {/* Right Sidebar */}
-                    <div className="w-64 border-l bg-background p-4 space-y-6">
+                    <div className="hidden lg:block w-64 border-l bg-background p-4 space-y-6">
                         <div className="space-y-2">
                             <div className="h-3 w-20 bg-muted rounded" />
                             <div className="h-8 w-full bg-muted/30 rounded border" />

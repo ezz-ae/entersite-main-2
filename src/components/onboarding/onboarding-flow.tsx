@@ -67,33 +67,33 @@ export function OnboardingFlow() {
   };
 
   return (
-    <div className="bg-zinc-950 border border-white/5 rounded-[3rem] overflow-hidden shadow-2xl">
-      <div className="p-8 border-b border-white/5 flex flex-col gap-3">
+    <div className="bg-zinc-950 border border-white/5 rounded-[2rem] sm:rounded-[3rem] overflow-hidden shadow-2xl">
+      <div className="p-6 sm:p-8 border-b border-white/5 flex flex-col gap-3">
         <p className="text-[10px] font-bold uppercase tracking-[0.4em] text-zinc-500">Get Started</p>
-        <h1 className="text-4xl md:text-5xl font-black tracking-tight text-white">Pick your next step.</h1>
+        <h1 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight text-white">Pick your next step.</h1>
         <p className="text-zinc-500 max-w-3xl">
           Choose one path and we will take you to the right screen.
         </p>
       </div>
 
-      <div className="p-8 space-y-10">
-        <div className="grid md:grid-cols-2 gap-6">
+      <div className="p-6 sm:p-8 space-y-8 sm:space-y-10">
+        <div className="grid sm:grid-cols-2 gap-4 sm:gap-6">
           {START_OPTIONS.map((option) => (
             <button
               key={option.id}
               onClick={() => setSelected(option.id)}
               className={cn(
-                'p-6 rounded-2xl border text-left transition-all',
+                'p-5 sm:p-6 rounded-2xl border text-left transition-all',
                 selected === option.id
                   ? 'border-blue-500/60 bg-blue-600/10'
                   : 'border-white/10 bg-white/5 hover:border-blue-500/30'
               )}
             >
               <div className="flex items-center gap-4 mb-4">
-                <option.icon className="h-8 w-8 text-blue-500" />
-                <h3 className="text-2xl font-bold">{option.label}</h3>
+                <option.icon className="h-6 w-6 sm:h-8 sm:w-8 text-blue-500" />
+                <h3 className="text-xl sm:text-2xl font-bold">{option.label}</h3>
               </div>
-              <p className="text-zinc-400">{option.description}</p>
+              <p className="text-sm sm:text-base text-zinc-400">{option.description}</p>
             </button>
           ))}
         </div>
@@ -105,7 +105,7 @@ export function OnboardingFlow() {
           <Button
             onClick={handleContinue}
             disabled={!selectedOption}
-            className="h-12 px-6 rounded-full bg-white text-black font-bold disabled:opacity-40"
+            className="h-11 sm:h-12 px-6 rounded-full bg-white text-black font-bold disabled:opacity-40"
           >
             Continue <ArrowRight className="ml-2 h-4 w-4" />
           </Button>

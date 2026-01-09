@@ -9,9 +9,9 @@ import Link from 'next/link';
 
 export function AdsShowcase() {
   return (
-    <section className="py-32 bg-background overflow-hidden">
+    <section className="py-20 md:py-28 bg-background overflow-hidden">
       <div className="container mx-auto px-6 max-w-[1800px]">
-        <div className="grid lg:grid-cols-2 gap-24 items-center">
+        <div className="grid lg:grid-cols-2 gap-16 lg:gap-24 items-center">
           
           {/* Left: Visual */}
           <div className="order-2 lg:order-1 relative">
@@ -73,12 +73,12 @@ export function AdsShowcase() {
                <Target className="h-3 w-3" /> Growth Engine
             </div>
             
-            <h2 className="text-5xl md:text-7xl font-bold tracking-tighter leading-[1.1]">
+            <h2 className="text-3xl sm:text-4xl md:text-6xl font-bold tracking-tighter leading-[1.1]">
               Google Ads <br/>
               <span className="text-zinc-500 font-light">handled for you.</span>
             </h2>
             
-            <p className="text-xl text-zinc-400 leading-relaxed max-w-xl">
+            <p className="text-base sm:text-lg text-zinc-400 leading-relaxed max-w-xl">
               Don't waste money on broad keywords. We build high-intent search campaigns that target the right investors at the right time.
             </p>
 
@@ -88,7 +88,7 @@ export function AdsShowcase() {
                <AdFeature title="Buyer matching" desc="Reach people similar to your current buyer list." />
             </div>
 
-            <Button size="lg" className="h-16 px-10 rounded-full bg-white text-black font-bold text-lg mt-8 group" asChild>
+            <Button size="lg" className="h-12 sm:h-14 md:h-16 px-8 md:px-10 rounded-full bg-white text-black font-bold text-base sm:text-lg mt-6 sm:mt-8 group w-full sm:w-auto" asChild>
               <Link href="/dashboard/google-ads">
                 Start Setup <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
               </Link>

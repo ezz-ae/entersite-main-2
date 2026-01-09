@@ -20,7 +20,7 @@ export default function InstagramAssistantPage() {
   return (
     <main className="min-h-screen bg-black text-white font-sans selection:bg-blue-500/30 overflow-x-hidden">
       {/* HERO */}
-      <section className="relative pt-40 pb-20 overflow-hidden">
+      <section className="relative pt-28 sm:pt-32 md:pt-40 pb-16 md:pb-20 overflow-hidden">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1400px] h-[700px] bg-indigo-600/10 blur-[120px] rounded-full pointer-events-none" />
 
         <div className="container mx-auto px-6 max-w-7xl relative z-10 text-center space-y-10">
@@ -34,21 +34,21 @@ export default function InstagramAssistantPage() {
               Instagram Assistant
             </div>
 
-            <h1 className="text-6xl md:text-9xl font-black tracking-tighter leading-[0.85] text-white italic uppercase">
+            <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-black tracking-tighter leading-[0.9] text-white italic uppercase">
               Never Miss <br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-600 not-italic">
                 A Lead Again.
               </span>
             </h1>
 
-            <p className="text-zinc-500 text-2xl md:text-3xl max-w-3xl mx-auto font-light leading-relaxed">
+            <p className="text-zinc-500 text-base sm:text-lg md:text-2xl max-w-3xl mx-auto font-light leading-relaxed">
               Reply to Instagram DMs in seconds, qualify buyers, and hand off warm leads to your team.
               It can also be added to your website chat when you are ready.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <Button
                 asChild
-                className="h-16 rounded-full bg-white text-black font-black text-lg hover:scale-105 transition-all shadow-2xl shadow-white/10"
+                className="h-12 sm:h-14 md:h-16 w-full sm:w-auto rounded-full bg-white text-black font-black text-base sm:text-lg hover:scale-105 transition-all shadow-2xl shadow-white/10"
               >
                 <Link href="/dashboard/chat-agent">
                   Get Your Assistant <ArrowRight className="ml-2 h-5 w-5" />
@@ -57,7 +57,7 @@ export default function InstagramAssistantPage() {
               <Button
                 asChild
                 variant="outline"
-                className="h-16 rounded-full border-white/10 bg-white/5 text-white font-bold text-lg hover:bg-white/10"
+                className="h-12 sm:h-14 md:h-16 w-full sm:w-auto rounded-full border-white/10 bg-white/5 text-white font-bold text-base sm:text-lg hover:bg-white/10"
               >
                 <Link href="/instagram-assistant/demo">See how it qualifies leads</Link>
               </Button>
@@ -67,14 +67,14 @@ export default function InstagramAssistantPage() {
       </section>
 
       {/* QUESTIONS IT HANDLES */}
-      <section className="py-20 border-t border-white/5 bg-black">
+      <section className="py-16 md:py-20 border-t border-white/5 bg-black">
         <div className="container mx-auto px-6 max-w-6xl text-center space-y-10">
           <div className="space-y-4">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-[10px] font-black uppercase tracking-[0.3em] mx-auto">
               Lead-Ready Answers
             </div>
-            <h2 className="text-4xl md:text-5xl font-black tracking-tight">Answers the questions your inbox gets every day.</h2>
-            <p className="text-zinc-500 text-lg md:text-xl max-w-3xl mx-auto font-light leading-relaxed">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight">Answers the questions your inbox gets every day.</h2>
+            <p className="text-zinc-500 text-base sm:text-lg md:text-xl max-w-3xl mx-auto font-light leading-relaxed">
               Set the answers once, then let the assistant reply instantly, collect details, and keep your team focused.
             </p>
           </div>
@@ -95,14 +95,14 @@ export default function InstagramAssistantPage() {
       </section>
 
       {/* WHAT IT USES */}
-      <section className="py-20 border-t border-white/5 bg-zinc-950">
+      <section className="py-16 md:py-20 border-t border-white/5 bg-zinc-950">
         <div className="container mx-auto px-6 max-w-6xl text-center space-y-10">
           <div className="space-y-4">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-[10px] font-black uppercase tracking-[0.3em] mx-auto">
               Your Approved Answers
             </div>
-            <h2 className="text-4xl md:text-5xl font-black tracking-tight">Built from your listings and FAQs.</h2>
-            <p className="text-zinc-500 text-lg md:text-xl max-w-3xl mx-auto font-light leading-relaxed">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight">Built from your listings and FAQs.</h2>
+            <p className="text-zinc-500 text-base sm:text-lg md:text-xl max-w-3xl mx-auto font-light leading-relaxed">
               Add your key details once and the assistant replies using the same wording your team trusts.
             </p>
           </div>
@@ -133,14 +133,14 @@ export default function InstagramAssistantPage() {
       />
 
       {/* WHAT HAPPENS NEXT */}
-      <section className="py-20 border-t border-white/5 bg-black">
+      <section className="py-16 md:py-20 border-t border-white/5 bg-black">
         <div className="container mx-auto px-6 max-w-6xl text-center space-y-10">
           <div className="space-y-4">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-[10px] font-black uppercase tracking-[0.3em] mx-auto">
               What Happens Next
             </div>
-            <h2 className="text-4xl md:text-5xl font-black tracking-tight">We set it up for you.</h2>
-            <p className="text-zinc-500 text-lg md:text-xl max-w-3xl mx-auto font-light leading-relaxed">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight">We set it up for you.</h2>
+            <p className="text-zinc-500 text-base sm:text-lg md:text-xl max-w-3xl mx-auto font-light leading-relaxed">
               Share your Instagram handle, confirm your listings, and we do the rest.
             </p>
           </div>
@@ -164,7 +164,7 @@ export default function InstagramAssistantPage() {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Button
               asChild
-              className="h-12 rounded-full bg-white text-black font-black text-base hover:scale-105 transition-all shadow-2xl shadow-white/10"
+              className="h-12 w-full sm:w-auto rounded-full bg-white text-black font-black text-base hover:scale-105 transition-all shadow-2xl shadow-white/10"
             >
               <Link href="/dashboard/chat-agent">
                 Connect Instagram <ArrowRight className="ml-2 h-5 w-5" />
@@ -173,7 +173,7 @@ export default function InstagramAssistantPage() {
             <Button
               asChild
               variant="outline"
-              className="h-12 rounded-full border-white/10 bg-white/5 text-white font-bold"
+              className="h-12 w-full sm:w-auto rounded-full border-white/10 bg-white/5 text-white font-bold"
             >
               <Link href="/support">Talk to support</Link>
             </Button>
@@ -182,14 +182,14 @@ export default function InstagramAssistantPage() {
       </section>
 
       {/* HOW IT WORKS */}
-      <section className="py-36 bg-zinc-950 border-y border-white/5">
+      <section className="py-24 md:py-36 bg-zinc-950 border-y border-white/5">
         <div className="container mx-auto px-6 max-w-7xl">
           <div className="text-center max-w-3xl mx-auto mb-20">
-            <h2 className="text-5xl md:text-7xl font-black tracking-tighter leading-tight text-white uppercase italic">
+            <h2 className="text-4xl sm:text-5xl md:text-7xl font-black tracking-tighter leading-tight text-white uppercase italic">
               Simple Setup. <br />
               <span className="text-zinc-600 not-italic">Clear Results.</span>
             </h2>
-            <p className="text-zinc-500 text-xl font-light leading-relaxed mt-6">
+            <p className="text-zinc-500 text-base sm:text-lg md:text-xl font-light leading-relaxed mt-6">
               Configurable, trained on your FAQs, and ready to answer the same questions your team gets every day.
             </p>
           </div>
@@ -214,7 +214,7 @@ export default function InstagramAssistantPage() {
       </section>
 
       {/* FEATURES */}
-      <section className="py-36">
+      <section className="py-24 md:py-36">
         <div className="container mx-auto px-6 max-w-7xl">
           <div className="grid lg:grid-cols-2 gap-20 items-center">
             <div>
@@ -229,8 +229,8 @@ export default function InstagramAssistantPage() {
                     </Badge>
                   </div>
                   <div className="space-y-6">
-                    <h3 className="text-4xl font-bold italic text-white uppercase tracking-tighter">Instant Engagement</h3>
-                    <p className="text-zinc-400 text-lg font-light">
+                    <h3 className="text-3xl sm:text-4xl font-bold italic text-white uppercase tracking-tighter">Instant Engagement</h3>
+                    <p className="text-zinc-400 text-base sm:text-lg font-light">
                       Respond to every DM quickly with consistent, on-brand answers.
                     </p>
                     <div className="space-y-3 text-sm text-zinc-400">

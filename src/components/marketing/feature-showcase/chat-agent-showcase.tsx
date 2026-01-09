@@ -65,11 +65,11 @@ export function ChatAgentShowcase() {
   };
 
   return (
-    <section className="py-32 bg-zinc-950 overflow-hidden relative">
+    <section className="py-20 md:py-28 bg-zinc-950 overflow-hidden relative">
       <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-blue-600/10 rounded-full blur-[120px] pointer-events-none" />
       
       <div className="container mx-auto px-6 max-w-[1800px]">
-        <div className="grid lg:grid-cols-2 gap-24 items-center">
+        <div className="grid lg:grid-cols-2 gap-16 lg:gap-24 items-center">
           
           {/* Left: Content */}
           <div className="space-y-10">
@@ -77,23 +77,23 @@ export function ChatAgentShowcase() {
                <Sparkles className="h-3 w-3" /> Instant Replies
             </div>
             
-            <h2 className="text-5xl md:text-7xl font-bold tracking-tighter leading-[1.1]">
+            <h2 className="text-3xl sm:text-4xl md:text-6xl font-bold tracking-tighter leading-[1.1]">
               Your Always-On <br/>
               <span className="text-blue-500">Sales Assistant.</span>
             </h2>
             
-            <p className="text-xl text-zinc-400 leading-relaxed max-w-xl">
+            <p className="text-base sm:text-lg text-zinc-400 leading-relaxed max-w-xl">
               Answer common questions and share listings on Instagram, WhatsApp, or your website to capture leads faster.
             </p>
 
-            <div className="grid grid-cols-2 gap-6 pt-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 pt-6">
                 <Feature icon={Instagram} title="Instagram Inbox" desc="Reply fast and capture details every time." />
                 <Feature icon={MessageSquare} title="WhatsApp Ready" desc="Share brochures and plans instantly." />
                 <Feature icon={Globe} title="Website Chat" desc="We add it to your site for you." />
                 <Feature icon={Zap} title="Always Accurate" desc="Uses your latest pricing and availability." />
             </div>
 
-            <Button asChild size="lg" className="h-16 px-10 rounded-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-lg mt-8 shadow-xl shadow-blue-900/20">
+            <Button asChild size="lg" className="h-12 sm:h-14 md:h-16 px-8 md:px-10 rounded-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-base sm:text-lg mt-6 sm:mt-8 shadow-xl shadow-blue-900/20 w-full sm:w-auto">
               <a href="/dashboard/chat-agent">Start Chat Assistant</a>
             </Button>
           </div>
@@ -102,11 +102,11 @@ export function ChatAgentShowcase() {
           <div className="relative">
              <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-[3rem] blur-2xl opacity-20 animate-pulse" />
              
-             <div className="relative bg-black border border-white/10 rounded-[3rem] p-8 aspect-[4/5] shadow-2xl flex flex-col overflow-hidden">
-                <div className="flex items-center justify-between mb-8 border-b border-white/5 pb-6">
+             <div className="relative bg-black border border-white/10 rounded-[2.5rem] sm:rounded-[3rem] p-5 sm:p-6 md:p-8 aspect-[4/5] shadow-2xl flex flex-col overflow-hidden">
+                <div className="flex items-center justify-between mb-6 sm:mb-8 border-b border-white/5 pb-5 sm:pb-6">
                    <div className="flex items-center gap-3">
-                      <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center">
-                         <Bot className="h-6 w-6 text-white" />
+                      <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center">
+                         <Bot className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
                       </div>
                       <div>
                          <p className="font-bold text-white">Creek Expert Assistant</p>
@@ -121,7 +121,7 @@ export function ChatAgentShowcase() {
                    </div>
                 </div>
 
-                <div className="flex-1 space-y-6 overflow-y-auto custom-scrollbar pr-2">
+                <div className="flex-1 space-y-5 sm:space-y-6 overflow-y-auto custom-scrollbar pr-2">
                   {messages.map((msg, i) => (
                     <ChatMessage key={i} role={msg.role} text={msg.text} />
                   ))}
@@ -130,16 +130,16 @@ export function ChatAgentShowcase() {
                   )}
                 </div>
 
-                <div className="mt-8 pt-6 border-t border-white/5 flex gap-3">
+                <div className="mt-6 sm:mt-8 pt-5 sm:pt-6 border-t border-white/5 flex gap-3">
                    <input
                       type="text"
                       value={inputValue}
                       onChange={(e) => setInputValue(e.target.value)}
                       onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
                       placeholder="Type your message..."
-                      className="flex-1 h-12 rounded-full bg-zinc-900 border border-white/5 px-6 text-sm text-zinc-100 placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="flex-1 h-11 sm:h-12 rounded-full bg-zinc-900 border border-white/5 px-4 sm:px-6 text-sm text-zinc-100 placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
                    />
-                   <button onClick={() => handleSendMessage()} className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center text-white flex-shrink-0">
+                   <button onClick={() => handleSendMessage()} className="w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-blue-600 flex items-center justify-center text-white flex-shrink-0">
                       <Send className="h-5 w-5" />
                    </button>
                 </div>

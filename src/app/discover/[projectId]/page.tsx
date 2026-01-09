@@ -110,26 +110,26 @@ const ProjectDetailPage: NextPage = () => {
   return (
     <div className="bg-black text-white min-h-screen">
       <div 
-        className="h-[50vh] bg-cover bg-center relative flex items-end p-12"
+        className="h-[45vh] sm:h-[50vh] bg-cover bg-center relative flex items-end p-6 sm:p-12"
         style={{ backgroundImage: `url(${project.images?.[0] || '/placeholder.jpg'})` }}
       >
         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/70 to-transparent"/>
         <div className="relative z-10">
-            <Badge className="mb-4 bg-blue-500 text-white">{project.status || project.availability || 'Under Construction'}</Badge>
-            <h1 className="text-5xl font-black italic uppercase tracking-tighter">{project.name}</h1>
-            <div className="flex items-center gap-4 mt-2 text-zinc-300">
-                <div className="flex items-center gap-2"><Building className="h-5 w-5"/><span>{project.developer}</span></div>
-                <div className="flex items-center gap-2"><MapPin className="h-5 w-5"/><span>{project.location.area}, {project.location.city}</span></div>
+            <Badge className="mb-3 sm:mb-4 bg-blue-500 text-white">{project.status || project.availability || 'Under Construction'}</Badge>
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-black italic uppercase tracking-tighter">{project.name}</h1>
+            <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 mt-3 sm:mt-2 text-zinc-300 text-sm sm:text-base">
+                <div className="flex items-center gap-2"><Building className="h-4 w-4 sm:h-5 sm:w-5"/><span>{project.developer}</span></div>
+                <div className="flex items-center gap-2"><MapPin className="h-4 w-4 sm:h-5 sm:w-5"/><span>{project.location.area}, {project.location.city}</span></div>
             </div>
         </div>
       </div>
 
-      <div className="container mx-auto max-w-7xl p-12">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+      <div className="container mx-auto max-w-7xl p-6 sm:p-10 lg:p-12">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 sm:gap-12">
             <div className="lg:col-span-2 space-y-12">
-                <Card className="bg-zinc-900 border-white/10 rounded-2xl">
+                <Card className="bg-zinc-900 border-white/10 rounded-xl sm:rounded-2xl">
                     <CardHeader>
-                        <CardTitle className="text-xl font-bold tracking-tight">Project Overview</CardTitle>
+                        <CardTitle className="text-lg sm:text-xl font-bold tracking-tight">Project Overview</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <p className="text-zinc-400">
@@ -138,7 +138,7 @@ const ProjectDetailPage: NextPage = () => {
                     </CardContent>
                 </Card>
 
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
                   <InfoCard icon={DollarSign} label="Starting Price" value={priceLabel} />
                   <InfoCard icon={TrendingUp} label="Est. ROI" value={roiLabel} />
                   <InfoCard icon={BarChart} label="Est. Appreciation" value={appreciationLabel} />
@@ -150,9 +150,9 @@ const ProjectDetailPage: NextPage = () => {
                 </div>
 
                 {(project.features?.length ?? 0) > 0 && (
-                  <Card className="bg-zinc-900 border-white/10 rounded-2xl">
+                  <Card className="bg-zinc-900 border-white/10 rounded-xl sm:rounded-2xl">
                     <CardHeader>
-                      <CardTitle className="text-xl font-bold tracking-tight">Features & Amenities</CardTitle>
+                      <CardTitle className="text-lg sm:text-xl font-bold tracking-tight">Features & Amenities</CardTitle>
                     </CardHeader>
                     <CardContent>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm text-zinc-300">
@@ -167,9 +167,9 @@ const ProjectDetailPage: NextPage = () => {
                   </Card>
                 )}
 
-                <Card className="bg-zinc-900 border-white/10 rounded-2xl">
+                <Card className="bg-zinc-900 border-white/10 rounded-xl sm:rounded-2xl">
                   <CardHeader>
-                    <CardTitle className="text-xl font-bold tracking-tight">Price & Availability</CardTitle>
+                    <CardTitle className="text-lg sm:text-xl font-bold tracking-tight">Price & Availability</CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4 text-sm text-zinc-300">
                     <InfoRow label="Starting from" value={priceLabel} />
@@ -183,9 +183,9 @@ const ProjectDetailPage: NextPage = () => {
                 </Card>
 
                 {(project.performance?.priceHistory?.length ?? 0) > 0 && (
-                  <Card className="bg-zinc-900 border-white/10 rounded-2xl">
+                  <Card className="bg-zinc-900 border-white/10 rounded-xl sm:rounded-2xl">
                     <CardHeader>
-                      <CardTitle className="text-xl font-bold tracking-tight">Price History</CardTitle>
+                      <CardTitle className="text-lg sm:text-xl font-bold tracking-tight">Price History</CardTitle>
                     </CardHeader>
                     <CardContent>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm text-zinc-300">
@@ -204,12 +204,12 @@ const ProjectDetailPage: NextPage = () => {
             </div>
 
             <div className="space-y-6">
-                <Card className="bg-blue-600 text-white rounded-2xl p-8 text-center">
-                    <h3 className="text-2xl font-bold mb-4">Interested in this project?</h3>
-                    <p className="text-blue-200 mb-6">Contact our sales team for a private consultation.</p>
+                <Card className="bg-blue-600 text-white rounded-2xl p-6 sm:p-8 text-center">
+                    <h3 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4">Interested in this project?</h3>
+                    <p className="text-blue-200 mb-5 sm:mb-6 text-sm sm:text-base">Contact our sales team for a private consultation.</p>
                     <Button className="bg-white text-blue-600 hover:bg-zinc-200 w-full font-bold">Request a Call</Button>
                 </Card>
-                <Card className="bg-zinc-900 border-white/10 rounded-2xl p-8">
+                <Card className="bg-zinc-900 border-white/10 rounded-2xl p-6 sm:p-8">
                   <h3 className="font-bold mb-4">Project Details</h3>
                   <div className="space-y-3 text-sm text-zinc-300">
                     <InfoRow label="Developer" value={project.developer || 'Not shared'} />
@@ -245,13 +245,13 @@ const ProjectDetailPage: NextPage = () => {
 
 function InfoCard({ icon: Icon, label, value }: { icon: React.ElementType, label: string, value: string }) {
     return (
-        <div className="bg-zinc-900 border border-white/10 rounded-xl p-4 flex items-center gap-4">
-            <div className="p-3 bg-blue-600/10 rounded-lg text-blue-500">
-                <Icon className="h-6 w-6" />
+        <div className="bg-zinc-900 border border-white/10 rounded-xl p-3 sm:p-4 flex items-center gap-4">
+            <div className="p-2 sm:p-3 bg-blue-600/10 rounded-lg text-blue-500">
+                <Icon className="h-5 w-5 sm:h-6 sm:w-6" />
             </div>
             <div>
                 <p className="text-xs text-zinc-400 font-semibold">{label}</p>
-                <p className="text-lg font-bold text-white">{value}</p>
+                <p className="text-base sm:text-lg font-bold text-white">{value}</p>
             </div>
         </div>
     )

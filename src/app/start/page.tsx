@@ -16,8 +16,8 @@ export const metadata: Metadata = {
 
 export default function StartPage() {
   return (
-    <main className="min-h-screen bg-black text-white py-20">
-      <div className="container mx-auto px-6 max-w-6xl">
+    <main className="min-h-screen bg-black text-white py-16 sm:py-20">
+      <div className="container mx-auto px-5 sm:px-6 max-w-6xl">
         <OnboardingFlow />
       </div>
     </main>

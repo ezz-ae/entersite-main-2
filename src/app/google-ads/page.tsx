@@ -21,7 +21,7 @@ export default function GoogleAdsPublicPage() {
         <main className="min-h-screen bg-black text-white font-sans selection:bg-blue-500/30 overflow-x-hidden">
             
             {/* 1. HERO SECTION */}
-            <section className="relative pt-40 pb-20 overflow-hidden">
+            <section className="relative pt-28 sm:pt-32 md:pt-40 pb-16 md:pb-20 overflow-hidden">
                 <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1400px] h-[700px] bg-blue-600/10 blur-[120px] rounded-full pointer-events-none" />
                 
                 <div className="container mx-auto px-6 max-w-7xl relative z-10 text-center space-y-10">
@@ -35,15 +35,15 @@ export default function GoogleAdsPublicPage() {
                             Your Ads, Amplified
                         </div>
                         
-                        <h1 className="text-6xl md:text-9xl font-black tracking-tighter leading-[0.85] text-white italic uppercase">
+                        <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-black tracking-tighter leading-[0.9] text-white italic uppercase">
                             Google Ads <br/>
                             <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-600 not-italic">Made Simple.</span>
                         </h1>
                         
-                        <p className="text-zinc-500 text-2xl md:text-3xl max-w-3xl mx-auto font-light leading-relaxed">
+                        <p className="text-zinc-500 text-base sm:text-lg md:text-2xl max-w-3xl mx-auto font-light leading-relaxed">
                             Build an AI plan in minutes. We write the ads and launch them for you. No Google setup needed.
                         </p>
-                        <Button asChild className="h-16 rounded-full bg-white text-black font-black text-lg hover:scale-105 transition-all shadow-2xl shadow-white/10">
+                        <Button asChild className="h-12 sm:h-14 md:h-16 w-full sm:w-auto rounded-full bg-white text-black font-black text-base sm:text-lg hover:scale-105 transition-all shadow-2xl shadow-white/10">
                             <Link href="/dashboard/google-ads">Build AI Plan <ChevronRight className="ml-2 h-5 w-5" /></Link>
                         </Button>
                     </motion.div>
@@ -51,14 +51,14 @@ export default function GoogleAdsPublicPage() {
             </section>
 
             {/* MANAGED LAUNCH */}
-            <section className="py-20 bg-zinc-950 border-t border-white/5">
+            <section className="py-16 md:py-20 bg-zinc-950 border-t border-white/5">
                 <div className="container mx-auto px-6 max-w-6xl text-center space-y-10">
                     <div className="space-y-4">
                         <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-[10px] font-black uppercase tracking-[0.3em] mx-auto">
                             Managed Launch
                         </div>
-                        <h2 className="text-4xl md:text-5xl font-black tracking-tight">No Google setup? We run it for you.</h2>
-                        <p className="text-zinc-500 text-lg md:text-xl max-w-3xl mx-auto font-light leading-relaxed">
+                        <h2 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight">No Google setup? We run it for you.</h2>
+                        <p className="text-zinc-500 text-base sm:text-lg md:text-xl max-w-3xl mx-auto font-light leading-relaxed">
                             We launch the campaigns for you inside our ads team and keep it simple.
                             If you already use Google Ads, we can connect it and keep billing your way.
                         </p>
@@ -84,12 +84,12 @@ export default function GoogleAdsPublicPage() {
             </section>
 
             {/* WHAT YOU NEED */}
-            <section className="py-20 border-t border-white/5 bg-black">
+            <section className="py-16 md:py-20 border-t border-white/5 bg-black">
                 <div className="container mx-auto px-6 max-w-5xl text-center space-y-8">
                     <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-zinc-500 text-[10px] font-black uppercase tracking-[0.3em] mx-auto">
                         What We Need
                     </div>
-                    <h2 className="text-3xl md:text-4xl font-black tracking-tight">Before we launch</h2>
+                    <h2 className="text-2xl sm:text-3xl md:text-4xl font-black tracking-tight">Before we launch</h2>
                     <div className="grid md:grid-cols-3 gap-6 text-sm text-zinc-400">
                         <div className="rounded-2xl border border-white/10 bg-zinc-900/50 p-6">
                             Your goal and target area (example: leads for Dubai Marina)
@@ -105,14 +105,14 @@ export default function GoogleAdsPublicPage() {
             </section>
 
             {/* AI PLAN PREVIEW */}
-            <section className="py-24 border-t border-white/5 bg-zinc-950">
+            <section className="py-20 md:py-24 border-t border-white/5 bg-zinc-950">
                 <div className="container mx-auto px-6 max-w-6xl text-center space-y-10">
                     <div className="space-y-4">
                         <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-[10px] font-black uppercase tracking-[0.3em] mx-auto">
                             AI Plan Preview
                         </div>
-                        <h2 className="text-4xl md:text-5xl font-black tracking-tight">See the plan before you launch.</h2>
-                        <p className="text-zinc-500 text-lg md:text-xl max-w-3xl mx-auto font-light leading-relaxed">
+                        <h2 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight">See the plan before you launch.</h2>
+                        <p className="text-zinc-500 text-base sm:text-lg md:text-xl max-w-3xl mx-auto font-light leading-relaxed">
                             Keywords, ad copy, and budget expectations in clear language.
                         </p>
                     </div>
@@ -143,14 +143,14 @@ export default function GoogleAdsPublicPage() {
             </section>
 
             {/* WHAT HAPPENS NEXT */}
-            <section className="py-20 border-t border-white/5 bg-black">
+            <section className="py-16 md:py-20 border-t border-white/5 bg-black">
                 <div className="container mx-auto px-6 max-w-6xl text-center space-y-10">
                     <div className="space-y-4">
                         <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-[10px] font-black uppercase tracking-[0.3em] mx-auto">
                             What Happens Next
                         </div>
-                        <h2 className="text-4xl md:text-5xl font-black tracking-tight">We launch it for you.</h2>
-                        <p className="text-zinc-500 text-lg md:text-xl max-w-3xl mx-auto font-light leading-relaxed">
+                        <h2 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight">We launch it for you.</h2>
+                        <p className="text-zinc-500 text-base sm:text-lg md:text-xl max-w-3xl mx-auto font-light leading-relaxed">
                             Share your goal and budget, review the AI plan, and we take care of the launch.
                         </p>
                     </div>
@@ -172,10 +172,10 @@ export default function GoogleAdsPublicPage() {
                         </div>
                     </div>
                     <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                        <Button asChild className="h-12 rounded-full bg-white text-black font-black text-base hover:scale-105 transition-all shadow-2xl shadow-white/10">
+                        <Button asChild className="h-12 w-full sm:w-auto rounded-full bg-white text-black font-black text-base hover:scale-105 transition-all shadow-2xl shadow-white/10">
                             <Link href="/dashboard/google-ads">Start Google Ads <ChevronRight className="ml-2 h-5 w-5" /></Link>
                         </Button>
-                        <Button asChild variant="outline" className="h-12 rounded-full border-white/10 bg-white/5 text-white font-bold">
+                        <Button asChild variant="outline" className="h-12 w-full sm:w-auto rounded-full border-white/10 bg-white/5 text-white font-bold">
                             <Link href="/support">Talk to support</Link>
                         </Button>
                     </div>
@@ -183,12 +183,12 @@ export default function GoogleAdsPublicPage() {
             </section>
 
             {/* 2. VALUE PROPOSITION */}
-            <section className="py-40 bg-zinc-950 border-y border-white/5">
+            <section className="py-24 md:py-32 bg-zinc-950 border-y border-white/5">
                 <div className="container mx-auto px-6 max-w-7xl">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
                         <div className="space-y-12">
-                            <h2 className="text-5xl md:text-7xl font-black tracking-tighter leading-tight text-white uppercase italic">Clear Results, <br/><span className="text-zinc-600 not-italic">Simple Actions.</span></h2>
-                            <p className="text-zinc-500 text-xl font-light leading-relaxed max-w-xl">
+                            <h2 className="text-4xl sm:text-5xl md:text-7xl font-black tracking-tighter leading-tight text-white uppercase italic">Clear Results, <br/><span className="text-zinc-600 not-italic">Simple Actions.</span></h2>
+                            <p className="text-zinc-500 text-base sm:text-lg md:text-xl font-light leading-relaxed max-w-xl">
                                 See what is working, what needs attention, and what to do next without digging through reports.
                             </p>
                             <div className="grid md:grid-cols-2 gap-8">
