@@ -2,35 +2,66 @@
 
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Bot, Instagram, MessageSquare, Zap, Globe, Sparkles, Send, FileText, Download } from 'lucide-react';
+import { Bot, Instagram, MessageSquare, Zap, Globe, Sparkles, Send } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
 interface Message {
-  side: 'left' | 'right';
+  role: 'user' | 'agent';
   text: string;
-  isPdf?: boolean;
 }
 
 export function ChatAgentShowcase() {
   const [messages, setMessages] = useState<Message[]>([
-    { side: 'left', text: 'Hi! I saw the post about the new launch in Creek Beach. Can you send me the floor plans for 2BR apartments?' },
-    { side: 'right', text: 'Absolutely. Here is the floor plan PDF for the 2BR options.', isPdf: true },
-    { side: 'right', text: 'Would you like to schedule a private viewing or speak to an area specialist?' },
+    { role: 'agent', text: 'Hi! Ask me about pricing, availability, or upcoming launches. I can shortlist the best options.' },
   ]);
   const [inputValue, setInputValue] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const quickPrompts = ['Price range in Dubai Marina', 'Best off-plan launches', 'Payment plan options'];
 
-  const handleSendMessage = () => {
-    if (!inputValue.trim()) return;
+  const handleSendMessage = async (text?: string) => {
+    const content = (text ?? inputValue).trim();
+    if (!content || isLoading) return;
 
-    const newMessages: Message[] = [...messages, { side: 'left', text: inputValue }];
-    setMessages(newMessages);
+    const nextMessages: Message[] = [...messages, { role: 'user', text: content }];
+    setMessages(nextMessages);
     setInputValue('');
+    setIsLoading(true);
 
-    // Simulate bot response
-    setTimeout(() => {
-      setMessages(prev => [...prev, { side: 'right', text: 'I can share availability, pricing ranges, or set up a viewing for you.' }]);
-    }, 1000);
+    try {
+      const response = await fetch('/api/bot/preview/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message: content,
+          history: nextMessages.slice(-6).map((entry) => ({
+            role: entry.role === 'user' ? 'user' : 'agent',
+            text: entry.text,
+          })),
+          context:
+            'Marketing preview. You are a UAE real estate assistant. Ask for budget, area, timeline, and contact when appropriate.',
+        }),
+      });
+      const data = await response.json();
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: 'agent',
+          text: data.reply || 'I can share options and help schedule a viewing. What area and budget should I focus on?',
+        },
+      ]);
+    } catch (error) {
+      console.error('Chat preview error', error);
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: 'agent',
+          text: 'I can share options and help schedule a viewing. What area and budget should I focus on?',
+        },
+      ]);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -92,24 +123,11 @@ export function ChatAgentShowcase() {
 
                 <div className="flex-1 space-y-6 overflow-y-auto custom-scrollbar pr-2">
                   {messages.map((msg, i) => (
-                    <React.Fragment key={i}>
-                      <ChatMessage side={msg.side} text={msg.text} />
-                      {msg.isPdf && (
-                        <div className="bg-zinc-900 border border-white/5 rounded-2xl p-4 flex items-center justify-between group cursor-pointer hover:bg-zinc-800 transition-colors">
-                          <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-xl bg-red-500/10 flex items-center justify-center">
-                                <FileText className="h-5 w-5 text-red-500" />
-                            </div>
-                            <div className="text-left">
-                                <p className="text-xs font-bold text-white">2BR_Creek_Waters.pdf</p>
-                                <p className="text-[10px] text-zinc-500">2.4 MB • PDF Document</p>
-                            </div>
-                          </div>
-                          <Download className="h-4 w-4 text-zinc-500 group-hover:text-white transition-colors" />
-                        </div>
-                      )}
-                    </React.Fragment>
+                    <ChatMessage key={i} role={msg.role} text={msg.text} />
                   ))}
+                  {isLoading && (
+                    <ChatMessage role="agent" text="Typing..." />
+                  )}
                 </div>
 
                 <div className="mt-8 pt-6 border-t border-white/5 flex gap-3">
@@ -117,13 +135,24 @@ export function ChatAgentShowcase() {
                       type="text"
                       value={inputValue}
                       onChange={(e) => setInputValue(e.target.value)}
-                      onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+                      onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
                       placeholder="Type your message..."
                       className="flex-1 h-12 rounded-full bg-zinc-900 border border-white/5 px-6 text-sm text-zinc-100 placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
                    />
-                   <button onClick={handleSendMessage} className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center text-white flex-shrink-0">
+                   <button onClick={() => handleSendMessage()} className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center text-white flex-shrink-0">
                       <Send className="h-5 w-5" />
                    </button>
+                </div>
+                <div className="mt-4 flex flex-wrap gap-2">
+                  {quickPrompts.map((prompt) => (
+                    <button
+                      key={prompt}
+                      onClick={() => handleSendMessage(prompt)}
+                      className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 hover:text-blue-400 transition-colors"
+                    >
+                      {prompt}
+                    </button>
+                  ))}
                 </div>
              </div>
           </div>
@@ -146,15 +175,15 @@ function Feature({ icon: Icon, title, desc }: any) {
     )
 }
 
-function ChatMessage({ side, text }: { side: 'left' | 'right', text: string }) {
+function ChatMessage({ role, text }: { role: 'user' | 'agent'; text: string }) {
     return (
         <div className={cn(
             "flex",
-            side === 'right' ? "justify-start" : "justify-end"
+            role === 'agent' ? "justify-start" : "justify-end"
         )}>
             <div className={cn(
                 "max-w-[85%] p-4 rounded-3xl text-sm leading-relaxed",
-                side === 'right' 
+                role === 'agent' 
                     ? "bg-zinc-800 text-zinc-100 rounded-tl-none" 
                     : "bg-blue-600 text-white rounded-tr-none shadow-lg shadow-blue-900/20"
             )}>
