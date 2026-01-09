@@ -142,6 +142,46 @@ export default function GoogleAdsPublicPage() {
                 </div>
             </section>
 
+            {/* WHAT HAPPENS NEXT */}
+            <section className="py-20 border-t border-white/5 bg-black">
+                <div className="container mx-auto px-6 max-w-6xl text-center space-y-10">
+                    <div className="space-y-4">
+                        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-[10px] font-black uppercase tracking-[0.3em] mx-auto">
+                            What Happens Next
+                        </div>
+                        <h2 className="text-4xl md:text-5xl font-black tracking-tight">We launch it for you.</h2>
+                        <p className="text-zinc-500 text-lg md:text-xl max-w-3xl mx-auto font-light leading-relaxed">
+                            Share your goal and budget, review the AI plan, and we take care of the launch.
+                        </p>
+                    </div>
+                    <div className="grid md:grid-cols-3 gap-6 text-left text-sm text-zinc-400">
+                        <div className="rounded-2xl border border-white/10 bg-zinc-900/40 p-6 space-y-3">
+                            <p className="text-[10px] font-black uppercase tracking-widest text-blue-400">Step 1</p>
+                            <h3 className="text-xl font-bold text-white">Share your goal</h3>
+                            <p>Tell us the area, budget, and landing page.</p>
+                        </div>
+                        <div className="rounded-2xl border border-white/10 bg-zinc-900/40 p-6 space-y-3">
+                            <p className="text-[10px] font-black uppercase tracking-widest text-blue-400">Step 2</p>
+                            <h3 className="text-xl font-bold text-white">Review the plan</h3>
+                            <p>AI writes the ads and shows expectations.</p>
+                        </div>
+                        <div className="rounded-2xl border border-white/10 bg-zinc-900/40 p-6 space-y-3">
+                            <p className="text-[10px] font-black uppercase tracking-widest text-blue-400">Step 3</p>
+                            <h3 className="text-xl font-bold text-white">Go live</h3>
+                            <p>We launch and share updates in plain language.</p>
+                        </div>
+                    </div>
+                    <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+                        <Button asChild className="h-12 rounded-full bg-white text-black font-black text-base hover:scale-105 transition-all shadow-2xl shadow-white/10">
+                            <Link href="/dashboard/google-ads">Start Google Ads <ChevronRight className="ml-2 h-5 w-5" /></Link>
+                        </Button>
+                        <Button asChild variant="outline" className="h-12 rounded-full border-white/10 bg-white/5 text-white font-bold">
+                            <Link href="/support">Talk to support</Link>
+                        </Button>
+                    </div>
+                </div>
+            </section>
+
             {/* 2. VALUE PROPOSITION */}
             <section className="py-40 bg-zinc-950 border-y border-white/5">
                 <div className="container mx-auto px-6 max-w-7xl">
