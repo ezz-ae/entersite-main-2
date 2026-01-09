@@ -18,7 +18,8 @@ import {
   CreditCard,
   Megaphone,
   ImageIcon,
-  Palette
+  Palette,
+  User
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { UserNav } from "@/components/user-nav";
@@ -83,6 +84,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                             <div className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
                             <span className="text-[10px] font-bold text-blue-500 uppercase tracking-widest">All Systems Go</span>
                         </div>
+                        <Link href="/profile" className="hidden md:inline-flex">
+                            <Button variant="ghost" size="sm" className="gap-2 text-zinc-400 hover:text-white hover:bg-white/5">
+                                <User className="h-4 w-4" />
+                                Profile
+                            </Button>
+                        </Link>
                         <Button variant="ghost" size="icon" className="h-10 w-10 text-zinc-400 hover:text-white hover:bg-white/5 rounded-full relative transition-colors">
                             <Bell className="h-5 w-5" />
                         </Button>

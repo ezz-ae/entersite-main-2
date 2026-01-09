@@ -41,7 +41,7 @@ export default function GoogleAdsPublicPage() {
                         </h1>
                         
                         <p className="text-zinc-500 text-2xl md:text-3xl max-w-3xl mx-auto font-light leading-relaxed">
-                            Build an AI plan in minutes and launch with our team running the ads. No Google billing needed.
+                            Build an AI plan in minutes. We write the ads and launch them for you. No Google setup needed.
                         </p>
                         <Button asChild className="h-16 rounded-full bg-white text-black font-black text-lg hover:scale-105 transition-all shadow-2xl shadow-white/10">
                             <Link href="/dashboard/google-ads">Build AI Plan <ChevronRight className="ml-2 h-5 w-5" /></Link>
@@ -57,22 +57,22 @@ export default function GoogleAdsPublicPage() {
                         <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-[10px] font-black uppercase tracking-[0.3em] mx-auto">
                             Managed Launch
                         </div>
-                        <h2 className="text-4xl md:text-5xl font-black tracking-tight">No account or billing? We run it for you.</h2>
+                        <h2 className="text-4xl md:text-5xl font-black tracking-tight">No Google setup? We run it for you.</h2>
                         <p className="text-zinc-500 text-lg md:text-xl max-w-3xl mx-auto font-light leading-relaxed">
-                            We launch the campaigns for you under our managed ads team.
-                            If you already use Google Ads, we can link it and keep billing your way.
+                            We launch the campaigns for you inside our ads team and keep it simple.
+                            If you already use Google Ads, we can connect it and keep billing your way.
                         </p>
                     </div>
                     <div className="grid md:grid-cols-3 gap-6 text-sm text-zinc-400">
                         <div className="rounded-2xl border border-white/10 bg-zinc-900/40 p-6 space-y-3">
                             <p className="text-[10px] font-black uppercase tracking-widest text-blue-400">Option A</p>
                             <h3 className="text-xl font-bold text-white">Use your Google Ads</h3>
-                            <p>Link your existing Google Ads and keep billing as-is.</p>
+                            <p>Connect your current setup and keep billing as-is.</p>
                         </div>
                         <div className="rounded-2xl border border-white/10 bg-zinc-900/40 p-6 space-y-3">
                             <p className="text-[10px] font-black uppercase tracking-widest text-blue-400">Option B</p>
                             <h3 className="text-xl font-bold text-white">We run it for you</h3>
-                            <p>No account or card? We launch it and share access when ready.</p>
+                            <p>No setup or card? We launch it and share access when ready.</p>
                         </div>
                         <div className="rounded-2xl border border-white/10 bg-zinc-900/40 p-6 space-y-3">
                             <p className="text-[10px] font-black uppercase tracking-widest text-blue-400">Visibility</p>
@@ -126,6 +126,7 @@ export default function GoogleAdsPublicPage() {
                         </div>
                         <div className="rounded-2xl border border-white/10 bg-zinc-900/40 p-6 space-y-3">
                             <p className="text-[10px] font-black uppercase tracking-widest text-blue-400">Ad Copy</p>
+                            <p className="text-xs text-zinc-500">AI writes headlines and descriptions for you.</p>
                             <p className="text-white font-semibold">Dubai Marina Homes From AED 1.9M</p>
                             <p>Secure a viewing today. Flexible payment plans.</p>
                             <p className="text-white font-semibold">Off-Plan Launches Now Open</p>
