@@ -67,12 +67,22 @@ ${historyText}
 User (${params.botId}): ${payload.message}
 `;
 
-    const { text } = await generateText({
-      model: getGoogleModel(FLASH_MODEL),
-      system:
-        "You are EntreSite's AI sales concierge. Be concise, cite Dubai market data when possible, and always steer toward capturing name/contact if missing.",
-      prompt,
-    });
+    let reply = '';
+    try {
+      const { text } = await generateText({
+        model: getGoogleModel(FLASH_MODEL),
+        system:
+          "You are EntreSite's AI sales concierge. Be concise, cite Dubai market data when possible, and always steer toward capturing name/contact if missing.",
+        prompt,
+      });
+      reply = text;
+    } catch (error) {
+      console.error('[bot/chat] ai error', error);
+      const fallbackList = relevantProjects.slice(0, 3).map(formatProjectContext).join('\n');
+      reply = fallbackList
+        ? `Here are a few options I can share right now:\n${fallbackList}\nTell me your budget and preferred area, and I will narrow it down.`
+        : 'I can help with UAE projects, pricing ranges, and next steps. What area and budget should I focus on?';
+    }
 
     // Log to Firestore for monitoring
     try {
@@ -82,7 +92,7 @@ User (${params.botId}): ${payload.message}
         tenantId: payload.tenantId || user.uid || 'public',
         siteId: payload.siteId || null,
         userMessage: payload.message,
-        agentReply: text,
+        agentReply: reply,
         createdAt: new Date().toISOString(),
         context: payload.context || 'web_widget',
       });
@@ -90,7 +100,7 @@ User (${params.botId}): ${payload.message}
       console.error('[bot] failed to log event', logError);
     }
 
-    return NextResponse.json({ reply: text });
+    return NextResponse.json({ reply });
   } catch (error) {
     console.error('[bot/chat] error', error);
     if (error instanceof z.ZodError) {

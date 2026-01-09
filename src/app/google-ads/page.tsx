@@ -41,10 +41,10 @@ export default function GoogleAdsPublicPage() {
                         </h1>
                         
                         <p className="text-zinc-500 text-2xl md:text-3xl max-w-3xl mx-auto font-light leading-relaxed">
-                            Start your ads setup and get clear campaign summaries with guided next steps, while we handle the account setup for you.
+                            Build an AI plan in minutes and launch from our managed ads account. No Google billing setup required.
                         </p>
                         <Button asChild className="h-16 rounded-full bg-white text-black font-black text-lg hover:scale-105 transition-all shadow-2xl shadow-white/10">
-                            <Link href="/dashboard/google-ads">Start Setup <ChevronRight className="ml-2 h-5 w-5" /></Link>
+                            <Link href="/dashboard/google-ads">Build AI Plan <ChevronRight className="ml-2 h-5 w-5" /></Link>
                         </Button>
                     </motion.div>
                 </div>
@@ -57,10 +57,10 @@ export default function GoogleAdsPublicPage() {
                         <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-[10px] font-black uppercase tracking-[0.3em] mx-auto">
                             Managed Setup
                         </div>
-                        <h2 className="text-4xl md:text-5xl font-black tracking-tight">No Google Ads account? We will set it up.</h2>
+                        <h2 className="text-4xl md:text-5xl font-black tracking-tight">No account or billing? We run it for you.</h2>
                         <p className="text-zinc-500 text-lg md:text-xl max-w-3xl mx-auto font-light leading-relaxed">
-                            We can create a client account for you under our main ads account and handle the setup.
-                            You still get access, clean reporting, and full visibility into performance.
+                            We create a client account under our manager and launch the campaigns for you.
+                            If you already have an account, we can connect it and keep billing your way.
                         </p>
                     </div>
                     <div className="grid md:grid-cols-3 gap-6 text-sm text-zinc-400">
@@ -72,10 +72,10 @@ export default function GoogleAdsPublicPage() {
                         <div className="rounded-2xl border border-white/10 bg-zinc-900/40 p-6 space-y-3">
                             <p className="text-[10px] font-black uppercase tracking-widest text-blue-400">Option B</p>
                             <h3 className="text-xl font-bold text-white">We create your client account</h3>
-                            <p>No account or card? We can set it up and share access when ready.</p>
+                            <p>No account or card? We can launch it and share access when ready.</p>
                         </div>
                         <div className="rounded-2xl border border-white/10 bg-zinc-900/40 p-6 space-y-3">
-                            <p className="text-[10px] font-black uppercase tracking-widest text-blue-400">Clarity</p>
+                            <p className="text-[10px] font-black uppercase tracking-widest text-blue-400">Visibility</p>
                             <h3 className="text-xl font-bold text-white">Clear access & reporting</h3>
                             <p>See every campaign, lead, and spend update in plain language.</p>
                         </div>
@@ -87,18 +87,55 @@ export default function GoogleAdsPublicPage() {
             <section className="py-20 border-t border-white/5 bg-black">
                 <div className="container mx-auto px-6 max-w-5xl text-center space-y-8">
                     <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-zinc-500 text-[10px] font-black uppercase tracking-[0.3em] mx-auto">
-                        What You Need
+                        What We Need
                     </div>
-                    <h2 className="text-3xl md:text-4xl font-black tracking-tight">Before you connect</h2>
+                    <h2 className="text-3xl md:text-4xl font-black tracking-tight">Before we launch</h2>
                     <div className="grid md:grid-cols-3 gap-6 text-sm text-zinc-400">
                         <div className="rounded-2xl border border-white/10 bg-zinc-900/50 p-6">
-                            Google Ads ID (10 digits) - we can provide this if we set it up
+                            Your goal and target area (example: leads for Dubai Marina)
                         </div>
                         <div className="rounded-2xl border border-white/10 bg-zinc-900/50 p-6">
-                            Billing details if you use your own account
+                            Daily budget and campaign length in AED
                         </div>
                         <div className="rounded-2xl border border-white/10 bg-zinc-900/50 p-6">
-                            Access to the ad account (or we create one for you)
+                            The landing page you want to send traffic to
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            {/* AI PLAN PREVIEW */}
+            <section className="py-24 border-t border-white/5 bg-zinc-950">
+                <div className="container mx-auto px-6 max-w-6xl text-center space-y-10">
+                    <div className="space-y-4">
+                        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-[10px] font-black uppercase tracking-[0.3em] mx-auto">
+                            AI Plan Preview
+                        </div>
+                        <h2 className="text-4xl md:text-5xl font-black tracking-tight">See the plan before you launch.</h2>
+                        <p className="text-zinc-500 text-lg md:text-xl max-w-3xl mx-auto font-light leading-relaxed">
+                            Keywords, ad copy, and budget expectations in clear language.
+                        </p>
+                    </div>
+                    <div className="grid md:grid-cols-3 gap-6 text-left text-sm text-zinc-400">
+                        <div className="rounded-2xl border border-white/10 bg-zinc-900/40 p-6 space-y-3">
+                            <p className="text-[10px] font-black uppercase tracking-widest text-blue-400">Keywords</p>
+                            <p>buy apartment dubai marina</p>
+                            <p>off plan projects dubai</p>
+                            <p>luxury villas palm jumeirah</p>
+                            <p>invest in dubai property</p>
+                        </div>
+                        <div className="rounded-2xl border border-white/10 bg-zinc-900/40 p-6 space-y-3">
+                            <p className="text-[10px] font-black uppercase tracking-widest text-blue-400">Ad Copy</p>
+                            <p className="text-white font-semibold">Dubai Marina Homes From AED 1.9M</p>
+                            <p>Secure a viewing today. Flexible payment plans.</p>
+                            <p className="text-white font-semibold">Off-Plan Launches Now Open</p>
+                            <p>Verified listings with clear handover timelines.</p>
+                        </div>
+                        <div className="rounded-2xl border border-white/10 bg-zinc-900/40 p-6 space-y-3">
+                            <p className="text-[10px] font-black uppercase tracking-widest text-blue-400">Expectations</p>
+                            <p>Estimated clicks and lead range based on budget.</p>
+                            <p>Projected cost per lead in AED ranges.</p>
+                            <p>Adjustments suggested weekly by the AI plan.</p>
                         </div>
                     </div>
                 </div>

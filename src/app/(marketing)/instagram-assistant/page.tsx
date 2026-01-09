@@ -42,6 +42,7 @@ export default function InstagramAssistantPage() {
 
             <p className="text-zinc-500 text-2xl md:text-3xl max-w-3xl mx-auto font-light leading-relaxed">
               Reply to Instagram DMs in seconds, qualify buyers, and hand off warm leads to your team.
+              It can also be added to your website chat when you are ready.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <Button
@@ -92,6 +93,35 @@ export default function InstagramAssistantPage() {
         </div>
       </section>
 
+      {/* WHAT IT USES */}
+      <section className="py-20 border-t border-white/5 bg-zinc-950">
+        <div className="container mx-auto px-6 max-w-6xl text-center space-y-10">
+          <div className="space-y-4">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-[10px] font-black uppercase tracking-[0.3em] mx-auto">
+              Your Approved Answers
+            </div>
+            <h2 className="text-4xl md:text-5xl font-black tracking-tight">Built from your listings and FAQs.</h2>
+            <p className="text-zinc-500 text-lg md:text-xl max-w-3xl mx-auto font-light leading-relaxed">
+              Add your key details once and the assistant replies using the same wording your team trusts.
+            </p>
+          </div>
+          <div className="grid md:grid-cols-3 gap-6 text-left text-sm text-zinc-400">
+            <div className="rounded-2xl border border-white/10 bg-black/40 p-6 space-y-3">
+              <h3 className="text-lg font-bold text-white uppercase italic tracking-tight">Listings</h3>
+              <p>Pricing ranges, inventory status, and handover timelines.</p>
+            </div>
+            <div className="rounded-2xl border border-white/10 bg-black/40 p-6 space-y-3">
+              <h3 className="text-lg font-bold text-white uppercase italic tracking-tight">Market Guidance</h3>
+              <p>Payment plan basics, area highlights, and common buyer questions.</p>
+            </div>
+            <div className="rounded-2xl border border-white/10 bg-black/40 p-6 space-y-3">
+              <h3 className="text-lg font-bold text-white uppercase italic tracking-tight">Lead Handoff</h3>
+              <p>Captures name, phone, budget, and timing before a handoff.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* HOW IT WORKS */}
       <section className="py-36 bg-zinc-950 border-y border-white/5">
         <div className="container mx-auto px-6 max-w-7xl">
@@ -112,12 +142,12 @@ export default function InstagramAssistantPage() {
             />
             <HowItWorksStep
               step="02"
-              title="Add Your FAQs"
+              title="Add Your Listings"
               desc="Upload answers, prices, and key details so replies stay accurate."
             />
             <HowItWorksStep
               step="03"
-              title="Capture Leads"
+              title="Go Live"
               desc="Auto-collect name, phone, and interest before a handoff."
             />
           </div>
@@ -168,8 +198,8 @@ export default function InstagramAssistantPage() {
               />
               <FeatureItem
                 icon={BarChart}
-                title="Lead Qualification"
-                desc="Ask the right questions and capture intent before a call."
+                title="Listing-Aware Replies"
+                desc="Answer pricing, handover, and availability using your approved details."
               />
               <FeatureItem
                 icon={Zap}

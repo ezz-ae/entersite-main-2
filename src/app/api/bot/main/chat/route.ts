@@ -44,13 +44,23 @@ Client: ${message}
 Agent:
 `;
 
-    const { text } = await generateText({
-      model: getGoogleModel(PRO_MODEL),
-      system: `${mainSystemPrompt}\nAlways be clear, helpful, and broker-friendly.`,
-      prompt,
-    });
+    let reply = '';
+    try {
+      const { text } = await generateText({
+        model: getGoogleModel(PRO_MODEL),
+        system: `${mainSystemPrompt}\nAlways be clear, helpful, and broker-friendly.`,
+        prompt,
+      });
+      reply = text;
+    } catch (error) {
+      console.error('[bot/main/chat] ai error', error);
+      const fallbackList = relevantProjects.slice(0, 3).map(formatProjectContext).join('\n');
+      reply = fallbackList
+        ? `Here are a few options I can share right now:\n${fallbackList}\nTell me your budget and preferred area, and I will narrow it down.`
+        : 'I can help with UAE projects, pricing ranges, and next steps. What area and budget should I focus on?';
+    }
 
-    return NextResponse.json({ reply: text });
+    return NextResponse.json({ reply });
   } catch (error) {
     console.error('[bot/main/chat] error', error);
     if (error instanceof z.ZodError) {

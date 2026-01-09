@@ -27,14 +27,16 @@ export default function InstagramAssistantDemoPage() {
             <Bubble label="Buyer" text="Off-plan. Handover 2026 is OK." />
             <Bubble label="Assistant" text="Got it. Which area do you prefer, and what is your budget range?" />
             <Bubble label="Buyer" text="Dubai Marina, up to AED 2.5M." />
-            <Bubble label="Assistant" text="Perfect. I can share 3 options and connect you with an agent now. What’s your name and WhatsApp?" />
+            <Bubble label="Assistant" text="Perfect. Do you want a flexible payment plan or a faster handover?" />
+            <Bubble label="Buyer" text="Flexible plan." />
+            <Bubble label="Assistant" text="Great. I can share 3 options and connect you with an agent now. What’s your name and WhatsApp?" />
           </div>
         </Card>
 
         <div className="grid md:grid-cols-3 gap-4">
           {[
             'Collects timeline and budget',
-            'Captures preferred area',
+            'Clarifies payment plan preference',
             'Gets phone before handoff',
           ].map((item) => (
             <div key={item} className="flex items-center gap-2 text-sm text-zinc-300">
