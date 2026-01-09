@@ -5,6 +5,20 @@ import { Sparkles, BrainCircuit } from 'lucide-react';
 import { BlogPostCard } from '@/components/marketing/blog-post-card';
 import { fetchBlogPosts, BlogPost } from '@/server/content';
 import { shouldUseRemoteContent } from '@/server/remote-config';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Market Insights Blog | Entrestate',
+  description: 'Insights for brokers, marketing, and UAE real estate trends.',
+  alternates: {
+    canonical: '/blog',
+  },
+  openGraph: {
+    title: 'Market Insights Blog | Entrestate',
+    description: 'Insights for brokers, marketing, and UAE real estate trends.',
+    url: '/blog',
+  },
+};
 
 const DEFAULT_POSTS: BlogPost[] = [
   {

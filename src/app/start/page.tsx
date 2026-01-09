@@ -1,4 +1,18 @@
 import { OnboardingFlow } from '@/components/onboarding/onboarding-flow';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Get Started | Entrestate',
+  description: 'Choose your next step: website, chat assistant, SMS, email, or ads.',
+  alternates: {
+    canonical: '/start',
+  },
+  openGraph: {
+    title: 'Get Started | Entrestate',
+    description: 'Choose your next step: website, chat assistant, SMS, email, or ads.',
+    url: '/start',
+  },
+};
 
 export default function StartPage() {
   return (

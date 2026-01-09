@@ -1,4 +1,18 @@
 import { Badge } from '@/components/ui/badge';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'System Status | Entrestate',
+  description: 'Live status of platform services and readiness.',
+  alternates: {
+    canonical: '/status',
+  },
+  openGraph: {
+    title: 'System Status | Entrestate',
+    description: 'Live status of platform services and readiness.',
+    url: '/status',
+  },
+};
 
 export default function StatusPage() {
   return (
