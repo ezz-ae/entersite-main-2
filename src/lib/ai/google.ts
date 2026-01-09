@@ -1,6 +1,9 @@
 import { createGoogleGenerativeAI } from '@ai-sdk/google';
 
-const API_KEY = process.env.GOOGLE_GENERATIVE_AI_API_KEY || process.env.GEMINI_API_KEY;
+const API_KEY =
+  process.env.GOOGLE_GENERATIVE_AI_API_KEY ||
+  process.env.GEMINI_API_KEY ||
+  process.env.Gemini_api_key;
 
 const client = API_KEY ? createGoogleGenerativeAI({ apiKey: API_KEY }) : null;
 

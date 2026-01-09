@@ -11,19 +11,13 @@ import {
     Activity, 
     Loader2, 
     ArrowRight, 
-    Target, 
-    BarChart3, 
-    PieChart, 
     TrendingUp, 
-    Calendar, 
-    MousePointerClick,
     ShieldCheck,
     Cpu,
-    Filter,
     Building
 } from "lucide-react";
 import type { ProjectData } from '@/lib/types';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useRouter } from 'next/navigation';
 import { ENTRESTATE_INVENTORY } from '@/data/entrestate-inventory';
@@ -50,12 +44,16 @@ export default function DiscoverPage() {
     { id: 'Appreciation', label: 'Value Growth', desc: 'Rising interest in Creek Harbour.', stat: 'Rising', trend: 'Trend' },
   ];
 
-  const fetchProjects = useCallback(async (pageParam: number, overrides?: { query?: string; city?: string }) => {
+  const fetchProjects = useCallback(async (
+    pageParam: number,
+    overrides?: { query?: string; city?: string; append?: boolean }
+  ) => {
     setLoading(true);
     try {
       const url = new URL('/api/projects/search', window.location.origin);
       const queryValue = overrides?.query ?? searchQuery;
       const cityValue = overrides?.city ?? selectedCity;
+      const append = overrides?.append ?? false;
       url.searchParams.set('query', queryValue);
       url.searchParams.set('city', cityValue);
       url.searchParams.set('page', String(pageParam));
@@ -68,12 +66,12 @@ export default function DiscoverPage() {
       const total = json.pagination?.total || 0;
       const shouldShowSample = total === 0 && !queryValue && cityValue === 'all';
       if (shouldShowSample) {
-        setProjects(ENTRESTATE_INVENTORY.slice(0, PROJECTS_PER_PAGE));
+        setProjects(ENTRESTATE_INVENTORY.slice(0, pageParam * PROJECTS_PER_PAGE));
         setTotalProjects(ENTRESTATE_INVENTORY.length);
         setShowingSample(true);
       } else {
         setTotalProjects(total);
-        setProjects(json.data);
+        setProjects((prev) => (append ? [...prev, ...(json.data || [])] : json.data || []));
         setShowingSample(false);
       }
       setPage(pageParam);
@@ -105,9 +103,10 @@ export default function DiscoverPage() {
   };
 
   const totalPages = Math.max(1, Math.ceil(totalProjects / PROJECTS_PER_PAGE));
-  const showingCount = showingSample
-    ? projects.length
-    : Math.max(0, Math.min(PROJECTS_PER_PAGE, totalProjects - (page - 1) * PROJECTS_PER_PAGE));
+  const showingCount = projects.length;
+  const canLoadMore = showingSample
+    ? projects.length < ENTRESTATE_INVENTORY.length
+    : projects.length < totalProjects;
 
   return (
     <main className="min-h-screen bg-black text-white flex flex-col font-sans selection:bg-blue-500/30">
@@ -211,7 +210,7 @@ export default function DiscoverPage() {
                           : 'Inventory setup needed'}
                     </span>
                     <div className="w-px h-4 bg-white/10" />
-                    <span>{showingSample ? 'Example feed' : `Page ${page} of ${totalPages}`}</span>
+                    <span>{showingSample ? 'Example feed' : `Loaded ${showingCount} of ${totalProjects}`}</span>
                 </div>
             </div>
 
@@ -247,23 +246,19 @@ export default function DiscoverPage() {
                 </div>
             )}
 
-            {!loading && !showingSample && totalProjects > PROJECTS_PER_PAGE && (
+            {!loading && canLoadMore && (
                 <div className="mt-12 flex flex-col sm:flex-row items-center justify-center gap-4">
                     <Button
-                        variant="outline"
-                        className="h-12 px-6 rounded-full border-white/10 bg-white/5 text-white font-bold"
-                        disabled={page <= 1}
-                        onClick={() => fetchProjects(page - 1)}
-                    >
-                        Previous 12
-                    </Button>
-                    <Button
                         className="h-12 px-6 rounded-full bg-white text-black font-bold"
-                        disabled={page >= totalPages}
-                        onClick={() => fetchProjects(page + 1)}
+                        disabled={loading}
+                        onClick={() => fetchProjects(page + 1, { append: true })}
                     >
-                        Load More
+                        {loading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : null}
+                        Load 12 More
                     </Button>
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">
+                      Page {page} of {totalPages}
+                    </span>
                 </div>
             )}
       </div>
@@ -313,17 +308,26 @@ function ProjectCard({ project, onClick }: ProjectCardProps) {
   const roiLabel = roiValue ? `${roiValue}%` : 'Not shared';
   const appreciationValue = project.performance?.capitalAppreciation;
   const appreciationLabel = appreciationValue ? `${appreciationValue}%` : 'Not shared';
+  const accent = pickAccent(project.id || project.name);
 
   return (
     <Card 
       onClick={onClick}
-      className="bg-zinc-900/50 border-white/5 overflow-hidden rounded-[2.5rem] hover:border-blue-500/20 transition-all duration-700 group cursor-pointer"
+      className="bg-zinc-900/60 border overflow-hidden rounded-[2.5rem] transition-all duration-700 group cursor-pointer"
+      style={{
+        borderColor: accent.stroke,
+        boxShadow: `0 0 0 1px ${accent.stroke}, 0 25px 60px ${accent.glow}`,
+      }}
     >
       <div className="h-48 relative overflow-hidden">
-        <img src={project.images?.[0] || 'https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&q=80&w=800'} alt={project.name} className="absolute inset-0 w-full h-full object-cover opacity-80 group-hover:scale-110 transition-all duration-1000" />
-        <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/60 to-transparent" />
+        <div className={`absolute inset-0 bg-gradient-to-br ${accent.bg}`} />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.12),_transparent_55%)] opacity-60" />
+        <div className="absolute inset-0 border border-white/5 rounded-[2.5rem]" />
         <div className="relative p-6 h-full flex flex-col justify-end">
-          <h3 className="text-2xl font-black text-white italic uppercase tracking-tighter">{project.name}</h3>
+          <div className="text-[10px] font-bold uppercase tracking-widest text-zinc-400">
+            {project.location?.area || project.location?.city || 'UAE'}
+          </div>
+          <h3 className="text-2xl font-black text-white italic uppercase tracking-tighter mt-2">{project.name}</h3>
           <p className="text-zinc-400 font-medium text-sm flex items-center gap-2">
             <Building className="h-4 w-4" />
             {developerLabel}
@@ -351,4 +355,45 @@ function ProjectCard({ project, onClick }: ProjectCardProps) {
       </CardContent>
     </Card>
   )
+}
+
+const ACCENTS = [
+  {
+    stroke: 'rgba(59, 130, 246, 0.45)',
+    glow: 'rgba(59, 130, 246, 0.15)',
+    bg: 'from-blue-600/25 via-blue-600/10 to-transparent',
+  },
+  {
+    stroke: 'rgba(16, 185, 129, 0.45)',
+    glow: 'rgba(16, 185, 129, 0.15)',
+    bg: 'from-emerald-500/25 via-emerald-500/10 to-transparent',
+  },
+  {
+    stroke: 'rgba(245, 158, 11, 0.45)',
+    glow: 'rgba(245, 158, 11, 0.15)',
+    bg: 'from-amber-500/25 via-amber-500/10 to-transparent',
+  },
+  {
+    stroke: 'rgba(236, 72, 153, 0.45)',
+    glow: 'rgba(236, 72, 153, 0.15)',
+    bg: 'from-pink-500/25 via-pink-500/10 to-transparent',
+  },
+  {
+    stroke: 'rgba(139, 92, 246, 0.45)',
+    glow: 'rgba(139, 92, 246, 0.15)',
+    bg: 'from-violet-500/25 via-violet-500/10 to-transparent',
+  },
+];
+
+function hashString(value: string) {
+  let hash = 0;
+  for (let i = 0; i < value.length; i += 1) {
+    hash = (hash * 31 + value.charCodeAt(i)) % 2147483647;
+  }
+  return hash;
+}
+
+function pickAccent(seed: string) {
+  const index = hashString(seed || 'entrestate') % ACCENTS.length;
+  return ACCENTS[index];
 }

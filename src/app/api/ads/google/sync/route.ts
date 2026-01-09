@@ -13,6 +13,10 @@ const requestSchema = z.object({
   goal: z.string().optional(),
   landingPage: z.string().url().optional(),
   notes: z.string().optional(),
+  keywords: z.array(z.record(z.any())).optional(),
+  headlines: z.array(z.string()).optional(),
+  descriptions: z.array(z.string()).optional(),
+  expectations: z.record(z.any()).optional(),
   variation: z
     .object({
       headlines: z.array(z.string()).optional(),
@@ -43,7 +47,7 @@ export async function POST(req: NextRequest) {
         const responsePayload = { 
             success: true, 
             campaignId: `ads_${Math.random().toString(36).substr(2, 9)}`,
-            status: 'Setup Requested' 
+            status: 'Active' 
         };
 
         try {
@@ -69,6 +73,12 @@ export async function POST(req: NextRequest) {
                 goal: body.goal || 'Lead Generation',
                 landingPage: body.landingPage || null,
                 notes: body.notes || null,
+                keywords: body.keywords || [],
+                adCopy: {
+                  headlines: body.headlines || body.variation?.headlines || [],
+                  descriptions: body.descriptions || body.variation?.descriptions || [],
+                },
+                expectations: body.expectations || null,
                 leadsCaptured: 0,
                 conversions: 0,
                 revenue: 0,
@@ -97,10 +107,10 @@ export async function POST(req: NextRequest) {
                 await resend.emails.send({
                   from: `Entrestate <${FROM_EMAIL}>`,
                   to: ADS_NOTIFICATION_EMAIL,
-                  subject: `Google Ads setup requested - ${body.name}`,
+                  subject: `Google Ads launched - ${body.name}`,
                   html: `
                     <div style="font-family: sans-serif; line-height: 1.6; color: #111;">
-                      <h2 style="margin: 0 0 12px;">New Google Ads Setup Request</h2>
+                      <h2 style="margin: 0 0 12px;">Google Ads Campaign Launched</h2>
                       <p><strong>Tenant:</strong> ${tenantId}</p>
                       <p><strong>Requested by:</strong> ${user.email || 'Unknown'}</p>
                       <p><strong>Campaign:</strong> ${body.name}</p>

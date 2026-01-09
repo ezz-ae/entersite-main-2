@@ -7,7 +7,10 @@ import { createGoogleGenerativeAI } from '@ai-sdk/google';
  * COST OPTIMIZED: Switched to 1.5-FLASH
  */
 
-const API_KEY = process.env.GOOGLE_GENERATIVE_AI_API_KEY || process.env.GEMINI_API_KEY;
+const API_KEY =
+  process.env.GOOGLE_GENERATIVE_AI_API_KEY ||
+  process.env.GEMINI_API_KEY ||
+  process.env.Gemini_api_key;
 const google = createGoogleGenerativeAI({ apiKey: API_KEY });
 
 // FLASH is 10x cheaper than Pro and ideal for writing emails

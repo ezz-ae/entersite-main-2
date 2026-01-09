@@ -23,9 +23,7 @@ export function ChatAgentBlock({
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [messages, setMessages] = useState([
-    { role: 'agent', text: "Hello! I'm your market advisor. Ask me anything about pricing, availability, or upcoming launches." },
-    { role: 'user', text: "What are the best options in Dubai Marina right now?" },
-    { role: 'agent', text: "There are a few strong options based on your budget and timeline. Want a quick shortlist to review?" },
+    { role: 'agent', text: "Hello! I'm your market advisor. Ask me about pricing, availability, or upcoming launches." },
   ]);
 
   const handleSend = async () => {

@@ -12,6 +12,7 @@ export interface AdCampaignRequest {
   budget: number;
   durationDays: number;
   goal: 'leads' | 'calls' | 'traffic';
+  location?: string;
 }
 
 const campaignSchema = z.object({
@@ -24,9 +25,11 @@ const campaignSchema = z.object({
 });
 
 export const generateCampaignStructure = async (req: AdCampaignRequest) => {
+    const locationText = req.location ? `Target location: ${req.location}.` : '';
     const promptContext = `
       You are the EntreSite Ads Architect. Build Google Ads assets for ${req.siteUrl}.
-      Budget: ${req.budget} USD/day for ${req.durationDays} days. Goal: ${req.goal}.
+      ${locationText}
+      Budget: ${req.budget} AED/day for ${req.durationDays} days. Goal: ${req.goal}.
       Output high-intent keywords, 3 responsive search headlines, and 2 concise descriptions.
     `;
 

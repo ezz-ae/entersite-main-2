@@ -22,10 +22,13 @@ export function EmailCampaignDashboard() {
 
   const [subject, setSubject] = useState(DEFAULT_SUBJECT);
   const [message, setMessage] = useState('');
+  const [aiTopic, setAiTopic] = useState('');
+  const [aiContext, setAiContext] = useState('');
   const [listType, setListType] = useState<'imported' | 'pilot'>('imported');
   const [testEmail, setTestEmail] = useState('');
   const [counts, setCounts] = useState({ imported: 0, pilot: 0 });
   const [loading, setLoading] = useState(false);
+  const [aiLoading, setAiLoading] = useState(false);
   const [showImportDialog, setShowImportDialog] = useState(false);
 
   const refreshCounts = async () => {
@@ -109,6 +112,42 @@ export function EmailCampaignDashboard() {
     }
   };
 
+  const handleGenerate = async () => {
+    if (!aiTopic.trim()) {
+      toast({ title: 'Add a campaign focus', variant: 'destructive' });
+      return;
+    }
+
+    setAiLoading(true);
+    try {
+      const res = await authorizedFetch('/api/email/generate', {
+        method: 'POST',
+        body: JSON.stringify({
+          topic: aiTopic.trim(),
+          context: aiContext.trim(),
+        }),
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data?.error || 'Failed to generate email');
+      }
+
+      if (data.subject) setSubject(data.subject);
+      if (data.body) setMessage(data.body);
+
+      toast({ title: 'AI draft ready', description: 'Review and edit before sending.' });
+    } catch (error: any) {
+      toast({
+        title: 'Generation failed',
+        description: error?.message || 'Please try again.',
+        variant: 'destructive',
+      });
+    } finally {
+      setAiLoading(false);
+    }
+  };
+
   const listCount = listType === 'imported' ? counts.imported : counts.pilot;
 
   return (
@@ -141,6 +180,34 @@ export function EmailCampaignDashboard() {
               <CardDescription>Write a short update. Keep it clear and simple.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
+              <div className="rounded-2xl border border-white/10 bg-black/40 p-4 space-y-3">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                  <div>
+                    <p className="text-xs font-bold uppercase tracking-widest text-zinc-500">AI Draft</p>
+                    <p className="text-sm text-zinc-400">Give the topic and let AI write the email.</p>
+                  </div>
+                  <Button
+                    onClick={handleGenerate}
+                    className="h-10 rounded-full bg-white text-black font-bold"
+                    disabled={aiLoading}
+                  >
+                    {aiLoading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : null}
+                    Generate Draft
+                  </Button>
+                </div>
+                <Input
+                  value={aiTopic}
+                  onChange={(e) => setAiTopic(e.target.value)}
+                  className="bg-black/40 border-white/10 text-white"
+                  placeholder="Example: New availability at Creek Beach this week"
+                />
+                <Input
+                  value={aiContext}
+                  onChange={(e) => setAiContext(e.target.value)}
+                  className="bg-black/40 border-white/10 text-white"
+                  placeholder="Optional context: price range, payment plan, launch date"
+                />
+              </div>
               <div className="space-y-2">
                 <label className="text-xs font-bold uppercase tracking-widest text-zinc-500">Subject</label>
                 <Input

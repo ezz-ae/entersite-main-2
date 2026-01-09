@@ -18,20 +18,33 @@ const requestSchema = z.object({
 });
 
 export async function POST(req: NextRequest) {
+  let payload: z.infer<typeof requestSchema> | null = null;
   try {
     const body = await req.json();
-    const payload = requestSchema.parse(body);
+    payload = requestSchema.parse(body);
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return NextResponse.json({ reply: 'Invalid request payload.', error: error.errors }, { status: 400 });
+    }
+    return NextResponse.json({ reply: 'Invalid request payload.' }, { status: 400 });
+  }
 
-    const historyText = (payload.history || [])
-      .map((entry) => `${entry.role === 'user' ? 'Investor' : 'Agent'}: ${entry.text}`)
-      .join('\n');
+  const historyText = (payload.history || [])
+    .map((entry) => `${entry.role === 'user' ? 'Investor' : 'Agent'}: ${entry.text}`)
+    .join('\n');
 
-    const relevantProjects = await getRelevantProjects(payload.message, payload.context, 8);
-    const projectContext = relevantProjects.length
-      ? `\nRelevant listings:\n${relevantProjects.map(formatProjectContext).join('\n')}`
-      : '';
+  let relevantProjects: Awaited<ReturnType<typeof getRelevantProjects>> = [];
+  try {
+    relevantProjects = await getRelevantProjects(payload.message, payload.context, 8);
+  } catch (error) {
+    console.error('[bot/preview/chat] inventory context failed', error);
+  }
 
-    const prompt = `
+  const projectContext = relevantProjects.length
+    ? `\nRelevant listings:\n${relevantProjects.map(formatProjectContext).join('\n')}`
+    : '';
+
+  const prompt = `
 Role & Context:
 ${payload.context || 'Entrestate chat assistant for UAE real estate teams.'}
 
@@ -49,6 +62,7 @@ Investor: ${payload.message}
 Agent:
 `;
 
+  try {
     const { text } = await generateText({
       model: getGoogleModel(FLASH_MODEL),
       system:
@@ -59,6 +73,10 @@ Agent:
     return NextResponse.json({ reply: text });
   } catch (error) {
     console.error('[bot/preview/chat] error', error);
-    return NextResponse.json({ reply: "I'm analyzing that project's latest data. How else can I help?" });
+    const fallbackList = relevantProjects.slice(0, 3).map(formatProjectContext).join('\n');
+    const fallbackReply = fallbackList
+      ? `Here are a few options I can share right now:\n${fallbackList}\nTell me your budget and preferred area, and I will narrow it down.`
+      : "I can help with UAE projects, pricing ranges, and next steps. What area and budget should I focus on?";
+    return NextResponse.json({ reply: fallbackReply });
   }
 }
