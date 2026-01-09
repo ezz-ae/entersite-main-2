@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { FieldValue } from 'firebase-admin/firestore';
 import { getAdminDb } from '@/server/firebase-admin';
 import { requireTenantScope, UnauthorizedError, ForbiddenError } from '@/server/auth';
+import { CAP } from '@/lib/capabilities';
 
 const payloadSchema = z.object({
   tenantId: z.string().optional(),
@@ -28,7 +29,7 @@ export async function GET(req: NextRequest) {
     const settings = docSnap.exists ? docSnap.data() : null;
     return NextResponse.json({
       settings,
-      hubspotAvailable: Boolean(process.env.HUBSPOT_ACCESS_TOKEN),
+      hubspotAvailable: CAP.hubspot,
     });
   } catch (error) {
     console.error('[leads/settings] error', error);

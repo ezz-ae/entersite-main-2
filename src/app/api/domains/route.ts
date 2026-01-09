@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { requireTenantScope, UnauthorizedError, ForbiddenError } from '@/server/auth';
 import { getAdminDb } from '@/server/firebase-admin';
+import { CAP } from '@/lib/capabilities';
 
 const VERCEL_TOKEN = process.env.VERCEL_API_TOKEN;
 const PROJECT_ID = process.env.VERCEL_PROJECT_ID;
@@ -17,7 +18,7 @@ const normalizeDomain = (value: string) => value.replace(/^https?:\/\//, '').rep
 export async function POST(req: NextRequest) {
   try {
     const { decoded } = await requireTenantScope(req);
-    if (!VERCEL_TOKEN || !PROJECT_ID) {
+    if (!CAP.vercel || !VERCEL_TOKEN || !PROJECT_ID) {
       return NextResponse.json({ error: 'Domain connection is not set up yet.' }, { status: 500 });
     }
 

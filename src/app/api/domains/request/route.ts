@@ -1,12 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { FieldValue } from 'firebase-admin/firestore';
-import { Resend } from 'resend';
 import { requireTenantScope, UnauthorizedError, ForbiddenError } from '@/server/auth';
 import { getAdminDb } from '@/server/firebase-admin';
+import { CAP } from '@/lib/capabilities';
+import { resend, fromEmail } from '@/lib/resend';
 
-const RESEND_API_KEY = process.env.RESEND_API_KEY;
-const FROM_EMAIL = process.env.FROM_EMAIL;
 const DOMAIN_REQUEST_EMAIL = process.env.DOMAIN_REQUEST_EMAIL;
 
 const payloadSchema = z.object({
@@ -55,10 +54,9 @@ export async function POST(req: NextRequest) {
       updatedAt: FieldValue.serverTimestamp(),
     });
 
-    if (RESEND_API_KEY && FROM_EMAIL && DOMAIN_REQUEST_EMAIL) {
-      const resend = new Resend(RESEND_API_KEY);
+    if (CAP.resend && resend && DOMAIN_REQUEST_EMAIL) {
       await resend.emails.send({
-        from: `Entrestate <${FROM_EMAIL}>`,
+        from: `Entrestate <${fromEmail()}>`,
         to: DOMAIN_REQUEST_EMAIL,
         subject: `Domain purchase request - ${normalizedDomain}`,
         html: `

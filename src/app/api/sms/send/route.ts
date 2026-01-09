@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { enforceRateLimit, getRequestIp } from '@/lib/rate-limit';
 import { requireAuth, UnauthorizedError, ForbiddenError } from '@/server/auth';
 import { createApiLogger } from '@/lib/logger';
+import { CAP } from '@/lib/capabilities';
 
 const ACCOUNT_SID = process.env.TWILIO_ACCOUNT_SID;
 const AUTH_TOKEN = process.env.TWILIO_AUTH_TOKEN;
@@ -21,7 +22,7 @@ export async function POST(req: NextRequest) {
   const logger = createApiLogger(req, { route: 'POST /api/sms/send' });
   try {
     await requireAuth(req);
-    if (!ACCOUNT_SID || !AUTH_TOKEN || !FROM_NUMBER) {
+    if (!CAP.twilio || !ACCOUNT_SID || !AUTH_TOKEN || !FROM_NUMBER) {
       logger.logError('Twilio not configured', 500);
       return NextResponse.json({ error: 'Twilio is not configured' }, { status: 500 });
     }

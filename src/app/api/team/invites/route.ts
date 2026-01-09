@@ -1,18 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { FieldValue } from 'firebase-admin/firestore';
-import { Resend } from 'resend';
 import { getAdminDb } from '@/server/firebase-admin';
 import { requireTenantScope, UnauthorizedError, ForbiddenError } from '@/server/auth';
+import { CAP } from '@/lib/capabilities';
+import { resend, fromEmail } from '@/lib/resend';
 
 const payloadSchema = z.object({
   tenantId: z.string().optional(),
   email: z.string().email(),
   role: z.enum(['Owner', 'Editor', 'Viewer']),
 });
-
-const RESEND_API_KEY = process.env.RESEND_API_KEY;
-const FROM_EMAIL = process.env.FROM_EMAIL;
 
 export async function GET(req: NextRequest) {
   try {
@@ -65,10 +63,9 @@ export async function POST(req: NextRequest) {
 
     await inviteRef.set(inviteData);
 
-    if (RESEND_API_KEY && FROM_EMAIL) {
-      const resend = new Resend(RESEND_API_KEY);
+    if (CAP.resend && resend) {
       await resend.emails.send({
-        from: `Entrestate Team <${FROM_EMAIL}>`,
+        from: `Entrestate Team <${fromEmail()}>`,
         to: payload.email,
         subject: 'You are invited to Entrestate',
         html: `

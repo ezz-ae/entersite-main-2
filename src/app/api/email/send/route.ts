@@ -1,18 +1,15 @@
 'use server';
 
 import { NextRequest, NextResponse } from 'next/server';
-import { Resend } from 'resend';
 import { z } from 'zod';
 import { enforceRateLimit, getRequestIp } from '@/lib/rate-limit';
 import { requireAuth, UnauthorizedError, ForbiddenError } from '@/server/auth';
 import { createApiLogger } from '@/lib/logger';
+import { CAP } from '@/lib/capabilities';
+import { resend, fromEmail } from '@/lib/resend';
 
-const RESEND_API_KEY = process.env.RESEND_API_KEY;
-const FROM_EMAIL = process.env.FROM_EMAIL;
 const RATE_LIMIT_WINDOW_MS = 60_000;
 const RATE_LIMIT_MAX = 30;
-
-const resend = RESEND_API_KEY ? new Resend(RESEND_API_KEY) : null;
 
 const payloadSchema = z.object({
   to: z.string().email(),
@@ -25,7 +22,7 @@ export async function POST(req: NextRequest) {
   const logger = createApiLogger(req, { route: 'POST /api/email/send' });
   try {
     await requireAuth(req);
-    if (!resend || !FROM_EMAIL) {
+    if (!CAP.resend || !resend) {
       logger.logError('Resend not configured', 500);
       return NextResponse.json({ error: 'Email provider is not configured' }, { status: 500 });
     }
@@ -40,7 +37,7 @@ export async function POST(req: NextRequest) {
     logger.setTenant(payload.tenantId);
 
     const { data, error } = await resend.emails.send({
-      from: `Entrelead <${FROM_EMAIL}>`,
+      from: `Entrelead <${fromEmail()}>`,
       to: payload.to,
       subject: payload.subject,
       html: `<div style="font-family: sans-serif; line-height: 1.6; color: #333;">${payload.body}</div>`,

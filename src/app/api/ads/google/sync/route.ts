@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { Resend } from 'resend';
 import { requireAuth, UnauthorizedError, ForbiddenError } from '@/server/auth';
 import { getAdminDb } from '@/server/firebase-admin';
 import { updateMarketingTotals } from '@/server/marketing-analytics';
 import { z } from 'zod';
+import { CAP } from '@/lib/capabilities';
+import { resend, fromEmail } from '@/lib/resend';
 
 const requestSchema = z.object({
   name: z.string().min(1),
@@ -25,8 +26,6 @@ const requestSchema = z.object({
     .optional(),
 });
 
-const RESEND_API_KEY = process.env.RESEND_API_KEY;
-const FROM_EMAIL = process.env.FROM_EMAIL;
 const ADS_NOTIFICATION_EMAIL = process.env.ADS_NOTIFICATION_EMAIL || 'google@entrestate.com';
 
 /**
@@ -101,11 +100,10 @@ export async function POST(req: NextRequest) {
               return totals;
             });
 
-            if (RESEND_API_KEY && FROM_EMAIL && ADS_NOTIFICATION_EMAIL) {
+            if (CAP.resend && resend && ADS_NOTIFICATION_EMAIL) {
               try {
-                const resend = new Resend(RESEND_API_KEY);
                 await resend.emails.send({
-                  from: `Entrestate <${FROM_EMAIL}>`,
+                  from: `Entrestate <${fromEmail()}>`,
                   to: ADS_NOTIFICATION_EMAIL,
                   subject: `Google Ads launched - ${body.name}`,
                   html: `

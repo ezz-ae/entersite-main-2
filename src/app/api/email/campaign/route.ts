@@ -1,11 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { Resend } from 'resend';
 import { z } from 'zod';
 import { getAdminDb } from '@/server/firebase-admin';
 import { requireTenantScope, UnauthorizedError, ForbiddenError } from '@/server/auth';
+import { CAP } from '@/lib/capabilities';
+import { resend, fromEmail } from '@/lib/resend';
 
-const RESEND_API_KEY = process.env.RESEND_API_KEY;
-const FROM_EMAIL = process.env.FROM_EMAIL;
 const MAX_RECIPIENTS = 50;
 
 const payloadSchema = z.object({
@@ -16,14 +15,12 @@ const payloadSchema = z.object({
   tenantId: z.string().optional(),
 });
 
-const resend = RESEND_API_KEY ? new Resend(RESEND_API_KEY) : null;
-
 export async function POST(req: NextRequest) {
   try {
     const payload = payloadSchema.parse(await req.json());
     const { tenantId } = await requireTenantScope(req, payload.tenantId);
 
-    if (!resend || !FROM_EMAIL) {
+    if (!CAP.resend || !resend) {
       return NextResponse.json({ error: 'Email provider is not configured' }, { status: 500 });
     }
 
@@ -56,7 +53,7 @@ export async function POST(req: NextRequest) {
 
     for (const email of recipients) {
       const { error } = await resend.emails.send({
-        from: `Entrestate <${FROM_EMAIL}>`,
+        from: `Entrestate <${fromEmail()}>`,
         to: email,
         subject: payload.subject,
         html: `<div style="font-family: sans-serif; line-height: 1.6; color: #333;">${formattedBody}</div>`,

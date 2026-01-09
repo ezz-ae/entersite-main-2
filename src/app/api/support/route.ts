@@ -1,9 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { Resend } from 'resend';
+import { CAP } from '@/lib/capabilities';
+import { resend, fromEmail } from '@/lib/resend';
 
-const RESEND_API_KEY = process.env.RESEND_API_KEY;
-const FROM_EMAIL = process.env.FROM_EMAIL;
 const SUPPORT_EMAIL = process.env.SUPPORT_EMAIL || 'support@entrestate.com';
 
 const payloadSchema = z.object({
@@ -15,15 +14,14 @@ const payloadSchema = z.object({
 
 export async function POST(req: NextRequest) {
   try {
-    if (!RESEND_API_KEY || !FROM_EMAIL) {
+    if (!CAP.resend || !resend) {
       return NextResponse.json({ error: 'Support email is not configured' }, { status: 500 });
     }
 
     const payload = payloadSchema.parse(await req.json());
-    const resend = new Resend(RESEND_API_KEY);
 
     await resend.emails.send({
-      from: `Entrestate Support <${FROM_EMAIL}>`,
+      from: `Entrestate Support <${fromEmail()}>`,
       to: SUPPORT_EMAIL,
       subject: `Support request - ${payload.topic}`,
       replyTo: payload.email,
