@@ -71,8 +71,16 @@ export function ProjectDiscoveryClient({ initialProjects }: Props) {
       if (!res.ok) throw new Error('Failed to fetch projects');
       const json = await res.json();
       const nextProjects = json.data || [];
+      const total = json.pagination?.total || 0;
+      const isDefaultFilters = !queryValue && cityValue === 'all' && statusValue === 'all';
+      if (!append && !nextProjects.length && total === 0 && isDefaultFilters && initialProjects.length) {
+        setProjects(initialProjects.slice(0, PROJECTS_PER_PAGE));
+        setTotalResults(initialProjects.length);
+        setPage(1);
+        return;
+      }
       setProjects((prev) => (append ? mergeProjects(prev, nextProjects) : nextProjects));
-      setTotalResults(json.pagination?.total || 0);
+      setTotalResults(total);
       setPage(nextPage);
     } catch (error) {
       console.error('Failed to fetch discovery projects', error);
