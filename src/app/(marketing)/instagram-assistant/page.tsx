@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { ChatAgentBlock } from '@/components/blocks/ai/chat-agent-block';
 import {
   Bot,
   ArrowRight,
@@ -121,6 +122,15 @@ export default function InstagramAssistantPage() {
           </div>
         </div>
       </section>
+
+      {/* LIVE DEMO */}
+      <ChatAgentBlock
+        headline="Try the Assistant Live"
+        subtext="Ask about pricing, availability, or handover. It replies using your approved answers."
+        agentName="Entrestate Assistant"
+        placeholder="Ask about a project, area, or price range..."
+        theme="glass"
+      />
 
       {/* HOW IT WORKS */}
       <section className="py-36 bg-zinc-950 border-y border-white/5">
