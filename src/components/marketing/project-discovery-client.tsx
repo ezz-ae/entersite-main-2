@@ -11,6 +11,8 @@ interface Props {
   initialProjects: ProjectData[];
 }
 
+const PROJECTS_PER_PAGE = 12;
+
 const buildQueryString = (params: Record<string, string | number | undefined>) => {
   const search = new URLSearchParams();
   Object.entries(params).forEach(([key, value]) => {
@@ -26,31 +28,50 @@ export function ProjectDiscoveryClient({ initialProjects }: Props) {
   const [city, setCity] = useState('all');
   const [status, setStatus] = useState('all');
   const [loading, setLoading] = useState(false);
-  const [projects, setProjects] = useState<ProjectData[]>(initialProjects.slice(0, 12));
+  const [projects, setProjects] = useState<ProjectData[]>(initialProjects.slice(0, PROJECTS_PER_PAGE));
   const [totalResults, setTotalResults] = useState(initialProjects.length);
   const [page, setPage] = useState(1);
   const [cityOptions, setCityOptions] = useState<string[]>(['Dubai', 'Abu Dhabi', 'Sharjah']);
 
+  const mergeProjects = (existing: ProjectData[], incoming: ProjectData[]) => {
+    const map = new Map<string, ProjectData>();
+    existing.forEach((project) => {
+      if (project.id) {
+        map.set(project.id, project);
+      }
+    });
+    incoming.forEach((project) => {
+      if (project.id) {
+        map.set(project.id, project);
+      }
+    });
+    const fallback = existing.filter((project) => !project.id);
+    const merged = Array.from(map.values());
+    return fallback.length ? [...fallback, ...merged] : merged;
+  };
+
   const fetchProjects = async (
     nextPage = 1,
-    overrides?: { query?: string; city?: string; status?: string }
+    overrides?: { query?: string; city?: string; status?: string; append?: boolean }
   ) => {
     setLoading(true);
     try {
       const queryValue = overrides?.query ?? query;
       const cityValue = overrides?.city ?? city;
       const statusValue = overrides?.status ?? status;
+      const append = overrides?.append ?? false;
       const qs = buildQueryString({
         query: queryValue,
         city: cityValue,
         status: statusValue,
         page: nextPage,
-        limit: 12,
+        limit: PROJECTS_PER_PAGE,
       });
       const res = await fetch(`/api/projects/search?${qs}`);
       if (!res.ok) throw new Error('Failed to fetch projects');
       const json = await res.json();
-      setProjects(json.data || []);
+      const nextProjects = json.data || [];
+      setProjects((prev) => (append ? mergeProjects(prev, nextProjects) : nextProjects));
       setTotalResults(json.pagination?.total || 0);
       setPage(nextPage);
     } catch (error) {
@@ -90,7 +111,8 @@ export function ProjectDiscoveryClient({ initialProjects }: Props) {
     fetchProjects(1, { query: nextQuery });
   };
 
-  const totalPages = Math.max(1, Math.ceil(totalResults / 12));
+  const totalPages = Math.max(1, Math.ceil(totalResults / PROJECTS_PER_PAGE));
+  const canLoadMore = projects.length < totalResults;
 
   return (
     <section className="bg-black text-white py-40 border-y border-white/5 relative overflow-hidden">
@@ -203,25 +225,17 @@ export function ProjectDiscoveryClient({ initialProjects }: Props) {
             </div>
         )}
 
-        {!loading && totalResults > 12 && (
+        {!loading && totalResults > PROJECTS_PER_PAGE && (
           <div className="mt-12 flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Button
-              variant="outline"
-              className="h-12 px-6 rounded-full border-white/10 bg-white/5 text-white font-bold"
-              disabled={page <= 1}
-              onClick={() => fetchProjects(page - 1)}
-            >
-              Previous 12
-            </Button>
             <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">
-              Page {page} of {totalPages}
+              Showing {projects.length} of {totalResults}
             </span>
             <Button
               className="h-12 px-6 rounded-full bg-blue-600 hover:bg-blue-700 text-white font-bold"
-              disabled={page >= totalPages}
-              onClick={() => fetchProjects(page + 1)}
+              disabled={page >= totalPages || !canLoadMore}
+              onClick={() => fetchProjects(page + 1, { append: true })}
             >
-              Load More
+              Load 12 More
             </Button>
           </div>
         )}

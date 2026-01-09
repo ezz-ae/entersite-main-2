@@ -7,21 +7,22 @@ import {
   Globe, 
   Users, 
   MessageSquare,
-  Search,
-  Smartphone,
-  Mail,
-  Palette
+  Palette,
+  Link2,
+  Megaphone,
+  Target,
+  ImageIcon
 } from 'lucide-react';
 
 const services = [
-    { name: 'Website Builder', href: '/dashboard/sites', icon: Globe, description: 'Create and publish project pages.' },
-    { name: 'Chat Assistant', href: '/dashboard/chat-agent', icon: MessageSquare, description: 'Answer buyer questions automatically.' },
-    { name: 'Google Ads', href: '/dashboard/google-ads', icon: Search, description: 'Launch and monitor search campaigns.' },
-    { name: 'Buyer Audience', href: '/dashboard/meta-audience', icon: Users, description: 'Activate your buyer list.' },
-    { name: 'SMS Campaigns', href: '/dashboard/sms-marketing', icon: Smartphone, description: 'Send quick updates to buyers.' },
-    { name: 'Email Campaigns', href: '/dashboard/email-marketing', icon: Mail, description: 'Send project announcements fast.' },
-    { name: 'Leads', href: '/dashboard/leads', icon: Users, description: 'Track and follow up with leads.' },
-    { name: 'Brand Kit', href: '/dashboard/brand', icon: Palette, description: 'Keep logos and colors consistent.' },
+    { name: 'Sites', href: '/dashboard/sites', icon: Globe, description: 'Create and publish project pages.' },
+    { name: 'Web Address', href: '/dashboard/domain', icon: Link2, description: 'Connect or buy a web address.' },
+    { name: 'Marketing', href: '/dashboard/marketing', icon: Megaphone, description: 'Run ads, email, and SMS in one place.' },
+    { name: 'Leads', href: '/dashboard/leads', icon: Target, description: 'Track and follow up with new leads.' },
+    { name: 'Chat', href: '/dashboard/chat-agent', icon: MessageSquare, description: 'Answer buyer questions automatically.' },
+    { name: 'Media', href: '/dashboard/assets', icon: ImageIcon, description: 'Keep images and files organized.' },
+    { name: 'Brand', href: '/dashboard/brand', icon: Palette, description: 'Keep logos and colors consistent.' },
+    { name: 'Team', href: '/dashboard/team', icon: Users, description: 'Invite teammates and manage access.' },
 ];
 
 const cardVariants = {

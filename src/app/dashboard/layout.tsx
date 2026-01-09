@@ -9,17 +9,16 @@ import { motion } from 'framer-motion';
 import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 import { 
   Bell, 
-  Settings, 
-  Search,
   Users,
   MessageSquare,
-  Mail,
-  Smartphone,
   Globe,
   Link2,
   Target,
   LayoutDashboard,
-  CreditCard
+  CreditCard,
+  Megaphone,
+  ImageIcon,
+  Palette
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { UserNav } from "@/components/user-nav";
@@ -28,19 +27,18 @@ import { MobileBottomNav } from "@/components/mobile-app/mobile-bottom-nav";
 
 const mainNavItems = [
     { href: "/dashboard", icon: LayoutDashboard, label: "Overview" },
-    { href: "/dashboard/sites", icon: Globe, label: "Website Builder" },
-    { href: "/dashboard/domain", icon: Link2, label: "Domains" },
-    { href: "/dashboard/chat-agent", icon: MessageSquare, label: "Chat Assistant" },
-    { href: "/dashboard/google-ads", icon: Search, label: "Google Ads" },
-    { href: "/dashboard/meta-audience", icon: Users, label: "Buyer Audience" },
-    { href: "/dashboard/sms-marketing", icon: Smartphone, label: "SMS Campaigns" },
-    { href: "/dashboard/email-marketing", icon: Mail, label: "Email Campaigns" },
+    { href: "/dashboard/sites", icon: Globe, label: "Sites" },
+    { href: "/dashboard/domain", icon: Link2, label: "Web Address" },
+    { href: "/dashboard/marketing", icon: Megaphone, label: "Marketing" },
     { href: "/dashboard/leads", icon: Target, label: "Leads" },
+    { href: "/dashboard/chat-agent", icon: MessageSquare, label: "Chat" },
+    { href: "/dashboard/assets", icon: ImageIcon, label: "Media" },
+    { href: "/dashboard/brand", icon: Palette, label: "Brand" },
+    { href: "/dashboard/team", icon: Users, label: "Team" },
 ];
 
 const secondaryNavItems = [
     { href: "/dashboard/billing", icon: CreditCard, label: "Billing" },
-    { href: "/dashboard/brand", icon: Settings, label: "Brand" },
 ];
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
