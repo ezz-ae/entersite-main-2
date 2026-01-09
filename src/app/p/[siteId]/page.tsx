@@ -4,15 +4,15 @@ import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 
 interface Props {
-  params: { siteId: string };
-  searchParams?: { variant?: string };
+  params: Promise<{ siteId: string }>;
+  searchParams?: Promise<{ variant?: string }>;
 }
 
 // Revalidate every 60 seconds
 export const revalidate = 60;
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { siteId } = params;
+  const { siteId } = await params;
   const page = await getPublishedSite(siteId);
 
   if (!page) {
@@ -29,8 +29,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function PublishedPage({ params, searchParams }: Props) {
-  const { siteId } = params;
-  const variant = searchParams?.variant;
+  const { siteId } = await params;
+  const resolvedSearchParams = searchParams ? await searchParams : undefined;
+  const variant = resolvedSearchParams?.variant;
   const page = await getPublishedSite(siteId);
 
   if (!page) {

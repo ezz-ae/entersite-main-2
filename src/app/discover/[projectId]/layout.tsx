@@ -2,11 +2,11 @@ import type { Metadata } from 'next';
 import { loadInventoryProjectById } from '@/server/inventory';
 
 type Params = {
-  params: { projectId: string };
+  params: Promise<{ projectId: string }>;
 };
 
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
-  const projectId = params.projectId;
+  const { projectId } = await params;
   const project = await loadInventoryProjectById(projectId);
 
   if (!project) {
