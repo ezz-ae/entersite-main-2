@@ -4,15 +4,22 @@ import { useMemo, useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { Globe, Smartphone, Mail, Target, ArrowRight } from 'lucide-react';
+import { Globe, Smartphone, Mail, Target, MessageSquare, ArrowRight } from 'lucide-react';
 
 const START_OPTIONS = [
   {
     id: 'website',
     label: 'Website',
     description: 'Create a project page with your branding.',
-    href: '/builder',
+    href: '/builder?start=1',
     icon: Globe,
+  },
+  {
+    id: 'chat-agent',
+    label: 'Chat Agent',
+    description: 'Launch a conversational assistant for your listings.',
+    href: '/dashboard/chat-agent',
+    icon: MessageSquare,
   },
   {
     id: 'sms',

@@ -46,6 +46,8 @@ function BuilderContent() {
     const blueprintId = searchParams.get('blueprint');
     const siteIdParam = searchParams.get('siteId');
     const variantParam = searchParams.get('variant');
+    const startParam = searchParams.get('start');
+    const forceStart = startParam === '1' || startParam === 'true';
     const { toast } = useToast();
     const [user] = useAuthState(getAuth());
 
@@ -139,8 +141,20 @@ function BuilderContent() {
             applyBlueprint(blueprintId);
         } else if (templateId) {
             setIsStarted(true);
+        } else if (forceStart) {
+            setIsStarted(true);
         }
-    }, [applyBlueprint, blueprintId, handleStartWithAI, initialPrompt, loadSite, siteIdParam, templateId, user]);
+    }, [
+        applyBlueprint,
+        blueprintId,
+        forceStart,
+        handleStartWithAI,
+        initialPrompt,
+        loadSite,
+        siteIdParam,
+        templateId,
+        user,
+    ]);
 
     useEffect(() => {
         if (user && (!page.tenantId || page.tenantId === 'public') && page.tenantId !== user.uid) {

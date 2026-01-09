@@ -51,7 +51,8 @@ const ProjectDetailPage: NextPage = () => {
       setLoading(true);
       try {
         const resolvedId = Array.isArray(projectId) ? projectId[0] : projectId;
-        const res = await fetch(`/api/projects/${resolvedId}`);
+        const encodedId = encodeURIComponent(resolvedId);
+        const res = await fetch(`/api/projects/${encodedId}`);
         if (!res.ok) {
           setProject(null);
           return;

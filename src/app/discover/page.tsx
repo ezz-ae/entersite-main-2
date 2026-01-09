@@ -87,7 +87,7 @@ export default function DiscoverPage() {
   }, [fetchProjects]);
 
   const handleProjectClick = (projectId: string) => {
-    router.push(`/discover/${projectId}`);
+    router.push(`/discover/${encodeURIComponent(projectId)}`);
   };
 
   const handleLoadSample = () => {

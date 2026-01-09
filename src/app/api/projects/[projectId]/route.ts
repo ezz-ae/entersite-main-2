@@ -3,8 +3,9 @@ import { loadInventoryProjectById } from '@/server/inventory';
 
 export async function GET(
   _req: NextRequest,
-  { params }: { params: { projectId?: string } }
+  { params: paramsPromise }: { params: Promise<{ projectId: string }> }
 ) {
+  const params = await paramsPromise;
   const projectId = params?.projectId;
   if (!projectId) {
     return NextResponse.json({ message: 'Project id is required.' }, { status: 400 });

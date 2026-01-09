@@ -57,6 +57,14 @@ const normalizeString = (value: unknown, fallback = '') => {
 const normalizeKey = (value: string) =>
   value.toLowerCase().replace(/[^a-z0-9]+/g, '');
 
+const safeDecodeURIComponent = (value: string) => {
+  try {
+    return decodeURIComponent(value);
+  } catch {
+    return value;
+  }
+};
+
 const CITY_LABELS: Record<string, string> = {
   dubai: 'Dubai',
   abudhabi: 'Abu Dhabi',
@@ -386,10 +394,11 @@ export async function loadInventoryProjects(max = DEFAULT_MAX, forceRefresh = fa
 
 export async function loadInventoryProjectById(projectId: string) {
   if (!projectId) return null;
+  const resolvedId = safeDecodeURIComponent(projectId);
 
   try {
     const db = getAdminDb();
-    const snapshot = await db.collection('inventory_projects').doc(projectId).get();
+    const snapshot = await db.collection('inventory_projects').doc(resolvedId).get();
     if (snapshot.exists) {
       return normalizeProjectData(snapshot.data(), snapshot.id);
     }
@@ -398,14 +407,30 @@ export async function loadInventoryProjectById(projectId: string) {
   }
 
   try {
-    const project = await loadPublicProjectById(projectId);
+    const project = await loadPublicProjectById(resolvedId);
     if (project) return project;
   } catch (error) {
     console.error('[inventory] public project lookup failed', error);
   }
 
   const fallback = await loadInventoryProjects();
-  return fallback.find((project) => project.id === projectId) ?? null;
+  const directMatch = fallback.find((project) => project.id === resolvedId);
+  if (directMatch) return directMatch;
+
+  const normalizedId = normalizeKey(resolvedId);
+  if (!normalizedId) return null;
+
+  return (
+    fallback.find((project) => {
+      if (normalizeKey(project.id) === normalizedId) return true;
+      if (normalizeKey(project.name) === normalizedId) return true;
+      if (project.publicUrl) {
+        const slug = project.publicUrl.split('/').filter(Boolean).pop();
+        if (slug && normalizeKey(slug) === normalizedId) return true;
+      }
+      return false;
+    }) ?? null
+  );
 }
 
 export async function getRelevantProjects(message: string, context?: string, max = 8) {
