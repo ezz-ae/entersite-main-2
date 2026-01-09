@@ -23,11 +23,11 @@ export default function BrandDashboardPage() {
             <div className="space-y-8">
                 <div className="flex justify-between items-center">
                     <div>
-                        <h1 className="text-3xl font-bold tracking-tight">Brand Kit</h1>
-                        <p className="text-muted-foreground">Manage your company's visual identity for all generated sites.</p>
+                        <h1 className="text-3xl font-bold tracking-tight">Brand</h1>
+                        <p className="text-muted-foreground">Keep your logo and colors consistent.</p>
                     </div>
                     <Button className="gap-2">
-                        <Save className="h-4 w-4" /> Save Brand Kit
+                        <Save className="h-4 w-4" /> Save Brand
                     </Button>
                 </div>
 
@@ -37,7 +37,7 @@ export default function BrandDashboardPage() {
                         <Card>
                             <CardHeader>
                                 <CardTitle>Logo</CardTitle>
-                                <CardDescription>Upload your company logo.</CardDescription>
+                                <CardDescription>Upload your logo.</CardDescription>
                             </CardHeader>
                             <CardContent>
                                 <div className="w-full aspect-video bg-muted/20 border-2 border-dashed rounded-xl flex items-center justify-center">
@@ -60,8 +60,8 @@ export default function BrandDashboardPage() {
 
                         <Card>
                             <CardHeader>
-                                <CardTitle>Color Palette</CardTitle>
-                                <CardDescription>Choose a base palette or customize your brand colors.</CardDescription>
+                                <CardTitle>Colors</CardTitle>
+                                <CardDescription>Pick a palette or set your own colors.</CardDescription>
                             </CardHeader>
                             <CardContent className="space-y-6">
                                 <div className="grid grid-cols-2 gap-4">

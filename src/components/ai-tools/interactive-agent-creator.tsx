@@ -28,12 +28,13 @@ import {
   Sparkles,
   Send,
   ShieldCheck,
-  CreditCard,
   Lock
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Checkbox } from '@/components/ui/checkbox';
+import { useAuth } from '@/hooks/useAuth';
+import { useToast } from '@/hooks/use-toast';
 
 interface Message {
     role: 'user' | 'agent';
@@ -48,6 +49,8 @@ const MARKET_KNOWLEDGE = [
 ];
 
 export function InteractiveAgentCreator() {
+    const { user } = useAuth();
+    const { toast } = useToast();
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
     const [agentName, setAgentName] = useState('Agent');
     const [agentTone, setAgentTone] = useState('Professional & Persuasive');
@@ -58,6 +61,8 @@ export function InteractiveAgentCreator() {
     const [input, setInput] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [isConnecting, setIsConnecting] = useState(false);
+    const [instagramHandle, setInstagramHandle] = useState('');
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const scrollRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
@@ -74,14 +79,14 @@ export function InteractiveAgentCreator() {
         setMessages(prev => [...prev, { role: 'user', text: userMsg }]);
         setIsLoading(true);
 
-        // Simulate AI Response with customized character logic
+        const history = [...messages, { role: 'user', text: userMsg }].slice(-6);
         try {
             const response = await fetch(`/api/bot/preview/chat`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     message: userMsg,
-                    history: messages.slice(-5),
+                    history,
                     context: `Agent Name: ${agentName}, Tone: ${agentTone}, Knowledge: ${selectedMarkets.join(', ')}`,
                 })
             });
@@ -89,8 +94,49 @@ export function InteractiveAgentCreator() {
             setMessages(prev => [...prev, { role: 'agent', text: data.reply || "I'm processing that market data now. How can I help with your property search?" }]);
         } catch (error) {
             console.error("Chat error:", error);
+            setMessages(prev => [...prev, { role: 'agent', text: "I can help with pricing, projects, or areas. What would you like to know?" }]);
         } finally {
             setIsLoading(false);
+        }
+    };
+
+    const handleRequestConnection = async () => {
+        const handle = instagramHandle.trim();
+        if (!handle) {
+            toast({ title: 'Add your Instagram handle', variant: 'destructive' });
+            return;
+        }
+        if (!user?.email) {
+            toast({ title: 'Sign in to continue', description: 'We need your email to confirm the connection.' });
+            return;
+        }
+        setIsSubmitting(true);
+        try {
+            const res = await fetch('/api/support', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    name: user.displayName || 'Entrestate user',
+                    email: user.email,
+                    topic: 'Chat Assistant',
+                    message: `Please connect Instagram for ${handle}. Markets: ${selectedMarkets.join(', ') || 'UAE'}.`,
+                }),
+            });
+            if (!res.ok) {
+                const data = await res.json();
+                throw new Error(data?.error || 'Request failed');
+            }
+            toast({ title: 'Request sent', description: 'We will reach out shortly to connect your Instagram.' });
+            setInstagramHandle('');
+            setIsConnecting(false);
+        } catch (error: any) {
+            toast({
+                title: 'Could not send',
+                description: error?.message || 'Please try again.',
+                variant: 'destructive',
+            });
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
@@ -109,12 +155,12 @@ export function InteractiveAgentCreator() {
                 isSidebarOpen ? "w-80 md:w-96" : "w-0 overflow-hidden opacity-0 border-none"
             )}>
                 <div className="p-8 border-b border-white/5 flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center">
-                            <Settings2 className="h-4 w-4 text-white" />
+                        <div className="flex items-center gap-2">
+                            <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center">
+                                <Settings2 className="h-4 w-4 text-white" />
+                            </div>
+                            <h3 className="font-bold text-white uppercase tracking-widest text-xs">Assistant Settings</h3>
                         </div>
-                        <h3 className="font-bold text-white uppercase tracking-widest text-xs">Assistant Setup</h3>
-                    </div>
                     <Button variant="ghost" size="icon" className="h-8 w-8 text-zinc-500" onClick={() => setIsSidebarOpen(false)}>
                         <ChevronLeft className="h-5 w-5" />
                     </Button>
@@ -127,7 +173,7 @@ export function InteractiveAgentCreator() {
                         <div className="space-y-6">
                             <div className="flex items-center gap-2 text-blue-500">
                                 <User className="h-4 w-4" />
-                                <span className="text-[10px] font-black uppercase tracking-[0.2em]">Assistant Profile</span>
+                                <span className="text-[10px] font-black uppercase tracking-[0.2em]">Assistant Details</span>
                             </div>
                             <div className="space-y-4">
                                 <div className="space-y-2">
@@ -140,7 +186,7 @@ export function InteractiveAgentCreator() {
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Conversation Tone</label>
+                                    <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Tone</label>
                                     <select 
                                         value={agentTone}
                                         onChange={(e) => setAgentTone(e.target.value)}
@@ -159,7 +205,7 @@ export function InteractiveAgentCreator() {
                         <div className="space-y-6">
                              <div className="flex items-center gap-2 text-emerald-500">
                                 <Database className="h-4 w-4" />
-                                <span className="text-[10px] font-black uppercase tracking-[0.2em]">Market Focus</span>
+                                <span className="text-[10px] font-black uppercase tracking-[0.2em]">Market Coverage</span>
                             </div>
                             <div className="grid grid-cols-1 gap-2">
                                 {MARKET_KNOWLEDGE.map((market) => (
@@ -189,7 +235,7 @@ export function InteractiveAgentCreator() {
                         <div className="pt-6 border-t border-white/5 space-y-6">
                             <div className="p-6 rounded-2xl bg-blue-600 text-white space-y-4">
                                 <h4 className="font-bold leading-tight">Connect Instagram</h4>
-                                <p className="text-[10px] opacity-80 leading-relaxed">Connect Instagram to activate your assistant and start capturing leads.</p>
+                                <p className="text-[10px] opacity-80 leading-relaxed">We will connect your Instagram and turn on auto replies.</p>
                                 <Button 
                                     className="w-full bg-white text-blue-600 font-bold hover:bg-zinc-100 rounded-xl h-12 gap-2"
                                     onClick={() => setIsConnecting(true)}
@@ -228,7 +274,7 @@ export function InteractiveAgentCreator() {
                                 <h2 className="font-black text-white italic uppercase tracking-tighter text-xl">{agentName}</h2>
                                 <Badge className="bg-green-500/10 text-green-500 border-0 text-[8px] font-black uppercase">Online</Badge>
                             </div>
-                            <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-[0.2em] mt-0.5">Custom Entrestate Build</p>
+                            <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-[0.2em] mt-0.5">Your assistant is ready</p>
                         </div>
                     </div>
                     
@@ -304,7 +350,7 @@ export function InteractiveAgentCreator() {
                             </Button>
                         </div>
                     </div>
-                    <p className="text-center text-[10px] text-zinc-600 font-bold uppercase tracking-[0.3em] mt-4">Powered by Entrestate Intelligence</p>
+                    <p className="text-center text-[10px] text-zinc-600 font-bold uppercase tracking-[0.3em] mt-4">Powered by Entrestate AI</p>
                 </div>
 
             </div>
@@ -318,31 +364,37 @@ export function InteractiveAgentCreator() {
                                 <Instagram className="h-12 w-12 text-white" />
                             </div>
                             <div>
-                                <h3 className="text-4xl font-black italic uppercase tracking-tighter">Connect to Instagram.</h3>
-                                <p className="text-zinc-500 text-lg font-light mt-2">Activate your assistant and unlock the full experience.</p>
+                                <h3 className="text-4xl font-black italic uppercase tracking-tighter">Connect Instagram</h3>
+                                <p className="text-zinc-500 text-lg font-light mt-2">Share your handle and we will connect it for you.</p>
                             </div>
                         </CardHeader>
-                        <CardContent className="p-12 pt-0 space-y-10">
-                            <div className="space-y-4">
-                                <div className="flex justify-between items-center py-4 border-b border-white/5">
-                                    <span className="text-zinc-400 font-medium">Monthly Platform Fee</span>
-                                    <span className="text-white font-black text-xl">$19.00</span>
-                                </div>
-                                <div className="flex justify-between items-center py-4 border-b border-white/5">
-                                    <span className="text-zinc-400 font-medium">Meta Connection</span>
-                                    <span className="text-green-500 font-black text-xs uppercase tracking-widest">Included</span>
-                                </div>
+                        <CardContent className="p-12 pt-0 space-y-8">
+                            <div className="space-y-2">
+                                <label className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">Instagram handle</label>
+                                <Input
+                                    value={instagramHandle}
+                                    onChange={(e) => setInstagramHandle(e.target.value)}
+                                    placeholder="@youragency"
+                                    className="h-12 bg-black/40 border-white/10 text-white"
+                                />
                             </div>
 
-                            <Button className="w-full h-20 rounded-3xl bg-blue-600 hover:bg-blue-700 text-white font-black text-2xl shadow-2xl flex flex-col justify-center items-center gap-1 group">
-                                <span>Pay & Activate Now</span>
-                                <span className="text-[10px] font-bold uppercase tracking-[0.2em] opacity-60 group-hover:opacity-100 transition-opacity">Instant Setup</span>
+                            <Button
+                                className="w-full h-14 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-black text-lg shadow-2xl"
+                                onClick={handleRequestConnection}
+                                disabled={isSubmitting}
+                            >
+                                {isSubmitting ? <Loader2 className="h-5 w-5 animate-spin" /> : 'Request Connection'}
                             </Button>
 
                             <div className="flex flex-col items-center gap-4">
-                                <button className="text-zinc-600 font-bold uppercase tracking-widest text-[10px] hover:text-zinc-400 transition-colors" onClick={() => setIsConnecting(false)}>Maybe Later</button>
+                                <button
+                                    className="text-zinc-600 font-bold uppercase tracking-widest text-[10px] hover:text-zinc-400 transition-colors"
+                                    onClick={() => setIsConnecting(false)}
+                                >
+                                    Maybe Later
+                                </button>
                                 <div className="flex gap-6 opacity-40">
-                                    <CreditCard className="h-5 w-5" />
                                     <Lock className="h-5 w-5" />
                                     <Globe className="h-5 w-5" />
                                 </div>

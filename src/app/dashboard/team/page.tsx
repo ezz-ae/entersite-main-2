@@ -19,18 +19,18 @@ export default function TeamDashboardPage() {
       <div className="space-y-8">
         <div className="flex justify-between items-center">
             <div>
-                <h1 className="text-3xl font-bold tracking-tight">Team Management</h1>
-                <p className="text-muted-foreground">Invite colleagues and manage access permissions.</p>
+                <h1 className="text-3xl font-bold tracking-tight">Team</h1>
+                <p className="text-muted-foreground">Invite teammates and control access.</p>
             </div>
             <Button className="gap-2">
-                <Plus className="h-4 w-4" /> Invite Member
+                <Plus className="h-4 w-4" /> Invite Teammate
             </Button>
         </div>
 
         <Card>
             <CardHeader>
-                <CardTitle>Active Members</CardTitle>
-                <CardDescription>Manage who has access to your workspace.</CardDescription>
+                <CardTitle>Team Members</CardTitle>
+                <CardDescription>See who can access your workspace.</CardDescription>
             </CardHeader>
             <CardContent>
                 <div className="space-y-6">
@@ -62,7 +62,7 @@ export default function TeamDashboardPage() {
                                         </Button>
                                     </DropdownMenuTrigger>
                                     <DropdownMenuContent align="end">
-                                        <DropdownMenuItem>Edit Role</DropdownMenuItem>
+                                        <DropdownMenuItem>Edit Access</DropdownMenuItem>
                                         <DropdownMenuItem className="text-red-600">
                                             <Trash2 className="h-4 w-4 mr-2" /> Remove
                                         </DropdownMenuItem>
@@ -77,7 +77,7 @@ export default function TeamDashboardPage() {
 
         <Card>
             <CardHeader>
-                <CardTitle>Pending Invitations</CardTitle>
+                <CardTitle>Invites Pending</CardTitle>
             </CardHeader>
             <CardContent>
                  <div className="flex gap-2">
