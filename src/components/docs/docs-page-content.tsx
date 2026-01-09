@@ -21,7 +21,7 @@ const DOCS_CATEGORIES = [
     title: 'Start Here',
     icon: Zap,
     links: [
-      { label: 'Set up your workspace', href: '#setup' },
+      { label: 'Get your workspace ready', href: '#setup' },
       { label: 'Add your inventory', href: '#inventory' },
       { label: 'Build your first page', href: '#website' },
       { label: 'Capture leads', href: '#leads' },
@@ -41,8 +41,8 @@ const DOCS_CATEGORIES = [
     title: 'Domains & Branding',
     icon: Globe,
     links: [
-      { label: 'Connect your domain', href: '#domain' },
-      { label: 'Set your logo & colors', href: '#branding' },
+      { label: 'Connect your web address', href: '#domain' },
+      { label: 'Choose your logo & colors', href: '#branding' },
       { label: 'Team access', href: '#team' },
       { label: 'Privacy & security', href: '#security' },
     ],
@@ -54,7 +54,7 @@ const DOCS_CATEGORIES = [
       { label: 'Talk to support', href: '#support' },
       { label: 'Book a walkthrough', href: '#support' },
       { label: 'Emergency help', href: '#support' },
-      { label: 'Account access', href: '#support' },
+      { label: 'Login help', href: '#support' },
     ],
   },
 ];
@@ -62,7 +62,7 @@ const DOCS_CATEGORIES = [
 const GUIDE_SECTIONS = [
   {
     id: 'setup',
-    title: 'Set Up Your Workspace',
+    title: 'Get Your Workspace Ready',
     subtitle: 'Get your profile ready in a few minutes.',
     steps: [
       'Add your logo, brand colors, and contact number.',
@@ -105,9 +105,9 @@ const GUIDE_SECTIONS = [
     title: 'Launch Google Ads',
     subtitle: 'Start with a simple campaign you can grow.',
     steps: [
-      'Request setup from the dashboard (no account needed).',
+      'Start Google Ads from the dashboard (no billing needed).',
       'Pick a budget and the area you want to target.',
-      'We set up the ads and keep you updated.',
+      'We launch the ads and keep you updated.',
     ],
   },
   {
@@ -142,17 +142,17 @@ const GUIDE_SECTIONS = [
   },
   {
     id: 'domain',
-    title: 'Connect Your Domain',
+    title: 'Connect Your Web Address',
     subtitle: 'Use your own website name.',
     steps: [
-      'Add your domain in the Domain section.',
-      'Copy the two values we show and paste them at your domain provider.',
+      'Add your web address in the Web Address section.',
+      'Copy the two lines we show and paste them where you bought your web address.',
       'We’ll confirm when it is connected.',
     ],
   },
   {
     id: 'branding',
-    title: 'Set Your Logo & Colors',
+    title: 'Choose Your Logo & Colors',
     subtitle: 'Keep everything on-brand.',
     steps: [
       'Upload your logo in the Brand area.',
@@ -176,7 +176,7 @@ const GUIDE_SECTIONS = [
     subtitle: 'Keep your data and leads protected.',
     steps: [
       'Only share pages you want public.',
-      'Use strong passwords for team accounts.',
+      'Use strong passwords for team logins.',
       'Contact support if you see anything unusual.',
     ],
   },
@@ -195,14 +195,14 @@ export function DocsPageContent() {
             <span className="text-zinc-600">Center.</span>
           </h1>
           <p className="text-xl text-zinc-400 font-light max-w-2xl mx-auto">
-            Simple steps for real estate teams. Clear answers, fast setup, and real support.
+            Simple steps for real estate teams. Clear answers, fast start, and real support.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
             <Link
               href="#setup"
               className="h-12 px-6 rounded-full border border-white/10 bg-white/5 text-white font-bold text-xs uppercase tracking-widest inline-flex items-center gap-2 hover:bg-white/10 transition-all"
             >
-              Start Setup <ArrowRight className="h-4 w-4" />
+              Get Started <ArrowRight className="h-4 w-4" />
             </Link>
             <Link
               href="#inventory"

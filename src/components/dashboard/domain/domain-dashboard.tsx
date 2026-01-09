@@ -68,7 +68,7 @@ export function DomainDashboard() {
       if (res.ok) {
         if (data.records?.length) {
           setVerificationRecords(data.records);
-          toast({ title: "Verification Started", description: "Add these two records at your domain provider to connect your site." });
+          toast({ title: "Connection started", description: "Add these two lines where you bought your web address to connect your site." });
           try {
             const refresh = await authorizedFetch('/api/sites');
             const refreshData = await refresh.json();
@@ -79,10 +79,10 @@ export function DomainDashboard() {
             console.error('Failed to refresh sites', refreshError);
           }
         } else {
-          toast({ title: "Connected", description: "Domain request submitted. DNS updates may take a few minutes." });
+          toast({ title: "Connected", description: "Connection request sent. Updates may take a few minutes." });
         }
       } else {
-        toast({ title: "Verification Failed", description: data.error || data.message || "Could not verify domain.", variant: 'destructive' });
+        toast({ title: "Connection failed", description: data.error || data.message || "Could not connect web address.", variant: 'destructive' });
       }
     } catch (error) {
       toast({ title: "Error", description: "An unexpected error occurred.", variant: 'destructive' });
@@ -107,7 +107,7 @@ export function DomainDashboard() {
       if (res.ok) {
         toast({
           title: 'Request sent',
-          description: 'We will purchase the domain and connect it to your site.',
+          description: 'We will buy the web address and connect it to your site.',
         });
         setPurchaseDomain('');
       } else {
@@ -133,8 +133,8 @@ export function DomainDashboard() {
     <div className="space-y-12 animate-in fade-in duration-700">
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-3xl font-bold tracking-tight text-white uppercase italic">Domains</h2>
-          <p className="text-zinc-500">Manage your domains and connect them to your sites.</p>
+          <h2 className="text-3xl font-bold tracking-tight text-white uppercase italic">Web Addresses</h2>
+          <p className="text-zinc-500">Connect your web address to your site.</p>
         </div>
         <div className="flex gap-2">
            <Badge variant="outline" className="bg-blue-500/10 text-blue-500 border-blue-500/20 px-3 py-1">
@@ -152,12 +152,12 @@ export function DomainDashboard() {
                         <Globe className="h-6 w-6 text-purple-500" />
                         Your Live Sites
                     </CardTitle>
-                    <CardDescription>Domains you have connected to your account.</CardDescription>
+                    <CardDescription>Your published and draft sites.</CardDescription>
                 </CardHeader>
                 <CardContent className="p-8 pt-0">
                     <div className="space-y-4">
                         {sites.length === 0 ? (
-                          <p className="text-sm text-zinc-500">No sites yet. Build your first site to connect a domain.</p>
+                          <p className="text-sm text-zinc-500">No sites yet. Build your first site to connect a web address.</p>
                         ) : (
                           sites.map((site) => (
                               <div key={site.id} className="flex items-center justify-between p-4 bg-black/40 border border-white/5 rounded-2xl">
@@ -192,9 +192,9 @@ export function DomainDashboard() {
               <CardHeader className="p-8 pb-4">
                  <CardTitle className="text-2xl font-bold flex items-center gap-3">
                     <Globe className="h-6 w-6 text-blue-500" />
-                    Connect a Domain
+                    Connect a Web Address
                  </CardTitle>
-                 <CardDescription>Already own a domain? Connect it to your site.</CardDescription>
+                 <CardDescription>Already own a web address? Connect it to your site.</CardDescription>
               </CardHeader>
               <CardContent className="p-8 pt-0 space-y-6">
                  <div className="space-y-2">
@@ -223,7 +223,7 @@ export function DomainDashboard() {
                         disabled={!domain || isVerifying || !selectedSiteId}
                         className="h-14 px-8 bg-white text-black font-bold rounded-2xl min-w-[140px]"
                     >
-                        {isVerifying ? <Loader2 className="h-5 w-5 animate-spin" /> : "Verify"}
+                        {isVerifying ? <Loader2 className="h-5 w-5 animate-spin" /> : "Connect"}
                     </Button>
                  </div>
                  
@@ -233,7 +233,7 @@ export function DomainDashboard() {
                         animate={{ opacity: 1, y: 0 }}
                         className="space-y-4 pt-4 border-t border-white/5"
                      >
-                        <p className="text-xs font-bold text-zinc-500 uppercase tracking-widest px-1">Domain Records to Add</p>
+                        <p className="text-xs font-bold text-zinc-500 uppercase tracking-widest px-1">Add these two lines</p>
                         <div className="grid grid-cols-1 gap-3">
                             {verificationRecords.map((record, index) => (
                                 <DnsRecordRow key={index} type={record.type} name={record.name} value={record.value} onCopy={copyValue} />
@@ -249,13 +249,13 @@ export function DomainDashboard() {
               <CardHeader className="p-8 pb-4">
                  <CardTitle className="text-2xl font-bold flex items-center gap-3">
                     <ShieldCheck className="h-6 w-6 text-emerald-500" />
-                    Buy a Domain
+                    Buy a Web Address
                  </CardTitle>
-                 <CardDescription>We will purchase it through Namecheap or Vercel and connect it for you.</CardDescription>
+                 <CardDescription>We will buy it for you and connect it to your site.</CardDescription>
               </CardHeader>
               <CardContent className="p-8 pt-0 space-y-6">
                  <div className="space-y-2">
-                    <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Choose Provider</p>
+                    <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Delivery Speed</p>
                     <div className="grid grid-cols-2 gap-3">
                       <Button
                         type="button"
@@ -269,7 +269,7 @@ export function DomainDashboard() {
                         onClick={() => setPurchaseProvider('namecheap')}
                         disabled={isPurchasing}
                       >
-                        Namecheap
+                        Standard
                       </Button>
                       <Button
                         type="button"
@@ -283,7 +283,7 @@ export function DomainDashboard() {
                         onClick={() => setPurchaseProvider('vercel')}
                         disabled={isPurchasing}
                       >
-                        Vercel
+                        Priority
                       </Button>
                     </div>
                  </div>
@@ -302,7 +302,7 @@ export function DomainDashboard() {
                     </select>
                  </div>
                  <div className="space-y-2">
-                    <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Domain Name</p>
+                    <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Web Address</p>
                     <Input 
                         placeholder="e.g. dubaihomefinder.com" 
                         className="bg-black/40 border-white/10 h-14 text-lg rounded-2xl text-white"
@@ -315,7 +315,7 @@ export function DomainDashboard() {
                     disabled={!purchaseDomain || isPurchasing || !selectedSiteId}
                     className="h-14 px-8 bg-white text-black font-bold rounded-2xl w-full"
                  >
-                    {isPurchasing ? <Loader2 className="h-5 w-5 animate-spin" /> : "Request Purchase"}
+                    {isPurchasing ? <Loader2 className="h-5 w-5 animate-spin" /> : "Buy for me"}
                  </Button>
               </CardContent>
            </Card>
@@ -332,11 +332,11 @@ export function DomainDashboard() {
               </CardHeader>
               <CardContent className="p-8 pt-0 space-y-6 relative z-10">
                  <p className="text-blue-100 text-lg font-light leading-relaxed">
-                    Custom domains on our platform use fast, reliable hosting to keep your site quick and secure.
+                    Your custom web address runs on fast hosting so your site stays quick and secure.
                  </p>
                  <div className="space-y-4 pt-4 border-t border-blue-500">
                     <FeatureItem text="Fast worldwide delivery" />
-                    <FeatureItem text="Automatic HTTPS" />
+                    <FeatureItem text="Secure browsing" />
                     <FeatureItem text="Instant updates" />
                  </div>
               </CardContent>
@@ -356,7 +356,7 @@ function DnsRecordRow({ type, name, value, onCopy }: any) {
                 </div>
                 <div className="flex gap-10">
                     <div>
-                        <p className="text-[8px] font-black text-zinc-600 uppercase mb-1 tracking-widest">Host</p>
+                        <p className="text-[8px] font-black text-zinc-600 uppercase mb-1 tracking-widest">Name</p>
                         <p className="text-sm font-mono text-white">{name}</p>
                     </div>
                     <div>

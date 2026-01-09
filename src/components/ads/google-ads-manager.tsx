@@ -129,8 +129,8 @@ export function GoogleAdsManager({
           }
           setStatus('active');
           toast({
-              title: "Campaign Funded & Active!",
-              description: `Campaign is now live in your ads dashboard.`,
+              title: "Campaign live!",
+              description: `Your ads are now live.`,
           });
       } catch (error: any) {
           toast({
@@ -192,8 +192,8 @@ export function GoogleAdsManager({
                     <Loader2 className="h-16 w-16 text-blue-500 animate-spin relative z-10" />
                </div>
                <div className="text-center">
-                    <h3 className="text-2xl font-black italic uppercase tracking-tighter">Processing Payment...</h3>
-                    <p className="text-zinc-500 text-sm font-medium mt-2">Setting up your ad account...</p>
+                    <h3 className="text-2xl font-black italic uppercase tracking-tighter">Finalizing launch...</h3>
+                    <p className="text-zinc-500 text-sm font-medium mt-2">Getting your ads ready...</p>
                </div>
           </div>
       )
@@ -209,7 +209,7 @@ export function GoogleAdsManager({
                       </div>
                       <div>
                           <h3 className="font-bold text-white text-lg tracking-tight">Campaign Active: {pageTitle}</h3>
-                          <p className="text-xs text-blue-400 font-bold uppercase tracking-widest mt-1">Managed Placement • High Health</p>
+                          <p className="text-xs text-blue-400 font-bold uppercase tracking-widest mt-1">Managed by Entrestate • Running well</p>
                       </div>
                   </div>
                   <Badge className="bg-blue-600 text-white px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest">Live</Badge>
@@ -241,8 +241,8 @@ export function GoogleAdsManager({
         <CardHeader className="p-10 border-b border-white/5">
             <div className="flex justify-between items-start">
                 <div>
-                    <CardTitle className="text-3xl font-bold tracking-tight text-white">Ad Setup Center</CardTitle>
-                    <CardDescription className="text-zinc-500 text-lg">Managed Google Ads placement for {pageTitle}.</CardDescription>
+                    <CardTitle className="text-3xl font-bold tracking-tight text-white">Ad Launch Center</CardTitle>
+                    <CardDescription className="text-zinc-500 text-lg">We run Google Ads for {pageTitle}.</CardDescription>
                 </div>
                 {adData && <Badge className="bg-blue-600/10 text-blue-500 border-blue-500/20 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest">Smart Strategy Active</Badge>}
             </div>
@@ -252,7 +252,7 @@ export function GoogleAdsManager({
             {status === 'generating' ? (
                 <div className="h-64 flex flex-col items-center justify-center space-y-6">
                     <Loader2 className="h-12 w-12 animate-spin text-blue-500" />
-                    <p className="text-zinc-500 font-bold uppercase tracking-[0.3em] animate-pulse">Finding High-Intent Keywords...</p>
+                    <p className="text-zinc-500 font-bold uppercase tracking-[0.3em] animate-pulse">Finding the best search keywords...</p>
                 </div>
             ) : !adData ? (
                  <div className="space-y-6">
@@ -329,7 +329,7 @@ export function GoogleAdsManager({
                             </div>
                         </div>
                         <Button className="w-full h-14 rounded-2xl bg-white text-black font-bold" onClick={() => setActiveTab("keywords")}>
-                            Next: Targeted Keywords <ChevronRight className="ml-2 h-5 w-5" />
+                            Next: Search Keywords <ChevronRight className="ml-2 h-5 w-5" />
                         </Button>
                     </TabsContent>
 
@@ -347,7 +347,7 @@ export function GoogleAdsManager({
                                 <div>
                                     <p className="text-[10px] font-bold uppercase tracking-widest opacity-60 mb-2">Total Budget</p>
                                     <p className="text-5xl font-black">${(budget[0] * 30).toLocaleString()}</p>
-                                    <p className="text-xs font-bold opacity-60 mt-1">First 30 days of placement</p>
+                                    <p className="text-xs font-bold opacity-60 mt-1">First 30 days of ads</p>
                                 </div>
                                 <div className="text-right">
                                     <p className="text-[10px] font-bold uppercase tracking-widest opacity-60 mb-2">Est. Qualified Leads</p>
@@ -358,8 +358,8 @@ export function GoogleAdsManager({
                                 <CreditCard className="mr-3 h-6 w-6" /> Confirm & Launch
                              </Button>
                              <div className="mt-6 flex items-center justify-center gap-6 opacity-60">
-                                <div className="flex items-center gap-2 text-[8px] font-bold uppercase tracking-widest"><Lock className="h-3 w-3" /> PCI Compliant</div>
-                                <div className="flex items-center gap-2 text-[8px] font-bold uppercase tracking-widest"><Target className="h-3 w-3" /> Campaign Sync</div>
+                                <div className="flex items-center gap-2 text-[8px] font-bold uppercase tracking-widest"><Lock className="h-3 w-3" /> Secure checkout</div>
+                                <div className="flex items-center gap-2 text-[8px] font-bold uppercase tracking-widest"><Target className="h-3 w-3" /> Auto-launch</div>
                              </div>
                         </div>
                     </TabsContent>

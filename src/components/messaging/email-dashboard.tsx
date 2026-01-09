@@ -278,7 +278,7 @@ export function EmailCampaignDashboard() {
                 Pilot list ({counts.pilot})
               </Button>
               <div className="rounded-2xl border border-white/5 bg-black/40 p-4 text-sm text-zinc-500">
-                Pilot list is managed by Entrestate. We only send when you request it.
+                Pilot list is managed by Entrestate. We only send when you start a campaign.
               </div>
             </CardContent>
           </Card>
@@ -289,7 +289,7 @@ export function EmailCampaignDashboard() {
                 <Send className="h-4 w-4" /> Delivery
               </div>
               <p className="text-sm text-zinc-200">We send to up to 50 contacts per campaign for safety.</p>
-              <Badge className="bg-blue-600/20 text-blue-200 border-0">Can expand on request</Badge>
+              <Badge className="bg-blue-600/20 text-blue-200 border-0">Can expand if needed</Badge>
             </CardContent>
           </Card>
         </div>

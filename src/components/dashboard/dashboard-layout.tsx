@@ -13,8 +13,7 @@ import {
   ImageIcon, 
   CreditCard, 
   LogOut, 
-  Palette,
-  Briefcase
+  Palette
 } from 'lucide-react';
 import { EntreSiteLogo } from '@/components/icons';
 import { Button } from '@/components/ui/button';
@@ -31,14 +30,13 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
   const navigation = [
     { name: 'Overview', href: '/dashboard', icon: LayoutDashboard },
     { name: 'My Sites', href: '/dashboard/sites', icon: Globe },
-    { name: 'Domain', href: '/dashboard/domain', icon: Globe },
-    { name: 'Marketing & Ads', href: '/dashboard/marketing', icon: Megaphone },
-    { name: 'CRM & Leads', href: '/dashboard/leads', icon: Users },
-    { name: 'AI Tools', href: '/dashboard/ai-tools', icon: Bot },
-    { name: 'Assets', href: '/dashboard/assets', icon: ImageIcon },
-    { name: 'Brand Kit', href: '/dashboard/brand', icon: Palette },
+    { name: 'Web Address', href: '/dashboard/domain', icon: Globe },
+    { name: 'Marketing', href: '/dashboard/marketing', icon: Megaphone },
+    { name: 'Leads', href: '/dashboard/leads', icon: Users },
+    { name: 'AI Studio', href: '/dashboard/ai-tools', icon: Bot },
+    { name: 'Media', href: '/dashboard/assets', icon: ImageIcon },
+    { name: 'Brand', href: '/dashboard/brand', icon: Palette },
     { name: 'Team', href: '/dashboard/team', icon: Users },
-    { name: 'Jobs', href: '/admin/jobs', icon: Briefcase },
   ];
   
   const bottomNavigation = [

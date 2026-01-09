@@ -139,7 +139,7 @@ export default function LeadCrmPage() {
     if (!user) {
       setLeads([]);
       setLoading(false);
-      setError('Please sign in to access your lead intelligence dashboard.');
+      setError('Please sign in to access your lead dashboard.');
       return;
     }
     loadLeads();
@@ -408,7 +408,7 @@ export default function LeadCrmPage() {
              <Card id="lead-settings" className="bg-zinc-950 border-white/5 rounded-[2.5rem] p-10 space-y-8">
                 <div className="space-y-2">
                     <h4 className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Lead Notifications</h4>
-                    <p className="text-sm text-zinc-400">Every new lead is sent to this email.</p>
+                    <p className="text-sm text-zinc-400">We email you every new lead.</p>
                     <Input
                         placeholder="you@brokerage.com"
                         className="bg-black/40 border-white/10 h-12 rounded-xl"
@@ -418,8 +418,8 @@ export default function LeadCrmPage() {
                     />
                 </div>
                 <div className="space-y-2">
-                    <h4 className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">CRM Destination</h4>
-                    <p className="text-sm text-zinc-400">Default is HubSpot. Choose where new leads sync.</p>
+                    <h4 className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Lead Destination</h4>
+                    <p className="text-sm text-zinc-400">Default is HubSpot. Choose where new leads go.</p>
                     <div className="grid grid-cols-2 gap-3">
                       <Button
                         type="button"
@@ -447,7 +447,7 @@ export default function LeadCrmPage() {
                         onClick={() => setCrmProvider('custom')}
                         disabled={settingsLoading}
                       >
-                        Custom Webhook
+                        Custom Link
                       </Button>
                     </div>
                     {crmProvider === 'hubspot' ? (
@@ -456,18 +456,18 @@ export default function LeadCrmPage() {
                         hubspotAvailable ? "text-emerald-400" : "text-amber-400"
                       )}>
                         {hubspotAvailable
-                          ? "HubSpot is connected. New leads sync automatically."
-                          : "HubSpot is not connected yet. Add HUBSPOT_ACCESS_TOKEN or switch to Custom."
+                          ? "HubSpot is connected. New leads go there automatically."
+                          : "HubSpot is not connected yet. We can connect it for you, or use Custom Link."
                         }
                       </p>
                     ) : (
-                      <p className="text-xs text-zinc-500">Use any CRM that accepts a webhook link.</p>
+                      <p className="text-xs text-zinc-500">Use any CRM that can receive new leads from a link.</p>
                     )}
                 </div>
                 {crmProvider === 'custom' && (
                   <div className="space-y-2">
-                      <h4 className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">CRM Connection Link</h4>
-                      <p className="text-sm text-zinc-400">Paste your CRM connection link to auto-send new leads.</p>
+                      <h4 className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Lead Delivery Link</h4>
+                      <p className="text-sm text-zinc-400">Paste your CRM link to send new leads there automatically.</p>
                       <Input
                           placeholder="https://connect.your-crm.com/lead"
                           className="bg-black/40 border-white/10 h-12 rounded-xl"
@@ -482,14 +482,14 @@ export default function LeadCrmPage() {
                     onClick={handleSaveSettings}
                     disabled={settingsSaving || settingsLoading}
                 >
-                    {settingsSaving ? 'Saving…' : 'Save Settings'}
+                    {settingsSaving ? 'Saving…' : 'Save'}
                 </Button>
                 {settingsMessage && (
                     <p className="text-xs text-green-500 font-semibold">{settingsMessage}</p>
                 )}
                 <Separator className="bg-white/5" />
                 <p className="text-xs text-zinc-500">
-                    Need a different CRM? Share your request and we will wire it up.
+                    Need another CRM? Tell us and we will connect it.
                 </p>
              </Card>
           </div>

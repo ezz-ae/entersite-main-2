@@ -8,7 +8,7 @@ import { Card } from '@/components/ui/card';
 const CHANNELS = [
   {
     title: 'Google Ads',
-    description: 'Launch and monitor search campaigns.',
+    description: 'Launch and track your ads.',
     href: '/dashboard/google-ads',
     icon: Search,
   },
@@ -26,7 +26,7 @@ const CHANNELS = [
   },
   {
     title: 'Buyer Audience',
-    description: 'Activate your buyer list for ads.',
+    description: 'Use your buyer list for ads.',
     href: '/dashboard/meta-audience',
     icon: Users,
   },
@@ -41,7 +41,7 @@ export default function MarketingDashboardPage() {
           <p className="text-zinc-500">Pick a channel to get started.</p>
         </div>
         <div className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-zinc-500">
-          <Megaphone className="h-4 w-4" /> Simple setup
+          <Megaphone className="h-4 w-4" /> Quick start
         </div>
       </div>
 

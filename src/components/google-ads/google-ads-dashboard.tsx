@@ -167,7 +167,7 @@ export function GoogleAdsDashboard() {
       }
       toast({
         title: 'Campaign launched',
-        description: 'Your ads are being activated in our master account.',
+        description: 'Your ads are being activated by our team.',
       });
       setLandingPage('');
       setNotes('');
@@ -189,11 +189,11 @@ export function GoogleAdsDashboard() {
         <div>
           <h1 className="text-4xl font-black tracking-tight text-white uppercase">Google Ads</h1>
           <p className="text-zinc-500 text-lg font-light">
-            We launch your campaigns inside our managed account, no Google billing setup required.
+            We launch your ads for you. No Google billing needed.
           </p>
         </div>
         <Badge className="bg-green-500/10 text-green-400 border border-green-500/20 px-4 py-2 uppercase tracking-widest text-[10px]">
-          Managed Setup
+          Managed Launch
         </Badge>
       </div>
 

@@ -10,28 +10,28 @@ const START_OPTIONS = [
   {
     id: 'website',
     label: 'Website',
-    description: 'Create a project landing page with your branding.',
+    description: 'Create a project page with your branding.',
     href: '/builder',
     icon: Globe,
   },
   {
     id: 'sms',
     label: 'SMS Campaign',
-    description: 'Set up SMS outreach for new listings.',
+    description: 'Send SMS updates for new listings.',
     href: '/start/sms',
     icon: Smartphone,
   },
   {
     id: 'email',
     label: 'Email Campaign',
-    description: 'Launch a simple email follow-up flow.',
+    description: 'Send a simple email follow-up.',
     href: '/start/email',
     icon: Mail,
   },
   {
     id: 'ads',
     label: 'Ads Launch',
-    description: 'Request Google Ads setup and launch your first campaign.',
+    description: 'Launch Google Ads in a few clicks.',
     href: '/dashboard/google-ads',
     icon: Target,
   },
@@ -65,7 +65,7 @@ export function OnboardingFlow() {
         <p className="text-[10px] font-bold uppercase tracking-[0.4em] text-zinc-500">Get Started</p>
         <h1 className="text-4xl md:text-5xl font-black tracking-tight text-white">Pick your next step.</h1>
         <p className="text-zinc-500 max-w-3xl">
-          Choose one path and we will take you to the right setup screen.
+          Choose one path and we will take you to the right screen.
         </p>
       </div>
 

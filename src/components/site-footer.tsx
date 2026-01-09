@@ -84,7 +84,7 @@ export function SiteFooter() {
                     <Zap className="h-4 w-4 fill-blue-500" />
                     <span className="text-[10px] font-black uppercase tracking-widest">System Status</span>
                 </div>
-                <p className="text-zinc-400 text-xs leading-relaxed font-medium mb-4">Core platform is online. Some features are still in pilot or setup mode.</p>
+                <p className="text-zinc-400 text-xs leading-relaxed font-medium mb-4">Core platform is online. Some features are still in pilot or getting ready.</p>
                 <Link href="/status" className="text-white text-[10px] font-black uppercase tracking-widest hover:underline flex items-center gap-2">
                     Live Status Page <ArrowUpRight className="h-3 w-3" />
                 </Link>

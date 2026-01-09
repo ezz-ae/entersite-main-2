@@ -92,8 +92,8 @@ export function AudienceBuilderTool() {
         throw new Error(data?.error || 'Request failed');
       }
       toast({
-        title: 'Request sent',
-        description: 'We will activate your audience and follow up with status updates.',
+        title: 'Activation started',
+        description: 'We will activate your audience and keep you updated.',
       });
       setNotes('');
       setBudget('');
@@ -119,7 +119,7 @@ export function AudienceBuilderTool() {
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 border-b border-white/5 pb-8">
         <div>
           <h2 className="text-4xl font-black tracking-tight text-white uppercase italic">Buyer Audience</h2>
-          <p className="text-zinc-500 text-lg font-light">Activate your buyer list or request a pilot audience.</p>
+          <p className="text-zinc-500 text-lg font-light">Activate your buyer list or join the pilot audience.</p>
         </div>
         <Badge variant="outline" className="bg-blue-500/10 text-blue-500 border-blue-500/20 px-4 py-2 rounded-full">
           <Users className="h-3 w-3 mr-2" /> Audience Ready
@@ -160,16 +160,16 @@ export function AudienceBuilderTool() {
                 <Upload className="h-4 w-4" /> Upload Contact List
               </Button>
               <Badge className="bg-white/5 text-zinc-400 border-white/10 self-start sm:self-center">
-                CSV with email column
+                CSV with emails
               </Badge>
             </div>
           </Card>
 
           <Card className="bg-zinc-950 border-white/5 rounded-[2.5rem] p-8 space-y-6">
             <div>
-              <CardTitle className="text-xl text-white">Request Activation</CardTitle>
+              <CardTitle className="text-xl text-white">Activate Audience</CardTitle>
               <CardDescription className="text-zinc-500">
-                We will prepare your Meta audience and notify you when it is ready.
+                We will prepare your ad audience and notify you when it is ready.
               </CardDescription>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -227,7 +227,7 @@ export function AudienceBuilderTool() {
               disabled={requestLoading}
             >
               {requestLoading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Send className="h-4 w-4 mr-2" />}
-              Request Activation
+              Activate Audience
             </Button>
           </Card>
         </div>
@@ -235,7 +235,7 @@ export function AudienceBuilderTool() {
         <div className="space-y-8">
           <Card className="bg-zinc-900/50 border-white/5 text-white rounded-[2.5rem] overflow-hidden">
             <CardHeader className="p-8 pb-4">
-              <CardTitle>Latest Request</CardTitle>
+              <CardTitle>Latest Activation</CardTitle>
               <CardDescription>We will update this status as soon as it is ready.</CardDescription>
             </CardHeader>
             <CardContent className="p-8 pt-0 space-y-4">
@@ -251,7 +251,7 @@ export function AudienceBuilderTool() {
                   ) : null}
                 </div>
               ) : (
-                <p className="text-sm text-zinc-500">No activation requests yet.</p>
+                <p className="text-sm text-zinc-500">No activations yet.</p>
               )}
             </CardContent>
           </Card>
