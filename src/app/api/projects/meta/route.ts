@@ -27,9 +27,14 @@ function buildMetadata(projects: any[]) {
     areas: Array.from(areas).sort(),
   })).sort((a, b) => a.city.localeCompare(b.city));
 
+  const areasCount = Array.from(locationMap.values()).reduce((sum, areas) => sum + areas.size, 0);
+
   return {
     developers: Array.from(developerSet).sort(),
     locations,
+    total: projects.length,
+    citiesCount: locationMap.size,
+    areasCount,
   };
 }
 
