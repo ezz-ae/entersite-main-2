@@ -59,6 +59,7 @@ export async function POST(req: NextRequest, { params: paramsPromise }: { params
     const prompt = `
 Context: ${payload.context || 'web_widget'}.
 Use simple, non-technical language. If details are missing, say so and offer next steps.
+Ask one question at a time. If the buyer shows interest and contact details are missing, ask for name and WhatsApp or email.
 ${projectContext}
 
 Conversation so far:
