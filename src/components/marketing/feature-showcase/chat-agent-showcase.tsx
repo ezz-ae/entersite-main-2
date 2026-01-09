@@ -87,10 +87,10 @@ export function ChatAgentShowcase() {
             </p>
 
             <div className="grid grid-cols-2 gap-6 pt-6">
-                <Feature icon={Instagram} title="Instagram Bio" desc="Automate lead capture from your bio link." />
-                <Feature icon={MessageSquare} title="WhatsApp Sync" desc="Share brochures and plans instantly." />
+                <Feature icon={Instagram} title="Instagram Inbox" desc="Reply fast and capture details every time." />
+                <Feature icon={MessageSquare} title="WhatsApp Ready" desc="Share brochures and plans instantly." />
                 <Feature icon={Globe} title="Website Chat" desc="We add it to your site for you." />
-                <Feature icon={Zap} title="Up-to-date Answers" desc="Uses your latest pricing and availability." />
+                <Feature icon={Zap} title="Always Accurate" desc="Uses your latest pricing and availability." />
             </div>
 
             <Button asChild size="lg" className="h-16 px-10 rounded-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-lg mt-8 shadow-xl shadow-blue-900/20">

@@ -37,7 +37,7 @@ export function SystemInsights() {
                     <InsightItem 
                         icon={Target} 
                         title="Ad Launch" 
-                        desc="Pick a budget and area, then launch ads with guided setup and clear previews."
+                        desc="Pick a budget and area, then launch ads with guided steps and clear previews."
                     />
                     <InsightItem 
                         icon={Bot} 

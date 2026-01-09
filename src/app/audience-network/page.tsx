@@ -93,7 +93,7 @@ export default function AudienceNetworkPublicPage() {
                             icon={Smartphone}
                             title="SMS VIP Broadcast"
                             desc="Private SMS and WhatsApp sequences for pre-launch updates."
-                            price="Request access"
+                            price="Pilot access"
                             tag="PILOT"
                             color="green"
                         />
@@ -102,7 +102,7 @@ export default function AudienceNetworkPublicPage() {
                             icon={Mail}
                             title="Email Intelligence"
                             desc="Structured email sequences with clear follow-up steps."
-                            price="Request access"
+                            price="Pilot access"
                             tag="PILOT"
                             color="purple"
                         />
@@ -119,7 +119,7 @@ export default function AudienceNetworkPublicPage() {
                                 <Badge className="bg-blue-600 text-white font-black text-[10px] px-4 py-2 rounded-full uppercase tracking-widest border-0">Pilot Access</Badge>
                                 <h2 className="text-5xl md:text-7xl font-black tracking-tighter leading-tight text-white uppercase">Broker-Owned <br/><span className="text-zinc-600 italic uppercase">Audiences.</span></h2>
                                 <p className="text-zinc-500 text-xl font-light leading-relaxed">
-                                    Use your own list or request access to pilot segments. Everything stays controlled by your team and shared only with your approval.
+                                    Use your own list or get invited to pilot segments. Everything stays controlled by your team and shared only with your approval.
                                 </p>
                             </div>
                             <div className="space-y-6">
@@ -198,9 +198,9 @@ function DeliveryCard({ icon: Icon, title, desc, price, tag, color }: any) {
                 <div className="flex items-baseline gap-2">
                     <span className="text-3xl font-black text-white tracking-tighter">{price}</span>
                 </div>
-                <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Requires subscription</p>
+                <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Pilot plan required</p>
                 <Button asChild className="w-full h-14 rounded-2xl bg-white text-black font-black hover:bg-zinc-200">
-                    <Link href="/dashboard/billing">Request Access <ChevronRight className="ml-2 h-4 w-4" /></Link>
+                    <Link href="/dashboard/billing">Join Pilot <ChevronRight className="ml-2 h-4 w-4" /></Link>
                 </Button>
             </div>
         </Card>

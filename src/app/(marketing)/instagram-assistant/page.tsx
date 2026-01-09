@@ -148,7 +148,7 @@ export default function InstagramAssistantPage() {
             <HowItWorksStep
               step="01"
               title="Connect Instagram"
-              desc="Link your Instagram account and choose your response tone."
+              desc="Connect Instagram and choose your reply tone."
             />
             <HowItWorksStep
               step="02"

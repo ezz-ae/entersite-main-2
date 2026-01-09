@@ -35,9 +35,9 @@ export function DomainSearchBlock() {
             <Globe className="h-4 w-4" />
             Your Online Identity
         </div>
-        <h2 className="text-3xl md:text-5xl font-bold tracking-tight mb-6">Find the perfect domain for your brand.</h2>
+        <h2 className="text-3xl md:text-5xl font-bold tracking-tight mb-6">Find the perfect web address for your brand.</h2>
         <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-10">
-            A great domain builds trust and credibility. Search for yours now.
+            A great web address builds trust and credibility. Search for yours now.
         </p>
 
         <form onSubmit={handleSearch} className="max-w-2xl mx-auto flex gap-2">

@@ -207,7 +207,7 @@ export default function DiscoverPage() {
                         ? `Sample listings (${showingCount})`
                         : totalProjects > 0
                           ? `Showing ${showingCount} of ${totalProjects}`
-                          : 'Inventory setup needed'}
+                          : 'Inventory not connected yet'}
                     </span>
                     <div className="w-px h-4 bg-white/10" />
                     <span>{showingSample ? 'Example feed' : `Loaded ${showingCount} of ${totalProjects}`}</span>
@@ -217,10 +217,10 @@ export default function DiscoverPage() {
             {!loading && totalProjects === 0 && !showingSample && (
                 <div className="mb-12 rounded-[2rem] border border-dashed border-white/10 bg-white/5 p-8 text-center space-y-4">
                     <p className="text-lg font-semibold text-white">No inventory connected yet.</p>
-                    <p className="text-sm text-zinc-500">Connect your feed or preview with sample listings.</p>
+                    <p className="text-sm text-zinc-500">Add your listings source or preview with sample listings.</p>
                     <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                         <Button asChild className="h-12 px-6 rounded-full bg-white text-black font-bold">
-                            <a href="/docs#inventory">Connect inventory feed</a>
+                            <a href="/docs#inventory">Add listings source</a>
                         </Button>
                         <Button onClick={handleLoadSample} variant="outline" className="h-12 px-6 rounded-full border-white/10 bg-white/5 text-white font-bold">
                             Add sample listings
