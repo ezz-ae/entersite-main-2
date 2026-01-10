@@ -7,8 +7,8 @@ const API_KEY =
 
 const client = API_KEY ? createGoogleGenerativeAI({ apiKey: API_KEY }) : null;
 
-export const FLASH_MODEL = 'gemini-1.5-flash';
-export const PRO_MODEL = 'gemini-1.5-pro';
+export const FLASH_MODEL = 'gemini-2.5-flash';
+export const PRO_MODEL = 'gemini-2.5-pro';
 export const IMAGE_MODEL = 'imagen-3.0-generate-001';
 
 export function getGoogleModel(modelId: string) {
