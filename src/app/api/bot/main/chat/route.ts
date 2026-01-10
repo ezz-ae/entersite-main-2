@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { generateText } from 'ai';
 import { z } from 'zod';
-import { getGoogleModel, PRO_MODEL } from '@/lib/ai/google';
+import { getGoogleModel, PRO_MODEL, FLASH_MODEL } from '@/lib/ai/google';
 import { mainSystemPrompt } from '@/config/prompts';
 import { formatProjectContext, getRelevantProjects } from '@/server/inventory';
 
@@ -54,11 +54,21 @@ Agent:
       });
       reply = text;
     } catch (error) {
-      console.error('[bot/main/chat] ai error', error);
-      const fallbackList = relevantProjects.slice(0, 3).map(formatProjectContext).join('\n');
-      reply = fallbackList
-        ? `Here are a few options I can share right now:\n${fallbackList}\nTell me your budget and preferred area, and I will narrow it down.`
-        : 'I can help with UAE projects, pricing ranges, and next steps. What area and budget should I focus on?';
+      console.error('[bot/main/chat] pro model error', error);
+      try {
+        const { text } = await generateText({
+          model: getGoogleModel(FLASH_MODEL),
+          system: `${mainSystemPrompt}\nAlways be clear, helpful, and broker-friendly.`,
+          prompt,
+        });
+        reply = text;
+      } catch (fallbackError) {
+        console.error('[bot/main/chat] flash model error', fallbackError);
+        const fallbackList = relevantProjects.slice(0, 3).map(formatProjectContext).join('\n');
+        reply = fallbackList
+          ? `Here are a few options I can share right now:\n${fallbackList}\nTell me your budget and preferred area, and I will narrow it down.`
+          : 'I can help with UAE projects, pricing ranges, and next steps. What area and budget should I focus on?';
+      }
     }
 
     return NextResponse.json({ reply });
