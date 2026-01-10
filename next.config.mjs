@@ -44,6 +44,15 @@ const nextConfig = {
             bodySizeLimit: '4.5mb',
         },
     },
+    async redirects() {
+        return [
+            {
+                source: '/trending',
+                destination: '/instagram-assistant',
+                permanent: true,
+            },
+        ];
+    },
     async rewrites() {
         const rootDomain = process.env.NEXT_PUBLIC_ROOT_DOMAIN || 'entrestate.com';
         const siteDomain = process.env.NEXT_PUBLIC_SITE_DOMAIN || `site.${rootDomain}`;
