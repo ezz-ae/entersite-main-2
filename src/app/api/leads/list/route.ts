@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getAdminDb } from '@/server/firebase-admin';
-import { requireTenantScope, UnauthorizedError, ForbiddenError } from '@/server/auth';
+import { requireRole, UnauthorizedError, ForbiddenError } from '@/server/auth';
+import { ALL_ROLES } from '@/lib/server/roles';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 const querySchema = z.object({
-  tenantId: z.string().optional(),
   limit: z.coerce.number().int().min(1).max(100).default(20),
 });
 
@@ -15,11 +15,10 @@ export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
     const parsed = querySchema.parse({
-      tenantId: searchParams.get('tenantId') || undefined,
       limit: searchParams.get('limit') || undefined,
     });
 
-    const { tenantId } = await requireTenantScope(req, parsed.tenantId);
+    const { tenantId } = await requireRole(req, ALL_ROLES);
 
     const db = getAdminDb();
     const snapshot = await db

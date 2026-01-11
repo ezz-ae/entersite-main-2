@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { requireAuth, UnauthorizedError, ForbiddenError } from '@/server/auth';
+import { requireRole, UnauthorizedError, ForbiddenError } from '@/server/auth';
+import { ADMIN_ROLES } from '@/lib/server/roles';
 
 const API_KEY = process.env.ZIINA_API_KEY;
 const BASE_URL = process.env.ZIINA_BASE_URL || 'https://api.sandbox.ziina.com';
@@ -11,7 +12,7 @@ const requestSchema = z.object({
 
 export async function POST(req: NextRequest) {
   try {
-    await requireAuth(req);
+    await requireRole(req, ADMIN_ROLES);
     if (!API_KEY) {
       return NextResponse.json({ error: 'Ziina is not configured' }, { status: 500 });
     }

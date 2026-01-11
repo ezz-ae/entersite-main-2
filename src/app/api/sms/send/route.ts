@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { enforceRateLimit, getRequestIp } from '@/lib/rate-limit';
-import { requireAuth, UnauthorizedError, ForbiddenError } from '@/server/auth';
+import { requireRole, UnauthorizedError, ForbiddenError } from '@/server/auth';
 import { createApiLogger } from '@/lib/logger';
 import { CAP } from '@/lib/capabilities';
+import { ADMIN_ROLES } from '@/lib/server/roles';
 
 const ACCOUNT_SID = process.env.TWILIO_ACCOUNT_SID;
 const AUTH_TOKEN = process.env.TWILIO_AUTH_TOKEN;
@@ -14,14 +15,13 @@ const RATE_LIMIT_MAX = 10;
 const payloadSchema = z.object({
   to: z.string().min(5),
   message: z.string().min(1).max(800),
-  tenantId: z.string().optional(),
   siteId: z.string().optional(),
 });
 
 export async function POST(req: NextRequest) {
   const logger = createApiLogger(req, { route: 'POST /api/sms/send' });
   try {
-    await requireAuth(req);
+    const { tenantId } = await requireRole(req, ADMIN_ROLES);
     if (!CAP.twilio || !ACCOUNT_SID || !AUTH_TOKEN || !FROM_NUMBER) {
       logger.logError('Twilio not configured', 500);
       return NextResponse.json({ error: 'Twilio is not configured' }, { status: 500 });
@@ -34,7 +34,7 @@ export async function POST(req: NextRequest) {
     }
 
     const payload = payloadSchema.parse(await req.json());
-    logger.setTenant(payload.tenantId);
+    logger.setTenant(tenantId);
 
     const response = await fetch(`https://api.twilio.com/2010-04-01/Accounts/${ACCOUNT_SID}/Messages.json`, {
       method: 'POST',

@@ -2,7 +2,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { FieldValue } from 'firebase-admin/firestore';
 import { getAdminDb } from '@/server/firebase-admin';
-import { requireTenantScope, UnauthorizedError, ForbiddenError } from '@/server/auth';
+import { requireRole, UnauthorizedError, ForbiddenError } from '@/server/auth';
+import { ALL_ROLES } from '@/lib/server/roles';
 
 const slugify = (value: string) =>
   value
@@ -21,7 +22,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ message: 'Site ID is required' }, { status: 400 });
     }
 
-    const { decoded } = await requireTenantScope(request);
+    const { tenantId, uid } = await requireRole(request, ALL_ROLES);
     const db = getAdminDb();
     const siteRef = db.collection('sites').doc(siteId);
     const siteSnap = await siteRef.get();
@@ -32,7 +33,11 @@ export async function POST(request: NextRequest) {
 
     const siteData = siteSnap.data() || {};
     const ownerUid = siteData.ownerUid as string | undefined;
-    if (ownerUid && ownerUid !== decoded.uid) {
+    const siteTenantId = siteData.tenantId as string | undefined;
+    if (siteTenantId && siteTenantId !== tenantId) {
+      return NextResponse.json({ message: 'Forbidden' }, { status: 403 });
+    }
+    if (!siteTenantId && ownerUid && ownerUid !== uid) {
       return NextResponse.json({ message: 'Forbidden' }, { status: 403 });
     }
 

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAdminDb } from '@/server/firebase-admin';
-import { requireTenantScope, UnauthorizedError, ForbiddenError } from '@/server/auth';
+import { requireRole, UnauthorizedError, ForbiddenError } from '@/server/auth';
+import { ALL_ROLES } from '@/lib/server/roles';
 
 const ALLOWED_CHANNELS = new Set(['email', 'sms']);
 
@@ -12,7 +13,7 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'Invalid channel.' }, { status: 400 });
     }
 
-    const { tenantId } = await requireTenantScope(req);
+    const { tenantId } = await requireRole(req, ALL_ROLES);
     const db = getAdminDb();
 
     const importedSnap = await db

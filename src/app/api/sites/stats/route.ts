@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getAdminDb } from '@/server/firebase-admin';
-import { requireTenantScope, UnauthorizedError, ForbiddenError } from '@/server/auth';
+import { requireRole, UnauthorizedError, ForbiddenError } from '@/server/auth';
+import { ALL_ROLES } from '@/lib/server/roles';
 
 const payloadSchema = z.object({
   siteIds: z.array(z.string().min(1)).min(1),
-  tenantId: z.string().optional(),
 });
 
 type SiteStats = {
@@ -16,8 +16,8 @@ type SiteStats = {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { siteIds, tenantId: requestedTenant } = payloadSchema.parse(body);
-    const { tenantId } = await requireTenantScope(req, requestedTenant);
+    const { siteIds } = payloadSchema.parse(body);
+    const { tenantId } = await requireRole(req, ALL_ROLES);
 
     const db = getAdminDb();
     const tenantRef = db.collection('tenants').doc(tenantId);

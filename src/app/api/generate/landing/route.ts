@@ -1,23 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { FirebaseError } from 'firebase/app';
+import { FieldValue } from 'firebase-admin/firestore';
 import { generateSiteStructure } from '@/lib/ai/vertex-service';
-import { saveSite } from '@/lib/firestore-service';
-import { getAuth } from 'firebase/auth';
+import { getAdminDb } from '@/server/firebase-admin';
+import { requireRole, UnauthorizedError, ForbiddenError } from '@/server/auth';
+import { ALL_ROLES } from '@/lib/server/roles';
 import { SitePage, Block } from '@/lib/types';
-
-// IMPORTANT: This function is using the client-side SDK. 
-// This is not ideal for a production environment.
-// We should migrate this to the Firebase Admin SDK as soon as possible.
 
 export async function POST(req: NextRequest) {
     try {
+        const { tenantId, uid } = await requireRole(req, ALL_ROLES);
         const { projectId, extractedText, language } = await req.json();
-        const auth = getAuth();
-        const user = auth.currentUser;
-
-        if (!user) {
-            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-        }
 
         if (!projectId || !extractedText) {
             return NextResponse.json({ error: 'projectId and extractedText are required' }, { status: 400 });
@@ -38,18 +30,35 @@ export async function POST(req: NextRequest) {
             seo: siteData.seo,
             canonicalListings: [],
             brochureUrl: '',
+            ownerUid: uid,
+            tenantId,
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString(),
         };
 
-        const pageId = await saveSite(user.uid, newSite);
+        const db = getAdminDb();
+        const siteRef = db.collection('sites').doc();
+        const pageId = siteRef.id;
+        await siteRef.set(
+            {
+                ...newSite,
+                id: pageId,
+                projectId: projectId || null,
+                updatedAt: FieldValue.serverTimestamp(),
+                createdAt: FieldValue.serverTimestamp(),
+            },
+            { merge: true },
+        );
 
         return NextResponse.json({ pageId });
     } catch (error) {
         console.error("API Error:", error);
 
-        if (error instanceof FirebaseError) {
-            return NextResponse.json({ error: error.message }, { status: 500 });
+        if (error instanceof UnauthorizedError) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        }
+        if (error instanceof ForbiddenError) {
+            return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
         }
 
         return NextResponse.json({ error: 'An unexpected error occurred.' }, { status: 500 });

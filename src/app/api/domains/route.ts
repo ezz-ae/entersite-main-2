@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { requireTenantScope, UnauthorizedError, ForbiddenError } from '@/server/auth';
+import { requireRole, UnauthorizedError, ForbiddenError } from '@/server/auth';
 import { getAdminDb } from '@/server/firebase-admin';
 import { CAP } from '@/lib/capabilities';
+import { ADMIN_ROLES } from '@/lib/server/roles';
 
 const VERCEL_TOKEN = process.env.VERCEL_API_TOKEN;
 const PROJECT_ID = process.env.VERCEL_PROJECT_ID;
@@ -17,7 +18,7 @@ const normalizeDomain = (value: string) => value.replace(/^https?:\/\//, '').rep
 
 export async function POST(req: NextRequest) {
   try {
-    const { decoded } = await requireTenantScope(req);
+    const { tenantId, uid } = await requireRole(req, ADMIN_ROLES);
     if (!CAP.vercel || !VERCEL_TOKEN || !PROJECT_ID) {
       return NextResponse.json({ error: 'Domain connection is not set up yet.' }, { status: 500 });
     }
@@ -48,7 +49,10 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: 'Site not found' }, { status: 404 });
       }
       const siteData = siteSnap.data() || {};
-      if (siteData.ownerUid && siteData.ownerUid !== decoded.uid) {
+      if (siteData.tenantId && siteData.tenantId !== tenantId) {
+        return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+      }
+      if (!siteData.tenantId && siteData.ownerUid && siteData.ownerUid !== uid) {
         return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
       }
 

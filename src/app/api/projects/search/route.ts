@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { filterProjects, paginateProjects } from '@/lib/projects/filter';
 import { loadInventoryProjects } from '@/server/inventory';
+import { requireRole, UnauthorizedError, ForbiddenError } from '@/server/auth';
+import { ALL_ROLES } from '@/lib/server/roles';
 
 const MAX_DATA_LOAD = 8000;
 
@@ -29,6 +31,7 @@ export async function GET(req: NextRequest) {
   console.log("[projects/search] Incoming Request:", filters);
 
   try {
+    await requireRole(req, ALL_ROLES);
     const source = await loadInventoryProjects(MAX_DATA_LOAD);
     
     if (!source.length) {
@@ -50,6 +53,12 @@ export async function GET(req: NextRequest) {
     });
   } catch (error: any) {
     console.error('[projects/search] Critical Database Error:', error.message);
+    if (error instanceof UnauthorizedError) {
+      return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
+    }
+    if (error instanceof ForbiddenError) {
+      return NextResponse.json({ message: 'Forbidden' }, { status: 403 });
+    }
     return NextResponse.json(
         { message: 'Could not load projects right now. Please try again.' },
         { status: 500 }

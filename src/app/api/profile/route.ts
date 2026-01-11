@@ -2,10 +2,10 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { FieldValue } from 'firebase-admin/firestore';
 import { getAdminDb } from '@/server/firebase-admin';
-import { requireTenantScope, UnauthorizedError, ForbiddenError } from '@/server/auth';
+import { requireRole, UnauthorizedError, ForbiddenError } from '@/server/auth';
+import { ALL_ROLES } from '@/lib/server/roles';
 
 const payloadSchema = z.object({
-  tenantId: z.string().optional(),
   firstName: z.string().trim().min(1).optional().nullable(),
   lastName: z.string().trim().min(1).optional().nullable(),
   companyName: z.string().trim().min(1).optional().nullable(),
@@ -21,9 +21,7 @@ const payloadSchema = z.object({
 
 export async function GET(req: NextRequest) {
   try {
-    const { searchParams } = new URL(req.url);
-    const requestedTenant = searchParams.get('tenantId') || undefined;
-    const { tenantId } = await requireTenantScope(req, requestedTenant);
+    const { tenantId } = await requireRole(req, ALL_ROLES);
 
     const db = getAdminDb();
     const docSnap = await db
@@ -49,7 +47,7 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const payload = payloadSchema.parse(await req.json());
-    const { tenantId } = await requireTenantScope(req, payload.tenantId || undefined);
+    const { tenantId } = await requireRole(req, ALL_ROLES);
 
     const updateData: Record<string, unknown> = {
       updatedAt: FieldValue.serverTimestamp(),

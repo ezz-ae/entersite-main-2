@@ -2,11 +2,11 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { FieldValue } from 'firebase-admin/firestore';
 import { getAdminDb } from '@/server/firebase-admin';
-import { requireTenantScope, UnauthorizedError, ForbiddenError } from '@/server/auth';
+import { requireRole, UnauthorizedError, ForbiddenError } from '@/server/auth';
 import { CAP } from '@/lib/capabilities';
+import { ADMIN_ROLES } from '@/lib/server/roles';
 
 const payloadSchema = z.object({
-  tenantId: z.string().optional(),
   notificationEmail: z.string().email().optional().nullable(),
   crmWebhookUrl: z.string().url().optional().nullable(),
   crmProvider: z.enum(['hubspot', 'custom']).optional().nullable(),
@@ -14,9 +14,7 @@ const payloadSchema = z.object({
 
 export async function GET(req: NextRequest) {
   try {
-    const { searchParams } = new URL(req.url);
-    const requestedTenant = searchParams.get('tenantId') || undefined;
-    const { tenantId } = await requireTenantScope(req, requestedTenant);
+    const { tenantId } = await requireRole(req, ADMIN_ROLES);
 
     const db = getAdminDb();
     const docSnap = await db
@@ -46,7 +44,7 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const payload = payloadSchema.parse(await req.json());
-    const { tenantId } = await requireTenantScope(req, payload.tenantId || undefined);
+    const { tenantId } = await requireRole(req, ADMIN_ROLES);
 
     const db = getAdminDb();
     await db

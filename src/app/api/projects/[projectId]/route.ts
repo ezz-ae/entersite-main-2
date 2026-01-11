@@ -1,8 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { loadInventoryProjectById } from '@/server/inventory';
+import { requireRole, UnauthorizedError, ForbiddenError } from '@/server/auth';
+import { ALL_ROLES } from '@/lib/server/roles';
 
 export async function GET(
-  _req: NextRequest,
+  req: NextRequest,
   { params: paramsPromise }: { params: Promise<{ projectId: string }> }
 ) {
   const params = await paramsPromise;
@@ -12,6 +14,7 @@ export async function GET(
   }
 
   try {
+    await requireRole(req, ALL_ROLES);
     const project = await loadInventoryProjectById(projectId);
     if (!project) {
       return NextResponse.json({ message: 'Project not found.' }, { status: 404 });
@@ -20,6 +23,12 @@ export async function GET(
     return NextResponse.json({ data: project });
   } catch (error) {
     console.error('[projects/:projectId] failed to load project', error);
+    if (error instanceof UnauthorizedError) {
+      return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
+    }
+    if (error instanceof ForbiddenError) {
+      return NextResponse.json({ message: 'Forbidden' }, { status: 403 });
+    }
     return NextResponse.json(
       { message: 'Could not load project right now. Please try again.' },
       { status: 500 }

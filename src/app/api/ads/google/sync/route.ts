@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { requireAuth, UnauthorizedError, ForbiddenError } from '@/server/auth';
+import { requireRole, UnauthorizedError, ForbiddenError } from '@/server/auth';
 import { getAdminDb } from '@/server/firebase-admin';
 import { updateMarketingTotals } from '@/server/marketing-analytics';
 import { z } from 'zod';
 import { CAP } from '@/lib/capabilities';
 import { resend, fromEmail } from '@/lib/resend';
+import { ADMIN_ROLES } from '@/lib/server/roles';
 
 const requestSchema = z.object({
   name: z.string().min(1),
@@ -35,7 +36,7 @@ const ADS_NOTIFICATION_EMAIL = process.env.ADS_NOTIFICATION_EMAIL || 'google@ent
 
 export async function POST(req: NextRequest) {
     try {
-        const user = await requireAuth(req);
+        const { tenantId, email, uid } = await requireRole(req, ADMIN_ROLES);
         const body = requestSchema.parse(await req.json());
         
         // This would implement the Google Ads API OAuth flow and mutate the campaign.
@@ -51,7 +52,6 @@ export async function POST(req: NextRequest) {
 
         try {
             const db = getAdminDb();
-            const tenantId = user.uid || 'public';
             const campaignsRef = db
               .collection('tenants')
               .doc(tenantId)
@@ -110,7 +110,7 @@ export async function POST(req: NextRequest) {
                     <div style="font-family: sans-serif; line-height: 1.6; color: #111;">
                       <h2 style="margin: 0 0 12px;">Google Ads Campaign Launched</h2>
                       <p><strong>Tenant:</strong> ${tenantId}</p>
-                      <p><strong>Requested by:</strong> ${user.email || 'Unknown'}</p>
+                      <p><strong>Requested by:</strong> ${email || uid || 'Unknown'}</p>
                       <p><strong>Campaign:</strong> ${body.name}</p>
                       <p><strong>Goal:</strong> ${body.goal || 'Lead Generation'}</p>
                       <p><strong>Daily Budget:</strong> ${body.budget}</p>

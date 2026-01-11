@@ -1,7 +1,21 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { getAdminDb } from '@/server/firebase-admin';
+import { requireRole, UnauthorizedError, ForbiddenError } from '@/server/auth';
+import { SUPER_ADMIN_ROLES } from '@/lib/server/roles';
 
-export async function GET() {
+export async function GET(req: NextRequest) {
+  try {
+    await requireRole(req, SUPER_ADMIN_ROLES);
+  } catch (error) {
+    if (error instanceof UnauthorizedError) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+    if (error instanceof ForbiddenError) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   const status = {
     status: 'healthy',
     timestamp: new Date().toISOString(),

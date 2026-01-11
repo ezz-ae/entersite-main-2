@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { FieldValue } from 'firebase-admin/firestore';
-import { requireTenantScope, UnauthorizedError, ForbiddenError } from '@/server/auth';
+import { requireRole, UnauthorizedError, ForbiddenError } from '@/server/auth';
 import { getAdminDb } from '@/server/firebase-admin';
 import { CAP } from '@/lib/capabilities';
 import { resend, fromEmail } from '@/lib/resend';
+import { ADMIN_ROLES } from '@/lib/server/roles';
 
 const DOMAIN_REQUEST_EMAIL = process.env.DOMAIN_REQUEST_EMAIL;
 
@@ -19,7 +20,7 @@ const normalizeDomain = (value: string) => value.replace(/^https?:\/\//, '').rep
 export async function POST(req: NextRequest) {
   try {
     const payload = payloadSchema.parse(await req.json());
-    const { decoded, tenantId } = await requireTenantScope(req);
+    const { tenantId, uid, email } = await requireRole(req, ADMIN_ROLES);
     const normalizedDomain = normalizeDomain(payload.domain);
 
     const db = getAdminDb();
@@ -30,7 +31,10 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: 'Site not found' }, { status: 404 });
       }
       const siteData = siteSnap.data() || {};
-      if (siteData.ownerUid && siteData.ownerUid !== decoded.uid) {
+      if (siteData.tenantId && siteData.tenantId !== tenantId) {
+        return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+      }
+      if (!siteData.tenantId && siteData.ownerUid && siteData.ownerUid !== uid) {
         return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
       }
     }
@@ -47,8 +51,8 @@ export async function POST(req: NextRequest) {
       siteId: payload.siteId || null,
       status: 'requested',
       requestedBy: {
-        uid: decoded.uid || null,
-        email: decoded.email || null,
+        uid: uid || null,
+        email: email || null,
       },
       createdAt: FieldValue.serverTimestamp(),
       updatedAt: FieldValue.serverTimestamp(),
@@ -65,7 +69,7 @@ export async function POST(req: NextRequest) {
             <p><strong>Domain:</strong> ${normalizedDomain}</p>
             <p><strong>Provider:</strong> ${payload.provider}</p>
             <p><strong>Tenant:</strong> ${tenantId}</p>
-            <p><strong>Requested by:</strong> ${decoded.email || decoded.uid || 'Unknown'}</p>
+            <p><strong>Requested by:</strong> ${email || uid || 'Unknown'}</p>
             ${payload.siteId ? `<p><strong>Site ID:</strong> ${payload.siteId}</p>` : ''}
           </div>
         `,

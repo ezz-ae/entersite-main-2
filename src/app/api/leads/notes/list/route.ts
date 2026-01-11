@@ -2,11 +2,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getAdminDb } from '@/server/firebase-admin';
-import { requireTenantScope, UnauthorizedError, ForbiddenError } from '@/server/auth';
+import { requireRole, UnauthorizedError, ForbiddenError } from '@/server/auth';
+import { ALL_ROLES } from '@/lib/server/roles';
 
 const querySchema = z.object({
   leadId: z.string().min(1),
-  tenantId: z.string().optional(),
 });
 
 export async function GET(req: NextRequest) {
@@ -14,10 +14,9 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const parsed = querySchema.parse({
       leadId: searchParams.get('leadId') || undefined,
-      tenantId: searchParams.get('tenantId') || undefined,
     });
 
-    const { tenantId } = await requireTenantScope(req, parsed.tenantId);
+    const { tenantId } = await requireRole(req, ALL_ROLES);
     const firestore = getAdminDb();
     const notesSnapshot = await firestore
       .collection('tenants')

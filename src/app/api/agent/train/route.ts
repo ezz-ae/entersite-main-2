@@ -4,9 +4,12 @@ import { NextRequest, NextResponse } from 'next/server';
 import { promises as fs } from 'fs';
 import { tmpdir } from 'os';
 import { join } from 'path';
+import { requireRole, UnauthorizedError, ForbiddenError } from '@/server/auth';
+import { ADMIN_ROLES } from '@/lib/server/roles';
 
 export async function POST(req: NextRequest) {
   try {
+    await requireRole(req, ADMIN_ROLES);
     const formData = await req.formData();
     const file = formData.get('file') as File | null;
 
@@ -33,6 +36,12 @@ export async function POST(req: NextRequest) {
 
   } catch (error) {
     console.error('Agent Training API Error:', error);
+    if (error instanceof UnauthorizedError) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+    if (error instanceof ForbiddenError) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
     return NextResponse.json({ error: 'An unexpected error occurred during training.' }, { status: 500 });
   }
 }

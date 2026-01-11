@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { requireAuth, UnauthorizedError, ForbiddenError } from '@/server/auth';
+import { requireRole, UnauthorizedError, ForbiddenError } from '@/server/auth';
 import { getAdminDb } from '@/server/firebase-admin';
+import { ALL_ROLES } from '@/lib/server/roles';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -8,11 +9,11 @@ export const revalidate = 0;
 
 export async function GET(req: NextRequest) {
   try {
-    const user = await requireAuth(req);
+    const { tenantId } = await requireRole(req, ALL_ROLES);
     const db = getAdminDb();
     const snapshot = await db
       .collection('tenants')
-      .doc(user.uid || 'public')
+      .doc(tenantId)
       .collection('ads_campaigns')
       .orderBy('createdAt', 'desc')
       .limit(20)

@@ -43,7 +43,7 @@ export const saveSite = async (ownerUid: string, site: SitePage) => {
   await setDoc(doc(db, 'sites', siteId), {
     ...site,
     ownerUid,
-    tenantId: site.tenantId || 'public',
+    tenantId: site.tenantId || ownerUid,
     id: siteId,
     updatedAt: serverTimestamp(),
     createdAt: site.createdAt || serverTimestamp(),

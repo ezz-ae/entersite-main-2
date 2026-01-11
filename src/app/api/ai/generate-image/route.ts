@@ -1,9 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { generateImage } from 'ai';
 import { getGoogleModel, IMAGE_MODEL } from '@/lib/ai/google';
+import { requireRole, UnauthorizedError, ForbiddenError } from '@/server/auth';
+import { ALL_ROLES } from '@/lib/server/roles';
 
 export async function POST(req: NextRequest) {
     try {
+        await requireRole(req, ALL_ROLES);
         const { prompt } = await req.json();
 
         if (!prompt || typeof prompt !== 'string') {
@@ -28,6 +31,12 @@ export async function POST(req: NextRequest) {
         throw new Error('Image generation returned no result');
     } catch (error) {
         console.error("Imagen API Error:", error);
+        if (error instanceof UnauthorizedError) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        }
+        if (error instanceof ForbiddenError) {
+            return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+        }
         return NextResponse.json({ 
             url: "https://firebasestorage.googleapis.com/v0/b/studio-7730943652-a28e0.firebasestorage.app/o/U10759_EXT_ZED739.webp?alt=media&token=be7418eb-0f7f-4df3-8c89-8fa5b070a7aa" 
         }, { status: 200 });

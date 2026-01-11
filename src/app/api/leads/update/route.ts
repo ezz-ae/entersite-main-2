@@ -2,19 +2,19 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { FieldValue } from 'firebase-admin/firestore';
 import { getAdminDb } from '@/server/firebase-admin';
-import { requireTenantScope, UnauthorizedError, ForbiddenError } from '@/server/auth';
+import { requireRole, UnauthorizedError, ForbiddenError } from '@/server/auth';
+import { ALL_ROLES } from '@/lib/server/roles';
 
 const payloadSchema = z.object({
   leadId: z.string().min(1),
   status: z.enum(['New', 'Contacted', 'Qualified', 'Lost']).optional(),
   priority: z.enum(['Hot', 'Warm', 'Cold']).optional(),
-  tenantId: z.string().optional(),
 });
 
 export async function POST(req: NextRequest) {
   try {
     const payload = payloadSchema.parse(await req.json());
-    const { tenantId } = await requireTenantScope(req, payload.tenantId);
+    const { tenantId } = await requireRole(req, ALL_ROLES);
 
     const updates: Record<string, any> = {
       updatedAt: FieldValue.serverTimestamp(),

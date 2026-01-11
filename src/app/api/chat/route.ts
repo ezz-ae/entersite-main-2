@@ -4,6 +4,8 @@ import { z } from 'zod';
 import { mainSystemPrompt } from '@/config/prompts';
 import { getGoogleModel, FLASH_MODEL } from '@/lib/ai/google';
 import { formatProjectContext, getRelevantProjects } from '@/server/inventory';
+import { requireRole, UnauthorizedError, ForbiddenError } from '@/server/auth';
+import { ALL_ROLES } from '@/lib/server/roles';
 
 const requestSchema = z.object({
   message: z.string().min(1),
@@ -20,11 +22,18 @@ const requestSchema = z.object({
 export async function POST(req: NextRequest) {
   let payload: z.infer<typeof requestSchema> | null = null;
   try {
+    await requireRole(req, ALL_ROLES);
     const body = await req.json();
     payload = requestSchema.parse(body);
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json({ reply: 'Invalid request payload.', error: error.errors }, { status: 400 });
+    }
+    if (error instanceof UnauthorizedError) {
+      return NextResponse.json({ reply: 'Unauthorized' }, { status: 401 });
+    }
+    if (error instanceof ForbiddenError) {
+      return NextResponse.json({ reply: 'Forbidden' }, { status: 403 });
     }
     return NextResponse.json({ reply: 'Invalid request payload.' }, { status: 400 });
   }

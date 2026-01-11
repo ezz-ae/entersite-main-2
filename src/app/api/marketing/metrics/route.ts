@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAdminDb } from '@/server/firebase-admin';
-import { requireTenantScope, UnauthorizedError, ForbiddenError } from '@/server/auth';
+import { requireRole, UnauthorizedError, ForbiddenError } from '@/server/auth';
 import { DEFAULT_MARKETING_METRICS } from '@/data/marketing-metrics';
+import { ALL_ROLES } from '@/lib/server/roles';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -11,9 +12,7 @@ const DOC_ID = 'marketing';
 
 export async function GET(req: NextRequest) {
   try {
-    const { searchParams } = new URL(req.url);
-    const requestedTenant = searchParams.get('tenantId') || undefined;
-    const { tenantId } = await requireTenantScope(req, requestedTenant);
+    const { tenantId } = await requireRole(req, ALL_ROLES);
 
     const db = getAdminDb();
     const docRef = db.collection('tenants').doc(tenantId).collection(COLLECTION).doc(DOC_ID);

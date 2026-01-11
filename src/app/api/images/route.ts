@@ -1,4 +1,6 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
+import { requireRole, UnauthorizedError, ForbiddenError } from '@/server/auth';
+import { ALL_ROLES } from '@/lib/server/roles';
 
 const placeholderImages = [
     {
@@ -83,6 +85,17 @@ const placeholderImages = [
     }
   ]
 
-export async function GET() {
-  return NextResponse.json(placeholderImages);
+export async function GET(req: NextRequest) {
+  try {
+    await requireRole(req, ALL_ROLES);
+    return NextResponse.json(placeholderImages);
+  } catch (error) {
+    if (error instanceof UnauthorizedError) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+    if (error instanceof ForbiddenError) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
+    return NextResponse.json({ error: 'Failed to load images' }, { status: 500 });
+  }
 }

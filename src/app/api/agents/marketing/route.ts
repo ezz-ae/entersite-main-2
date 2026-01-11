@@ -2,8 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { generateObject } from 'ai';
 import { z } from 'zod';
 import { getGoogleModel, PRO_MODEL } from '@/lib/ai/google';
-import { requireAuth, UnauthorizedError, ForbiddenError } from '@/server/auth';
+import { requireRole, UnauthorizedError, ForbiddenError } from '@/server/auth';
 import { getAdminDb } from '@/server/firebase-admin';
+import { ALL_ROLES } from '@/lib/server/roles';
 
 const agentResponseSchema = z.object({
   siteType: z.enum(['roadshow', 'developer-focus', 'partner-launch', 'full-company', 'freelancer', 'map-focused', 'ads-launch', 'agent-portfolio', 'custom']).optional(),
@@ -54,7 +55,7 @@ const requestSchema = z.object({
 
 export async function POST(req: NextRequest) {
     try {
-        const user = await requireAuth(req);
+        const { tenantId } = await requireRole(req, ALL_ROLES);
         const ip = req.headers.get('x-forwarded-for') || 'anonymous';
         if (!consumeRateLimit(ip)) {
             return NextResponse.json({ error: 'Rate limit exceeded' }, { status: 429 });
@@ -80,7 +81,7 @@ export async function POST(req: NextRequest) {
             const db = getAdminDb();
             await db
               .collection('tenants')
-              .doc(user.uid || 'public')
+              .doc(tenantId)
               .collection('marketing_plans')
               .add({
                   prompt: payload.prompt,

@@ -7,7 +7,8 @@ import { CAP } from '@/lib/capabilities';
 import { sendLeadEmail } from '@/lib/notifications/email';
 import { sendLeadSMS } from '@/lib/notifications/sms';
 import { upsertHubspotLead } from '@/lib/integrations/hubspot-leads';
-import { requireAuth } from '@/server/auth';
+import { requireRole } from '@/server/auth';
+import { ALL_ROLES } from '@/lib/server/roles';
 
 const NOTIFY_EMAIL_TO = process.env.NOTIFY_EMAIL_TO;
 const NOTIFY_SMS_TO = process.env.NOTIFY_SMS_TO;
@@ -24,7 +25,6 @@ const payloadSchema = z.object({
   context: z.record(z.any()).optional(),
   attribution: z.record(z.any()).optional(),
   metadata: z.record(z.any()).optional(),
-  tenantId: z.string().optional(),
   siteId: z.string().optional(),
 });
 
@@ -38,25 +38,7 @@ const parseEmailList = (value?: string | null) => {
     .filter(Boolean);
 };
 
-async function resolveAgentEmail(req: NextRequest) {
-  const authHeader = req.headers.get('authorization') || '';
-  if (!authHeader.startsWith('Bearer ')) {
-    return null;
-  }
-  try {
-    const decoded = await requireAuth(req);
-    return decoded.email || null;
-  } catch (error) {
-    console.warn('[leads] could not resolve agent email', error);
-    return null;
-  }
-}
-
-async function resolveTenant(db: Firestore, payload: LeadPayload) {
-  if (payload.tenantId) {
-    return payload.tenantId;
-  }
-
+async function resolveTenant(db: Firestore, payload: LeadPayload, fallbackTenantId: string) {
   if (payload.siteId) {
     const siteSnap = await db.collection('sites').doc(payload.siteId).get();
     if (siteSnap.exists) {
@@ -65,15 +47,16 @@ async function resolveTenant(db: Firestore, payload: LeadPayload) {
     }
   }
 
-  return 'public';
+  return fallbackTenantId;
 }
 
 export async function POST(req: NextRequest) {
   try {
     const payload = payloadSchema.parse(await req.json());
     const db = getAdminDb();
-    const tenantId = await resolveTenant(db, payload);
-    const agentEmail = await resolveAgentEmail(req);
+    const context = await requireRole(req, ALL_ROLES);
+    const tenantId = await resolveTenant(db, payload, context.tenantId);
+    const agentEmail = context.email;
 
     const leadData = {
       tenantId,

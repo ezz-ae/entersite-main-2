@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { generateText } from 'ai';
 import { createGoogleGenerativeAI } from '@ai-sdk/google';
+import { requireRole, UnauthorizedError, ForbiddenError } from '@/server/auth';
+import { ALL_ROLES } from '@/lib/server/roles';
 
 /**
  * AI Email Content Generator
@@ -18,6 +20,7 @@ const MODEL_ID = 'gemini-1.5-flash';
 
 export async function POST(req: NextRequest) {
     try {
+        await requireRole(req, ALL_ROLES);
         const { topic, context } = await req.json();
 
         if (!topic) return NextResponse.json({ error: 'Topic required' }, { status: 400 });
@@ -37,6 +40,12 @@ export async function POST(req: NextRequest) {
             body: body 
         });
     } catch (error: any) {
+        if (error instanceof UnauthorizedError) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        }
+        if (error instanceof ForbiddenError) {
+            return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+        }
         return NextResponse.json({ error: 'Generation failed', details: error.message }, { status: 500 });
     }
 }

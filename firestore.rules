@@ -2,50 +2,141 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Inventory projects are publicly readable
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function tenantFromToken() {
+      return request.auth.token.tenantId != null ? request.auth.token.tenantId : request.auth.uid;
+    }
+
+    function hasRole(allowedRoles) {
+      return request.auth != null && (
+        (request.auth.token.role != null && request.auth.token.role in allowedRoles) ||
+        (request.auth.token.roles != null && request.auth.token.roles.hasAny(allowedRoles))
+      );
+    }
+
+    function isTenantMember(tenantId) {
+      return isSignedIn() && tenantId == tenantFromToken();
+    }
+
+    function isTenantAdmin(tenantId) {
+      return isTenantMember(tenantId) && hasRole(['team_admin', 'agency_admin', 'super_admin']);
+    }
+
+    // Public inventory projects
     match /inventory_projects/{projectId} {
       allow read: if true;
-      allow write: if false; // Can only be written by a trusted server process
+      allow write: if false;
     }
 
-    // Projects are private to the user who owns them.
-    match /projects/{projectId} {
-      // A user must be logged in and the ownerUid must match their own UID.
-      allow read, update, delete: if request.auth != null && request.auth.uid == resource.data.ownerUid;
-      // On creation, the ownerUid in the new document must be the user's UID.
-      allow create: if request.auth != null && request.resource.data.ownerUid == request.auth.uid;
-
-      // The pages subcollection is also private to the owner.
-      match /pages/{pageId} {
-        allow read, create, update, delete: if request.auth != null && get(/databases/$(database)/documents/projects/$(projectId)).data.ownerUid == request.auth.uid;
-      }
-      
-      // The audiences subcollection is also private to the owner.
-      match /audiences/{audId} {
-        allow read, create, update, delete: if request.auth != null && get(/databases/$(database)/documents/projects/$(projectId)).data.ownerUid == request.auth.uid;
-      }
-    }
-
-    // Builder sites are private to the owner.
-    match /sites/{siteId} {
-      allow read, update, delete: if request.auth != null && request.auth.uid == resource.data.ownerUid;
-      allow create: if request.auth != null && request.resource.data.ownerUid == request.auth.uid;
-    }
-
-    // Published pages are public-read. They are only written by the backend.
+    // Public published pages
     match /pages_public/{slug} {
       allow read: if true;
-      allow write: if false; // Can only be written by a trusted server process
+      allow write: if false;
     }
 
-    // Leads can only be created via the backend API. They are readable by the project owner.
-    match /leads/{leadId} {
-      allow read: if request.auth != null && get(/databases/$(database)/documents/projects/$(resource.data.projectId)).data.ownerUid == request.auth.uid;
-      allow write: if false; // Can only be written by a trusted server process
+    // Tenant-scoped data
+    match /tenants/{tenantId} {
+      allow read: if isTenantMember(tenantId);
+      allow create, update, delete: if isTenantAdmin(tenantId);
 
-      match /notes/{noteId} {
-        allow read, create: if request.auth != null && get(/databases/$(database)/documents/projects/$(get(/databases/$(database)/documents/leads/$(leadId)).data.projectId)).data.ownerUid == request.auth.uid;
+      match /settings/{docId} {
+        allow read: if isTenantMember(tenantId);
+        allow write: if isTenantAdmin(tenantId);
       }
+
+      match /leads/{leadId} {
+        allow read, create, update, delete: if isTenantMember(tenantId);
+        match /notes/{noteId} {
+          allow read, create, update, delete: if isTenantMember(tenantId);
+        }
+      }
+
+      match /ads_campaigns/{docId} {
+        allow read: if isTenantMember(tenantId);
+        allow write: if isTenantAdmin(tenantId);
+      }
+
+      match /audience_requests/{docId} {
+        allow read, write: if isTenantAdmin(tenantId);
+      }
+
+      match /marketing_plans/{docId} {
+        allow read, write: if isTenantMember(tenantId);
+      }
+
+      match /teamInvites/{docId} {
+        allow read, write: if isTenantAdmin(tenantId);
+      }
+
+      match /domain_requests/{docId} {
+        allow read, write: if isTenantAdmin(tenantId);
+      }
+
+      match /events/{docId} {
+        allow read, write: if isTenantMember(tenantId);
+      }
+
+      match /analytics/{docId} {
+        allow read: if isTenantMember(tenantId);
+        allow write: if isTenantAdmin(tenantId);
+      }
+    }
+
+    // Sites owned by a tenant or legacy ownerUid-only entries
+    match /sites/{siteId} {
+      allow create: if isSignedIn()
+        && request.resource.data.ownerUid == request.auth.uid
+        && request.resource.data.tenantId == tenantFromToken();
+
+      allow read, update, delete: if isSignedIn() && (
+        (resource.data.tenantId == tenantFromToken()) ||
+        (resource.data.tenantId == null && resource.data.ownerUid == request.auth.uid)
+      );
+    }
+
+    // Contacts are tenant-owned
+    match /contacts/{contactId} {
+      allow create: if isSignedIn() && request.resource.data.tenantId == tenantFromToken();
+      allow read, update, delete: if isSignedIn() && resource.data.tenantId == tenantFromToken();
+    }
+
+    // Bot event logs are tenant-owned
+    match /bot_events/{eventId} {
+      allow create: if isSignedIn() && request.resource.data.tenantId == tenantFromToken();
+      allow read, update, delete: if isSignedIn() && resource.data.tenantId == tenantFromToken();
+    }
+
+    // Legacy projects (owner-only)
+    match /projects/{projectId} {
+      allow read, update, delete: if isSignedIn() && request.auth.uid == resource.data.ownerUid;
+      allow create: if isSignedIn() && request.resource.data.ownerUid == request.auth.uid;
+      match /pages/{pageId} {
+        allow read, create, update, delete: if isSignedIn()
+          && get(/databases/$(database)/documents/projects/$(projectId)).data.ownerUid == request.auth.uid;
+      }
+      match /audiences/{audId} {
+        allow read, create, update, delete: if isSignedIn()
+          && get(/databases/$(database)/documents/projects/$(projectId)).data.ownerUid == request.auth.uid;
+      }
+    }
+
+    // Jobs are owner-scoped
+    match /jobs/{jobId} {
+      allow create: if isSignedIn() && request.resource.data.ownerUid == request.auth.uid;
+      allow read, update, delete: if isSignedIn() && resource.data.ownerUid == request.auth.uid;
+    }
+
+    // Content posts are admin-only (server can still write)
+    match /content_posts/{postId} {
+      allow read, write: if false;
+    }
+
+    // Health checks are server-only
+    match /health/{docId} {
+      allow read, write: if false;
     }
   }
 }

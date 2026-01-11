@@ -2,21 +2,19 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { FieldValue } from 'firebase-admin/firestore';
 import { getAdminDb } from '@/server/firebase-admin';
-import { requireTenantScope, UnauthorizedError, ForbiddenError } from '@/server/auth';
+import { requireRole, UnauthorizedError, ForbiddenError } from '@/server/auth';
 import { CAP } from '@/lib/capabilities';
 import { resend, fromEmail } from '@/lib/resend';
+import { ADMIN_ROLES } from '@/lib/server/roles';
 
 const payloadSchema = z.object({
-  tenantId: z.string().optional(),
   email: z.string().email(),
-  role: z.enum(['Owner', 'Editor', 'Viewer']),
+  role: z.enum(['agent', 'team_admin', 'agency_admin']),
 });
 
 export async function GET(req: NextRequest) {
   try {
-    const { searchParams } = new URL(req.url);
-    const requestedTenant = searchParams.get('tenantId') || undefined;
-    const { tenantId } = await requireTenantScope(req, requestedTenant);
+    const { tenantId } = await requireRole(req, ADMIN_ROLES);
 
     const db = getAdminDb();
     const snapshot = await db
@@ -44,7 +42,7 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const payload = payloadSchema.parse(await req.json());
-    const { decoded, tenantId } = await requireTenantScope(req, payload.tenantId || undefined);
+    const { tenantId, email: inviterEmail, uid } = await requireRole(req, ADMIN_ROLES);
 
     const db = getAdminDb();
     const inviteRef = db
@@ -57,7 +55,7 @@ export async function POST(req: NextRequest) {
       email: payload.email,
       role: payload.role,
       status: 'pending',
-      invitedBy: decoded.email || decoded.uid,
+      invitedBy: inviterEmail || uid,
       createdAt: FieldValue.serverTimestamp(),
     };
 

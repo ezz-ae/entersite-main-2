@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { ENTRESTATE_INVENTORY } from '@/data/entrestate-inventory';
 import { loadInventoryProjects } from '@/server/inventory';
+import { requireRole, UnauthorizedError, ForbiddenError } from '@/server/auth';
+import { ALL_ROLES } from '@/lib/server/roles';
 
 function buildMetadata(projects: any[]) {
   const developerSet = new Set<string>();
@@ -38,14 +40,21 @@ function buildMetadata(projects: any[]) {
   };
 }
 
-export async function GET() {
+export async function GET(req: Request) {
   try {
+    await requireRole(req, ALL_ROLES);
     const projects = await loadInventoryProjects(8000);
     if (projects.length) {
       return NextResponse.json(buildMetadata(projects));
     }
   } catch (error) {
     console.error('[projects/meta] failed to load metadata', error);
+    if (error instanceof UnauthorizedError) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+    if (error instanceof ForbiddenError) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
   }
 
   return NextResponse.json(buildMetadata(ENTRESTATE_INVENTORY));

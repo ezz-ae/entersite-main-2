@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { paypalRequest } from '@/server/paypal';
-import { requireAuth, UnauthorizedError, ForbiddenError } from '@/server/auth';
+import { requireRole, UnauthorizedError, ForbiddenError } from '@/server/auth';
+import { ADMIN_ROLES } from '@/lib/server/roles';
 
 const requestSchema = z.object({
   orderId: z.string().min(1),
@@ -9,7 +10,7 @@ const requestSchema = z.object({
 
 export async function POST(req: NextRequest) {
   try {
-    await requireAuth(req);
+    await requireRole(req, ADMIN_ROLES);
     const payload = requestSchema.parse(await req.json());
 
     const response = await paypalRequest(`/v2/checkout/orders/${payload.orderId}/capture`, {

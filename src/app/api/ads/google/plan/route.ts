@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { requireAuth, UnauthorizedError, ForbiddenError } from '@/server/auth';
+import { requireRole, UnauthorizedError, ForbiddenError } from '@/server/auth';
 import { generateCampaignStructure } from '@/lib/ai/marketing-os';
+import { ALL_ROLES } from '@/lib/server/roles';
 
 const requestSchema = z.object({
   goal: z.string().min(1),
@@ -73,7 +74,7 @@ function estimatePerformance({
 
 export async function POST(req: NextRequest) {
   try {
-    await requireAuth(req);
+    await requireRole(req, ALL_ROLES);
     const payload = requestSchema.parse(await req.json());
 
     const goal = GOAL_MAP[payload.goal] || 'leads';

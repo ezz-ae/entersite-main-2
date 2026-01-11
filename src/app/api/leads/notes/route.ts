@@ -2,18 +2,18 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { FieldValue } from 'firebase-admin/firestore';
 import { getAdminDb } from '@/server/firebase-admin';
-import { requireTenantScope, UnauthorizedError, ForbiddenError } from '@/server/auth';
+import { requireRole, UnauthorizedError, ForbiddenError } from '@/server/auth';
+import { ALL_ROLES } from '@/lib/server/roles';
 
 const payloadSchema = z.object({
   leadId: z.string().min(1),
   note: z.string().min(1),
-  tenantId: z.string().optional(),
 });
 
 export async function POST(req: NextRequest) {
   try {
     const payload = payloadSchema.parse(await req.json());
-    const { tenantId, decoded } = await requireTenantScope(req, payload.tenantId);
+    const { tenantId, uid } = await requireRole(req, ALL_ROLES);
 
     const firestore = getAdminDb();
     const leadRef = firestore.collection('tenants').doc(tenantId).collection('leads').doc(payload.leadId);
@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
 
     const noteRef = await leadRef.collection('notes').add({
       content: payload.note,
-      authorId: decoded.uid,
+      authorId: uid,
       createdAt: FieldValue.serverTimestamp(),
     });
 

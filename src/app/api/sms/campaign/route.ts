@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getAdminDb } from '@/server/firebase-admin';
-import { requireTenantScope, UnauthorizedError, ForbiddenError } from '@/server/auth';
+import { requireRole, UnauthorizedError, ForbiddenError } from '@/server/auth';
 import { CAP } from '@/lib/capabilities';
+import { ADMIN_ROLES } from '@/lib/server/roles';
 
 const ACCOUNT_SID = process.env.TWILIO_ACCOUNT_SID;
 const AUTH_TOKEN = process.env.TWILIO_AUTH_TOKEN;
@@ -13,13 +14,12 @@ const payloadSchema = z.object({
   message: z.string().min(1).max(800),
   list: z.enum(['imported', 'pilot', 'manual']),
   recipients: z.array(z.string().min(5)).optional(),
-  tenantId: z.string().optional(),
 });
 
 export async function POST(req: NextRequest) {
   try {
     const payload = payloadSchema.parse(await req.json());
-    const { tenantId } = await requireTenantScope(req, payload.tenantId);
+    const { tenantId } = await requireRole(req, ADMIN_ROLES);
 
     if (!CAP.twilio || !ACCOUNT_SID || !AUTH_TOKEN || !FROM_NUMBER) {
       return NextResponse.json({ error: 'SMS provider is not configured' }, { status: 500 });

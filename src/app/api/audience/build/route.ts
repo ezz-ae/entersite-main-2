@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { FieldValue } from 'firebase-admin/firestore';
 import { getAdminDb } from '@/server/firebase-admin';
-import { requireTenantScope, UnauthorizedError, ForbiddenError } from '@/server/auth';
+import { requireRole, UnauthorizedError, ForbiddenError } from '@/server/auth';
+import { ADMIN_ROLES } from '@/lib/server/roles';
 
 const payloadSchema = z.object({
   listType: z.enum(['imported', 'pilot']).default('imported'),
@@ -10,13 +11,12 @@ const payloadSchema = z.object({
   region: z.string().min(1),
   budget: z.number().nonnegative().optional(),
   notes: z.string().optional(),
-  tenantId: z.string().optional(),
 });
 
 export async function POST(req: NextRequest) {
   try {
     const payload = payloadSchema.parse(await req.json());
-    const { tenantId } = await requireTenantScope(req, payload.tenantId);
+    const { tenantId } = await requireRole(req, ADMIN_ROLES);
 
     const db = getAdminDb();
     const requestRef = db

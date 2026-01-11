@@ -4,7 +4,8 @@ import { z } from 'zod';
 import { getGoogleModel, FLASH_MODEL } from '@/lib/ai/google';
 import { getAdminDb } from '@/server/firebase-admin';
 import { formatProjectContext, getRelevantProjects } from '@/server/inventory';
-import { requireAuth, UnauthorizedError, ForbiddenError } from '@/server/auth';
+import { requireRole, UnauthorizedError, ForbiddenError } from '@/server/auth';
+import { ALL_ROLES } from '@/lib/server/roles';
 
 const requestSchema = z.object({
   message: z.string().min(1),
@@ -12,7 +13,6 @@ const requestSchema = z.object({
     role: z.enum(['user', 'agent']),
     text: z.string(),
   })).optional(),
-  tenantId: z.string().optional(),
   siteId: z.string().optional(),
   context: z.string().optional(),
 });
@@ -38,7 +38,7 @@ function consumeRateLimit(key: string) {
 export async function POST(req: NextRequest, { params: paramsPromise }: { params: Promise<{ botId: string }> }) {
   try {
     const params = await paramsPromise;
-    const user = await requireAuth(req);
+    const { tenantId, uid } = await requireRole(req, ALL_ROLES);
     const ip = req.headers.get('x-forwarded-for') || 'anon';
     if (!consumeRateLimit(`${params.botId}:${ip}`)) {
       return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
@@ -90,7 +90,7 @@ User (${params.botId}): ${payload.message}
       const db = getAdminDb();
       await db.collection('bot_events').add({
         botId: params.botId,
-        tenantId: payload.tenantId || user.uid || 'public',
+        tenantId,
         siteId: payload.siteId || null,
         userMessage: payload.message,
         agentReply: reply,

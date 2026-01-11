@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { generateText } from 'ai';
 import { createGoogleGenerativeAI } from '@ai-sdk/google';
 import { z } from 'zod';
+import { requireRole, UnauthorizedError, ForbiddenError } from '@/server/auth';
+import { ALL_ROLES } from '@/lib/server/roles';
 
 const requestSchema = z.object({
   topic: z.string().min(1),
@@ -26,6 +28,7 @@ const clampLength = (value: string, maxChars: number) => {
 
 export async function POST(req: NextRequest) {
   try {
+    await requireRole(req, ALL_ROLES);
     if (!google) {
       return NextResponse.json({ error: 'AI provider is not configured' }, { status: 500 });
     }
@@ -45,6 +48,12 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ message });
   } catch (error: any) {
+    if (error instanceof UnauthorizedError) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+    if (error instanceof ForbiddenError) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
     if (error instanceof z.ZodError) {
       return NextResponse.json({ error: 'Invalid payload', details: error.errors }, { status: 400 });
     }

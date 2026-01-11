@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getAdminDb } from '@/server/firebase-admin';
-import { requireTenantScope, UnauthorizedError, ForbiddenError } from '@/server/auth';
+import { requireRole, UnauthorizedError, ForbiddenError } from '@/server/auth';
 import { CAP } from '@/lib/capabilities';
 import { resend, fromEmail } from '@/lib/resend';
+import { ADMIN_ROLES } from '@/lib/server/roles';
 
 const MAX_RECIPIENTS = 50;
 
@@ -12,13 +13,12 @@ const payloadSchema = z.object({
   body: z.string().min(1),
   list: z.enum(['imported', 'pilot', 'manual']),
   recipients: z.array(z.string().email()).optional(),
-  tenantId: z.string().optional(),
 });
 
 export async function POST(req: NextRequest) {
   try {
     const payload = payloadSchema.parse(await req.json());
-    const { tenantId } = await requireTenantScope(req, payload.tenantId);
+    const { tenantId } = await requireRole(req, ADMIN_ROLES);
 
     if (!CAP.resend || !resend) {
       return NextResponse.json({ error: 'Email provider is not configured' }, { status: 500 });

@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { CAP } from '@/lib/capabilities';
 import { resend, fromEmail } from '@/lib/resend';
+import { requireRole, UnauthorizedError, ForbiddenError } from '@/server/auth';
+import { ALL_ROLES } from '@/lib/server/roles';
 
 const SUPPORT_EMAIL = process.env.SUPPORT_EMAIL || 'support@entrestate.com';
 
@@ -14,6 +16,7 @@ const payloadSchema = z.object({
 
 export async function POST(req: NextRequest) {
   try {
+    await requireRole(req, ALL_ROLES);
     if (!CAP.resend || !resend) {
       return NextResponse.json({ error: 'Support email is not configured' }, { status: 500 });
     }
@@ -40,6 +43,12 @@ export async function POST(req: NextRequest) {
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json({ error: 'Invalid payload', details: error.errors }, { status: 400 });
+    }
+    if (error instanceof UnauthorizedError) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+    if (error instanceof ForbiddenError) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
     console.error('[support] error', error);
     return NextResponse.json({ error: 'Failed to send support request' }, { status: 500 });
