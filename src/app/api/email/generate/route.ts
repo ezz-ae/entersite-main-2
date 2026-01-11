@@ -3,6 +3,7 @@ import { generateText } from 'ai';
 import { createGoogleGenerativeAI } from '@ai-sdk/google';
 import { requireRole, UnauthorizedError, ForbiddenError } from '@/server/auth';
 import { ALL_ROLES } from '@/lib/server/roles';
+import { enforceRateLimit, getRequestIp } from '@/lib/server/rateLimit';
 
 /**
  * AI Email Content Generator
@@ -20,7 +21,11 @@ const MODEL_ID = 'gemini-1.5-flash';
 
 export async function POST(req: NextRequest) {
     try {
-        await requireRole(req, ALL_ROLES);
+        const { tenantId } = await requireRole(req, ALL_ROLES);
+        const ip = getRequestIp(req);
+        if (!enforceRateLimit(`email:generate:${tenantId}:${ip}`, 20, 60_000)) {
+            return NextResponse.json({ error: 'Rate limit exceeded' }, { status: 429 });
+        }
         const { topic, context } = await req.json();
 
         if (!topic) return NextResponse.json({ error: 'Topic required' }, { status: 400 });

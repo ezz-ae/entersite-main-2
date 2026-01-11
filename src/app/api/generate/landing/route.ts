@@ -4,6 +4,7 @@ import { generateSiteStructure } from '@/lib/ai/vertex-service';
 import { getAdminDb } from '@/server/firebase-admin';
 import { requireRole, UnauthorizedError, ForbiddenError } from '@/server/auth';
 import { ALL_ROLES } from '@/lib/server/roles';
+import { enforceUsageLimit, PlanLimitError } from '@/lib/server/billing';
 import { SitePage, Block } from '@/lib/types';
 
 export async function POST(req: NextRequest) {
@@ -37,6 +38,7 @@ export async function POST(req: NextRequest) {
         };
 
         const db = getAdminDb();
+        await enforceUsageLimit(db, tenantId, 'landing_pages', 1);
         const siteRef = db.collection('sites').doc();
         const pageId = siteRef.id;
         await siteRef.set(
@@ -54,6 +56,12 @@ export async function POST(req: NextRequest) {
     } catch (error) {
         console.error("API Error:", error);
 
+        if (error instanceof PlanLimitError) {
+            return NextResponse.json(
+                { error: 'Plan limit reached', metric: error.metric, limit: error.limit },
+                { status: 402 }
+            );
+        }
         if (error instanceof UnauthorizedError) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }

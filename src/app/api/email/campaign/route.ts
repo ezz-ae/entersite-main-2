@@ -5,8 +5,12 @@ import { requireRole, UnauthorizedError, ForbiddenError } from '@/server/auth';
 import { CAP } from '@/lib/capabilities';
 import { resend, fromEmail } from '@/lib/resend';
 import { ADMIN_ROLES } from '@/lib/server/roles';
+import { enforceRateLimit, getRequestIp } from '@/lib/server/rateLimit';
+import { enforceUsageLimit, PlanLimitError } from '@/lib/server/billing';
 
 const MAX_RECIPIENTS = 50;
+const RATE_LIMIT_WINDOW_MS = 60_000;
+const RATE_LIMIT_MAX = 5;
 
 const payloadSchema = z.object({
   subject: z.string().min(1),
@@ -19,6 +23,10 @@ export async function POST(req: NextRequest) {
   try {
     const payload = payloadSchema.parse(await req.json());
     const { tenantId } = await requireRole(req, ADMIN_ROLES);
+    const ip = getRequestIp(req);
+    if (!enforceRateLimit(`email:campaign:${tenantId}:${ip}`, RATE_LIMIT_MAX, RATE_LIMIT_WINDOW_MS)) {
+      return NextResponse.json({ error: 'Rate limit exceeded' }, { status: 429 });
+    }
 
     if (!CAP.resend || !resend) {
       return NextResponse.json({ error: 'Email provider is not configured' }, { status: 500 });
@@ -46,6 +54,8 @@ export async function POST(req: NextRequest) {
     if (!recipients.length) {
       return NextResponse.json({ error: 'No recipients found for this list.' }, { status: 400 });
     }
+
+    await enforceUsageLimit(db, tenantId, 'email_sends', recipients.length);
 
     const formattedBody = payload.body.replace(/\n/g, '<br/>');
     let sentCount = 0;
@@ -75,6 +85,12 @@ export async function POST(req: NextRequest) {
       limited: recipients.length >= MAX_RECIPIENTS,
     });
   } catch (error) {
+    if (error instanceof PlanLimitError) {
+      return NextResponse.json(
+        { error: 'Plan limit reached', metric: error.metric, limit: error.limit },
+        { status: 402 }
+      );
+    }
     if (error instanceof z.ZodError) {
       return NextResponse.json({ error: 'Invalid payload', details: error.errors }, { status: 400 });
     }

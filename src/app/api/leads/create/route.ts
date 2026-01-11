@@ -4,6 +4,7 @@ import { FieldValue } from 'firebase-admin/firestore';
 import { getAdminDb } from '@/server/firebase-admin';
 import { requireRole, UnauthorizedError, ForbiddenError } from '@/server/auth';
 import { ALL_ROLES } from '@/lib/server/roles';
+import { enforceUsageLimit, PlanLimitError } from '@/lib/server/billing';
 
 const payloadSchema = z.object({
   name: z.string().min(1),
@@ -18,6 +19,7 @@ export async function POST(req: NextRequest) {
     const { tenantId } = await requireRole(req, ALL_ROLES);
 
     const db = getAdminDb();
+    await enforceUsageLimit(db, tenantId, 'leads', 1);
     const leadRef = await db
       .collection('tenants')
       .doc(tenantId)
@@ -38,6 +40,12 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ id: leadRef.id }, { status: 201 });
   } catch (error) {
     console.error('[leads/create] error', error);
+    if (error instanceof PlanLimitError) {
+      return NextResponse.json(
+        { error: 'Plan limit reached', metric: error.metric, limit: error.limit },
+        { status: 402 }
+      );
+    }
     if (error instanceof z.ZodError) {
       return NextResponse.json({ error: 'Invalid payload', details: error.errors }, { status: 400 });
     }

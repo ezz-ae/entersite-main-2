@@ -7,6 +7,7 @@ interface ApiLoggerContext {
   route: string;
   requestId?: string;
   tenantId?: string;
+  userId?: string;
 }
 
 interface LogPayload {
@@ -14,6 +15,7 @@ interface LogPayload {
   route: string;
   requestId: string;
   tenantId?: string;
+  userId?: string;
   method: string;
   message: string;
   status?: number;
@@ -27,6 +29,7 @@ export function createApiLogger(req: NextRequest, context: { route: string }) {
   const requestId = req.headers.get('x-request-id') || randomUUID();
   const method = req.method;
   let tenantId: string | undefined;
+  let userId: string | undefined;
 
   const commit = (payload: Omit<LogPayload, 'route' | 'requestId' | 'method'>) => {
     const body: LogPayload = {
@@ -35,6 +38,7 @@ export function createApiLogger(req: NextRequest, context: { route: string }) {
       requestId,
       method,
       tenantId: tenantId || payload.tenantId,
+      userId: userId || payload.userId,
       message: payload.message,
       status: payload.status,
       durationMs: payload.durationMs,
@@ -48,6 +52,9 @@ export function createApiLogger(req: NextRequest, context: { route: string }) {
     requestId,
     setTenant(id?: string) {
       tenantId = id || tenantId;
+    },
+    setActor(id?: string) {
+      userId = id || userId;
     },
     logSuccess(status: number, metadata?: Record<string, unknown>) {
       commit({

@@ -1,9 +1,10 @@
 import { cert, getApps, initializeApp, ServiceAccount } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
 import { getAuth } from 'firebase-admin/auth';
+import { SERVER_ENV } from '@/lib/server/env';
 
 function getServiceAccount(): ServiceAccount {
-    const serviceAccountString = process.env.FIREBASE_ADMIN_SDK_CONFIG;
+    const serviceAccountString = SERVER_ENV.FIREBASE_ADMIN_SDK_CONFIG;
     if (serviceAccountString) {
         try {
             return JSON.parse(serviceAccountString) as ServiceAccount;
@@ -13,9 +14,9 @@ function getServiceAccount(): ServiceAccount {
         }
     }
 
-    const projectId = process.env.FIREBASE_PROJECT_ID || process.env.project_id;
-    const clientEmail = process.env.FIREBASE_CLIENT_EMAIL || process.env.client_email;
-    const privateKey = process.env.FIREBASE_PRIVATE_KEY || process.env.private_key;
+    const projectId = SERVER_ENV.FIREBASE_PROJECT_ID || SERVER_ENV.project_id;
+    const clientEmail = SERVER_ENV.FIREBASE_CLIENT_EMAIL || SERVER_ENV.client_email;
+    const privateKey = SERVER_ENV.FIREBASE_PRIVATE_KEY || SERVER_ENV.private_key;
 
     if (projectId && clientEmail && privateKey) {
         return {

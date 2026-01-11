@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { requireRole, UnauthorizedError, ForbiddenError } from '@/server/auth';
 import { getAdminDb } from '@/server/firebase-admin';
 import { ALL_ROLES } from '@/lib/server/roles';
+import { enforceRateLimit, getRequestIp } from '@/lib/server/rateLimit';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -10,6 +11,10 @@ export const revalidate = 0;
 export async function GET(req: NextRequest) {
   try {
     const { tenantId } = await requireRole(req, ALL_ROLES);
+    const ip = getRequestIp(req);
+    if (!enforceRateLimit(`ads:campaigns:${tenantId}:${ip}`, 60, 60_000)) {
+      return NextResponse.json({ error: 'Rate limit exceeded' }, { status: 429 });
+    }
     const db = getAdminDb();
     const snapshot = await db
       .collection('tenants')

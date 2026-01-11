@@ -12,7 +12,7 @@ const requestSchema = z.object({
 
 export async function POST(req: NextRequest) {
   try {
-    await requireRole(req, ADMIN_ROLES);
+    const { tenantId } = await requireRole(req, ADMIN_ROLES);
     const payload = requestSchema.parse(await req.json());
 
     const body = {
@@ -24,6 +24,8 @@ export async function POST(req: NextRequest) {
             value: payload.amount,
           },
           reference_id: payload.planId,
+          custom_id: tenantId,
+          invoice_id: `${tenantId}:${Date.now()}`,
         },
       ],
     };

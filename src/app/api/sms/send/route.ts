@@ -5,6 +5,8 @@ import { requireRole, UnauthorizedError, ForbiddenError } from '@/server/auth';
 import { createApiLogger } from '@/lib/logger';
 import { CAP } from '@/lib/capabilities';
 import { ADMIN_ROLES } from '@/lib/server/roles';
+import { enforceUsageLimit, PlanLimitError } from '@/lib/server/billing';
+import { getAdminDb } from '@/server/firebase-admin';
 
 const ACCOUNT_SID = process.env.TWILIO_ACCOUNT_SID;
 const AUTH_TOKEN = process.env.TWILIO_AUTH_TOKEN;
@@ -21,20 +23,22 @@ const payloadSchema = z.object({
 export async function POST(req: NextRequest) {
   const logger = createApiLogger(req, { route: 'POST /api/sms/send' });
   try {
-    const { tenantId } = await requireRole(req, ADMIN_ROLES);
+    const { tenantId, uid } = await requireRole(req, ADMIN_ROLES);
     if (!CAP.twilio || !ACCOUNT_SID || !AUTH_TOKEN || !FROM_NUMBER) {
       logger.logError('Twilio not configured', 500);
       return NextResponse.json({ error: 'Twilio is not configured' }, { status: 500 });
     }
 
     const ip = getRequestIp(req);
-    if (!enforceRateLimit(`sms:${ip}`, RATE_LIMIT_MAX, RATE_LIMIT_WINDOW_MS)) {
+    if (!enforceRateLimit(`sms:send:${tenantId}:${ip}`, RATE_LIMIT_MAX, RATE_LIMIT_WINDOW_MS)) {
       logger.logRateLimit();
       return NextResponse.json({ error: 'Rate limit exceeded' }, { status: 429 });
     }
 
     const payload = payloadSchema.parse(await req.json());
+    await enforceUsageLimit(getAdminDb(), tenantId, 'sms_sends', 1);
     logger.setTenant(tenantId);
+    logger.setActor(uid);
 
     const response = await fetch(`https://api.twilio.com/2010-04-01/Accounts/${ACCOUNT_SID}/Messages.json`, {
       method: 'POST',
@@ -61,6 +65,12 @@ export async function POST(req: NextRequest) {
   } catch (error) {
     console.error('SMS Engine Error:', error);
     logger.logError(error);
+    if (error instanceof PlanLimitError) {
+      return NextResponse.json(
+        { error: 'Plan limit reached', metric: error.metric, limit: error.limit },
+        { status: 402 }
+      );
+    }
     if (error instanceof z.ZodError) {
       return NextResponse.json({ error: error.errors }, { status: 400 });
     }

@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { requireRole, UnauthorizedError, ForbiddenError } from '@/server/auth';
 import { generateCampaignStructure } from '@/lib/ai/marketing-os';
 import { ALL_ROLES } from '@/lib/server/roles';
+import { enforceRateLimit, getRequestIp } from '@/lib/server/rateLimit';
 
 const requestSchema = z.object({
   goal: z.string().min(1),
@@ -74,7 +75,11 @@ function estimatePerformance({
 
 export async function POST(req: NextRequest) {
   try {
-    await requireRole(req, ALL_ROLES);
+    const { tenantId } = await requireRole(req, ALL_ROLES);
+    const ip = getRequestIp(req);
+    if (!enforceRateLimit(`ads:plan:${tenantId}:${ip}`, 20, 60_000)) {
+      return NextResponse.json({ error: 'Rate limit exceeded' }, { status: 429 });
+    }
     const payload = requestSchema.parse(await req.json());
 
     const goal = GOAL_MAP[payload.goal] || 'leads';

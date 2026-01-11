@@ -9,6 +9,7 @@ import { sendLeadSMS } from '@/lib/notifications/sms';
 import { upsertHubspotLead } from '@/lib/integrations/hubspot-leads';
 import { requireRole } from '@/server/auth';
 import { ALL_ROLES } from '@/lib/server/roles';
+import { enforceUsageLimit, PlanLimitError } from '@/lib/server/billing';
 
 const NOTIFY_EMAIL_TO = process.env.NOTIFY_EMAIL_TO;
 const NOTIFY_SMS_TO = process.env.NOTIFY_SMS_TO;
@@ -57,6 +58,8 @@ export async function POST(req: NextRequest) {
     const context = await requireRole(req, ALL_ROLES);
     const tenantId = await resolveTenant(db, payload, context.tenantId);
     const agentEmail = context.email;
+
+    await enforceUsageLimit(db, tenantId, 'leads', 1);
 
     const leadData = {
       tenantId,
@@ -182,6 +185,12 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ id: leadRef.id, tenantId });
   } catch (error) {
     console.error('[leads] capture error', error);
+    if (error instanceof PlanLimitError) {
+      return NextResponse.json(
+        { error: 'Plan limit reached', metric: error.metric, limit: error.limit },
+        { status: 402 }
+      );
+    }
     if (error instanceof z.ZodError) {
       return NextResponse.json({ error: 'Invalid payload', details: error.errors }, { status: 400 });
     }

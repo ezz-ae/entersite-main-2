@@ -6,6 +6,8 @@ import { mainSystemPrompt } from '@/config/prompts';
 import { formatProjectContext, getRelevantProjects } from '@/server/inventory';
 import { requireRole, UnauthorizedError, ForbiddenError } from '@/server/auth';
 import { ALL_ROLES } from '@/lib/server/roles';
+import { enforceUsageLimit, PlanLimitError } from '@/lib/server/billing';
+import { getAdminDb } from '@/server/firebase-admin';
 
 const requestSchema = z.object({
   message: z.string().min(1),
@@ -17,7 +19,8 @@ const requestSchema = z.object({
 
 export async function POST(req: NextRequest) {
   try {
-    await requireRole(req, ALL_ROLES);
+    const { tenantId } = await requireRole(req, ALL_ROLES);
+    await enforceUsageLimit(getAdminDb(), tenantId, 'ai_conversations', 1);
     const body = await req.json();
     const { message, history: incomingHistory } = requestSchema.parse(body);
 
@@ -77,6 +80,12 @@ Agent:
     return NextResponse.json({ reply });
   } catch (error) {
     console.error('[bot/main/chat] error', error);
+    if (error instanceof PlanLimitError) {
+      return NextResponse.json(
+        { reply: 'Plan limit reached', metric: error.metric, limit: error.limit },
+        { status: 402 }
+      );
+    }
     if (error instanceof UnauthorizedError) {
       return NextResponse.json({ reply: "Unauthorized" }, { status: 401 });
     }

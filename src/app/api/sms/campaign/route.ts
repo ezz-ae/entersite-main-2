@@ -4,11 +4,15 @@ import { getAdminDb } from '@/server/firebase-admin';
 import { requireRole, UnauthorizedError, ForbiddenError } from '@/server/auth';
 import { CAP } from '@/lib/capabilities';
 import { ADMIN_ROLES } from '@/lib/server/roles';
+import { enforceRateLimit, getRequestIp } from '@/lib/server/rateLimit';
+import { enforceUsageLimit, PlanLimitError } from '@/lib/server/billing';
 
 const ACCOUNT_SID = process.env.TWILIO_ACCOUNT_SID;
 const AUTH_TOKEN = process.env.TWILIO_AUTH_TOKEN;
 const FROM_NUMBER = process.env.TWILIO_FROM_NUMBER;
 const MAX_RECIPIENTS = 50;
+const RATE_LIMIT_WINDOW_MS = 60_000;
+const RATE_LIMIT_MAX = 5;
 
 const payloadSchema = z.object({
   message: z.string().min(1).max(800),
@@ -20,6 +24,10 @@ export async function POST(req: NextRequest) {
   try {
     const payload = payloadSchema.parse(await req.json());
     const { tenantId } = await requireRole(req, ADMIN_ROLES);
+    const ip = getRequestIp(req);
+    if (!enforceRateLimit(`sms:campaign:${tenantId}:${ip}`, RATE_LIMIT_MAX, RATE_LIMIT_WINDOW_MS)) {
+      return NextResponse.json({ error: 'Rate limit exceeded' }, { status: 429 });
+    }
 
     if (!CAP.twilio || !ACCOUNT_SID || !AUTH_TOKEN || !FROM_NUMBER) {
       return NextResponse.json({ error: 'SMS provider is not configured' }, { status: 500 });
@@ -47,6 +55,8 @@ export async function POST(req: NextRequest) {
     if (!recipients.length) {
       return NextResponse.json({ error: 'No recipients found for this list.' }, { status: 400 });
     }
+
+    await enforceUsageLimit(db, tenantId, 'sms_sends', recipients.length);
 
     let sentCount = 0;
     const failures: string[] = [];
@@ -81,6 +91,12 @@ export async function POST(req: NextRequest) {
       limited: recipients.length >= MAX_RECIPIENTS,
     });
   } catch (error) {
+    if (error instanceof PlanLimitError) {
+      return NextResponse.json(
+        { error: 'Plan limit reached', metric: error.metric, limit: error.limit },
+        { status: 402 }
+      );
+    }
     if (error instanceof z.ZodError) {
       return NextResponse.json({ error: 'Invalid payload', details: error.errors }, { status: 400 });
     }

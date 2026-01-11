@@ -6,6 +6,7 @@ import { getAdminDb } from '@/server/firebase-admin';
 import { formatProjectContext, getRelevantProjects } from '@/server/inventory';
 import { requireRole, UnauthorizedError, ForbiddenError } from '@/server/auth';
 import { ALL_ROLES } from '@/lib/server/roles';
+import { enforceUsageLimit, PlanLimitError } from '@/lib/server/billing';
 
 const requestSchema = z.object({
   message: z.string().min(1),
@@ -38,7 +39,8 @@ function consumeRateLimit(key: string) {
 export async function POST(req: NextRequest, { params: paramsPromise }: { params: Promise<{ botId: string }> }) {
   try {
     const params = await paramsPromise;
-    const { tenantId, uid } = await requireRole(req, ALL_ROLES);
+    const { tenantId } = await requireRole(req, ALL_ROLES);
+    await enforceUsageLimit(getAdminDb(), tenantId, 'ai_conversations', 1);
     const ip = req.headers.get('x-forwarded-for') || 'anon';
     if (!consumeRateLimit(`${params.botId}:${ip}`)) {
       return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
@@ -104,6 +106,12 @@ User (${params.botId}): ${payload.message}
     return NextResponse.json({ reply });
   } catch (error) {
     console.error('[bot/chat] error', error);
+    if (error instanceof PlanLimitError) {
+      return NextResponse.json(
+        { error: 'Plan limit reached', metric: error.metric, limit: error.limit },
+        { status: 402 }
+      );
+    }
     if (error instanceof z.ZodError) {
       return NextResponse.json({ error: error.errors }, { status: 400 });
     }

@@ -4,6 +4,7 @@ import { createGoogleGenerativeAI } from '@ai-sdk/google';
 import { z } from 'zod';
 import { requireRole, UnauthorizedError, ForbiddenError } from '@/server/auth';
 import { ALL_ROLES } from '@/lib/server/roles';
+import { enforceRateLimit, getRequestIp } from '@/lib/server/rateLimit';
 
 const requestSchema = z.object({
   topic: z.string().min(1),
@@ -28,7 +29,11 @@ const clampLength = (value: string, maxChars: number) => {
 
 export async function POST(req: NextRequest) {
   try {
-    await requireRole(req, ALL_ROLES);
+    const { tenantId } = await requireRole(req, ALL_ROLES);
+    const ip = getRequestIp(req);
+    if (!enforceRateLimit(`sms:generate:${tenantId}:${ip}`, 30, 60_000)) {
+      return NextResponse.json({ error: 'Rate limit exceeded' }, { status: 429 });
+    }
     if (!google) {
       return NextResponse.json({ error: 'AI provider is not configured' }, { status: 500 });
     }

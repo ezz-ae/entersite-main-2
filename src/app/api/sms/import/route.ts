@@ -9,10 +9,15 @@ import { FieldValue } from 'firebase-admin/firestore';
 import { getAdminDb } from '@/server/firebase-admin';
 import { requireRole, UnauthorizedError, ForbiddenError } from '@/server/auth';
 import { ADMIN_ROLES } from '@/lib/server/roles';
+import { enforceRateLimit, getRequestIp } from '@/lib/server/rateLimit';
 
 export async function POST(req: NextRequest) {
   try {
     const { tenantId } = await requireRole(req, ADMIN_ROLES);
+    const ip = getRequestIp(req);
+    if (!enforceRateLimit(`sms:import:${tenantId}:${ip}`, 5, 60_000)) {
+      return NextResponse.json({ error: 'Rate limit exceeded' }, { status: 429 });
+    }
     const formData = await req.formData();
     const file = formData.get('file') as File | null;
 
