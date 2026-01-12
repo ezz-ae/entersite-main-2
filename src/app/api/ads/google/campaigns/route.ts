@@ -12,7 +12,7 @@ export async function GET(req: NextRequest) {
   try {
     const { tenantId } = await requireRole(req, ALL_ROLES);
     const ip = getRequestIp(req);
-    if (!enforceRateLimit(`ads:campaigns:${tenantId}:${ip}`, 60, 60_000)) {
+    if (!(await enforceRateLimit(`ads:campaigns:${tenantId}:${ip}`, 60, 60_000))) {
       return NextResponse.json({ error: 'Rate limit exceeded' }, { status: 429 });
     }
     const db = getAdminDb();

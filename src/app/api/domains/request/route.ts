@@ -6,6 +6,11 @@ import { getAdminDb } from '@/server/firebase-admin';
 import { CAP } from '@/lib/capabilities';
 import { resend, fromEmail } from '@/lib/resend';
 import { ADMIN_ROLES } from '@/lib/server/roles';
+import {
+  checkUsageLimit,
+  PlanLimitError,
+  planLimitErrorResponse,
+} from '@/lib/server/billing';
 
 const DOMAIN_REQUEST_EMAIL = process.env.DOMAIN_REQUEST_EMAIL;
 
@@ -22,6 +27,7 @@ export async function POST(req: NextRequest) {
     const payload = payloadSchema.parse(await req.json());
     const { tenantId, uid, email } = await requireRole(req, ADMIN_ROLES);
     const normalizedDomain = normalizeDomain(payload.domain);
+    await checkUsageLimit(getAdminDb(), tenantId, 'domains');
 
     const db = getAdminDb();
     if (payload.siteId) {
@@ -79,6 +85,9 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ success: true, requestId: requestRef.id });
   } catch (error) {
     console.error('[domains/request] error', error);
+    if (error instanceof PlanLimitError) {
+      return NextResponse.json(planLimitErrorResponse(error), { status: 402 });
+    }
     if (error instanceof z.ZodError) {
       return NextResponse.json({ error: 'Invalid payload', details: error.errors }, { status: 400 });
     }

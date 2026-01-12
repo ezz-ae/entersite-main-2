@@ -4,7 +4,11 @@ import { FieldValue } from 'firebase-admin/firestore';
 import { getAdminDb } from '@/server/firebase-admin';
 import { requireRole, UnauthorizedError, ForbiddenError } from '@/server/auth';
 import { ALL_ROLES } from '@/lib/server/roles';
-import { enforceUsageLimit, PlanLimitError } from '@/lib/server/billing';
+import {
+  enforceUsageLimit,
+  PlanLimitError,
+  planLimitErrorResponse,
+} from '@/lib/server/billing';
 
 const payloadSchema = z.object({
   name: z.string().min(1),
@@ -41,10 +45,7 @@ export async function POST(req: NextRequest) {
   } catch (error) {
     console.error('[leads/create] error', error);
     if (error instanceof PlanLimitError) {
-      return NextResponse.json(
-        { error: 'Plan limit reached', metric: error.metric, limit: error.limit },
-        { status: 402 }
-      );
+      return NextResponse.json(planLimitErrorResponse(error), { status: 402 });
     }
     if (error instanceof z.ZodError) {
       return NextResponse.json({ error: 'Invalid payload', details: error.errors }, { status: 400 });

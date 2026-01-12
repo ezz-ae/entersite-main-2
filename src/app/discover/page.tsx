@@ -59,7 +59,7 @@ export default function DiscoverPage() {
       url.searchParams.set('page', String(pageParam));
       url.searchParams.set('limit', String(PROJECTS_PER_PAGE));
 
-      const res = await fetch(url.toString());
+      const res = await fetch(url.toString(), { cache: 'no-store' });
       if (!res.ok) throw new Error('Failed to fetch projects');
       const json = await res.json();
       

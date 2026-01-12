@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { loadInventoryProjectById } from '@/server/inventory';
-import { requireRole, UnauthorizedError, ForbiddenError } from '@/server/auth';
-import { ALL_ROLES } from '@/lib/server/roles';
+import { enforceRateLimit, getRequestIp } from '@/lib/server/rateLimit';
 
 export async function GET(
   req: NextRequest,
   { params: paramsPromise }: { params: Promise<{ projectId: string }> }
 ) {
+  // Public read-only inventory detail; no auth or tenant writes allowed.
   const params = await paramsPromise;
   const projectId = params?.projectId;
   if (!projectId) {
@@ -14,7 +14,10 @@ export async function GET(
   }
 
   try {
-    await requireRole(req, ALL_ROLES);
+    const ip = getRequestIp(req);
+    if (!(await enforceRateLimit(`projects:detail:${ip}`, 120, 60_000))) {
+      return NextResponse.json({ message: 'Rate limit exceeded' }, { status: 429 });
+    }
     const project = await loadInventoryProjectById(projectId);
     if (!project) {
       return NextResponse.json({ message: 'Project not found.' }, { status: 404 });
@@ -23,12 +26,6 @@ export async function GET(
     return NextResponse.json({ data: project });
   } catch (error) {
     console.error('[projects/:projectId] failed to load project', error);
-    if (error instanceof UnauthorizedError) {
-      return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
-    }
-    if (error instanceof ForbiddenError) {
-      return NextResponse.json({ message: 'Forbidden' }, { status: 403 });
-    }
     return NextResponse.json(
       { message: 'Could not load project right now. Please try again.' },
       { status: 500 }

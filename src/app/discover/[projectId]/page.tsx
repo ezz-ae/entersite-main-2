@@ -52,7 +52,7 @@ const ProjectDetailPage: NextPage = () => {
       try {
         const resolvedId = Array.isArray(projectId) ? projectId[0] : projectId;
         const encodedId = encodeURIComponent(resolvedId);
-        const res = await fetch(`/api/projects/${encodedId}`);
+        const res = await fetch(`/api/projects/${encodedId}`, { cache: 'no-store' });
         if (!res.ok) {
           setProject(null);
           return;

@@ -5,7 +5,12 @@ import { requireRole, UnauthorizedError, ForbiddenError } from '@/server/auth';
 import { createApiLogger } from '@/lib/logger';
 import { CAP } from '@/lib/capabilities';
 import { ADMIN_ROLES } from '@/lib/server/roles';
-import { enforceUsageLimit, PlanLimitError } from '@/lib/server/billing';
+import {
+  checkUsageLimit,
+  enforceUsageLimit,
+  PlanLimitError,
+  planLimitErrorResponse,
+} from '@/lib/server/billing';
 import { getAdminDb } from '@/server/firebase-admin';
 
 const ACCOUNT_SID = process.env.TWILIO_ACCOUNT_SID;
@@ -30,13 +35,14 @@ export async function POST(req: NextRequest) {
     }
 
     const ip = getRequestIp(req);
-    if (!enforceRateLimit(`sms:send:${tenantId}:${ip}`, RATE_LIMIT_MAX, RATE_LIMIT_WINDOW_MS)) {
+    if (!(await enforceRateLimit(`sms:send:${tenantId}:${ip}`, RATE_LIMIT_MAX, RATE_LIMIT_WINDOW_MS))) {
       logger.logRateLimit();
       return NextResponse.json({ error: 'Rate limit exceeded' }, { status: 429 });
     }
 
     const payload = payloadSchema.parse(await req.json());
-    await enforceUsageLimit(getAdminDb(), tenantId, 'sms_sends', 1);
+    const db = getAdminDb();
+    await checkUsageLimit(db, tenantId, 'sms_sends');
     logger.setTenant(tenantId);
     logger.setActor(uid);
 
@@ -60,16 +66,20 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Twilio send failed', details: data }, { status: 500 });
     }
 
+    try {
+      await enforceUsageLimit(db, tenantId, 'sms_sends', 1);
+    } catch (usageError) {
+      // SMS already sent; log and continue without failing the request.
+      logger.logError(usageError, 200, { metric: 'sms_sends' });
+    }
+
     logger.logSuccess(200, { to: payload.to });
     return NextResponse.json({ success: true, data });
   } catch (error) {
     console.error('SMS Engine Error:', error);
     logger.logError(error);
     if (error instanceof PlanLimitError) {
-      return NextResponse.json(
-        { error: 'Plan limit reached', metric: error.metric, limit: error.limit },
-        { status: 402 }
-      );
+      return NextResponse.json(planLimitErrorResponse(error), { status: 402 });
     }
     if (error instanceof z.ZodError) {
       return NextResponse.json({ error: error.errors }, { status: 400 });

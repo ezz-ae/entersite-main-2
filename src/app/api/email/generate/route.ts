@@ -23,8 +23,8 @@ export async function POST(req: NextRequest) {
     try {
         const { tenantId } = await requireRole(req, ALL_ROLES);
         const ip = getRequestIp(req);
-        if (!enforceRateLimit(`email:generate:${tenantId}:${ip}`, 20, 60_000)) {
-            return NextResponse.json({ error: 'Rate limit exceeded' }, { status: 429 });
+        if (!(await enforceRateLimit(`email:generate:${tenantId}:${ip}`, 20, 60_000))) {
+          return NextResponse.json({ error: 'Rate limit exceeded' }, { status: 429 });
         }
         const { topic, context } = await req.json();
 

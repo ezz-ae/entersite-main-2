@@ -6,7 +6,11 @@ import { mainSystemPrompt } from '@/config/prompts';
 import { formatProjectContext, getRelevantProjects } from '@/server/inventory';
 import { requireRole, UnauthorizedError, ForbiddenError } from '@/server/auth';
 import { ALL_ROLES } from '@/lib/server/roles';
-import { enforceUsageLimit, PlanLimitError } from '@/lib/server/billing';
+import {
+  enforceUsageLimit,
+  PlanLimitError,
+  planLimitErrorResponse,
+} from '@/lib/server/billing';
 import { getAdminDb } from '@/server/firebase-admin';
 
 const requestSchema = z.object({
@@ -82,8 +86,8 @@ Agent:
     console.error('[bot/main/chat] error', error);
     if (error instanceof PlanLimitError) {
       return NextResponse.json(
-        { reply: 'Plan limit reached', metric: error.metric, limit: error.limit },
-        { status: 402 }
+        { reply: 'Plan limit reached', error: planLimitErrorResponse(error) },
+        { status: 402 },
       );
     }
     if (error instanceof UnauthorizedError) {

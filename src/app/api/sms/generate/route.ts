@@ -31,7 +31,7 @@ export async function POST(req: NextRequest) {
   try {
     const { tenantId } = await requireRole(req, ALL_ROLES);
     const ip = getRequestIp(req);
-    if (!enforceRateLimit(`sms:generate:${tenantId}:${ip}`, 30, 60_000)) {
+    if (!(await enforceRateLimit(`sms:generate:${tenantId}:${ip}`, 30, 60_000))) {
       return NextResponse.json({ error: 'Rate limit exceeded' }, { status: 429 });
     }
     if (!google) {

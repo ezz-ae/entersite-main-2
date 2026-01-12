@@ -6,7 +6,11 @@ import { getAdminDb } from '@/server/firebase-admin';
 import { formatProjectContext, getRelevantProjects } from '@/server/inventory';
 import { requireRole, UnauthorizedError, ForbiddenError } from '@/server/auth';
 import { ALL_ROLES } from '@/lib/server/roles';
-import { enforceUsageLimit, PlanLimitError } from '@/lib/server/billing';
+import {
+  enforceUsageLimit,
+  PlanLimitError,
+  planLimitErrorResponse,
+} from '@/lib/server/billing';
 
 const requestSchema = z.object({
   message: z.string().min(1),
@@ -108,8 +112,8 @@ User (${params.botId}): ${payload.message}
     console.error('[bot/chat] error', error);
     if (error instanceof PlanLimitError) {
       return NextResponse.json(
-        { error: 'Plan limit reached', metric: error.metric, limit: error.limit },
-        { status: 402 }
+        { reply: 'Plan limit reached', error: planLimitErrorResponse(error) },
+        { status: 402 },
       );
     }
     if (error instanceof z.ZodError) {

@@ -3,10 +3,7 @@ import { generateText } from 'ai';
 import { z } from 'zod';
 import { getGoogleModel, FLASH_MODEL } from '@/lib/ai/google';
 import { formatProjectContext, getRelevantProjects } from '@/server/inventory';
-import { requireRole, UnauthorizedError, ForbiddenError } from '@/server/auth';
-import { ALL_ROLES } from '@/lib/server/roles';
-import { enforceUsageLimit, PlanLimitError } from '@/lib/server/billing';
-import { getAdminDb } from '@/server/firebase-admin';
+import { enforceRateLimit, getRequestIp } from '@/lib/server/rateLimit';
 
 const requestSchema = z.object({
   message: z.string().min(1),
@@ -22,27 +19,18 @@ const requestSchema = z.object({
 });
 
 export async function POST(req: NextRequest) {
+  // Public marketing preview: no auth, no persistence, strict rate limiting.
   let payload: z.infer<typeof requestSchema> | null = null;
   try {
-    const { tenantId } = await requireRole(req, ALL_ROLES);
-    await enforceUsageLimit(getAdminDb(), tenantId, 'ai_conversations', 1);
+    const ip = getRequestIp(req);
+    if (!(await enforceRateLimit(`bot:preview:${ip}`, 20, 60_000))) {
+      return NextResponse.json({ reply: 'Rate limit exceeded' }, { status: 429 });
+    }
     const body = await req.json();
     payload = requestSchema.parse(body);
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json({ reply: 'Invalid request payload.', error: error.errors }, { status: 400 });
-    }
-    if (error instanceof PlanLimitError) {
-      return NextResponse.json(
-        { reply: 'Plan limit reached', metric: error.metric, limit: error.limit },
-        { status: 402 }
-      );
-    }
-    if (error instanceof UnauthorizedError) {
-      return NextResponse.json({ reply: 'Unauthorized' }, { status: 401 });
-    }
-    if (error instanceof ForbiddenError) {
-      return NextResponse.json({ reply: 'Forbidden' }, { status: 403 });
     }
     return NextResponse.json({ reply: 'Invalid request payload.' }, { status: 400 });
   }

@@ -5,8 +5,8 @@
 
 export interface PayPalOrderRequest {
     planId?: string;
-    amount: string;
-    currency: string;
+    sku?: string;
+    currency?: string;
 }
 
 import { authorizedFetch } from './auth-fetch';

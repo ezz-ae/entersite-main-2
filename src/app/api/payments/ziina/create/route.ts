@@ -2,25 +2,35 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { requireRole, UnauthorizedError, ForbiddenError } from '@/server/auth';
 import { ADMIN_ROLES } from '@/lib/server/roles';
+import { BILLING_SKUS, resolveBillingSku } from '@/lib/server/billing';
 
 const API_KEY = process.env.ZIINA_API_KEY;
 const BASE_URL = process.env.ZIINA_BASE_URL || 'https://api.sandbox.ziina.com';
 
 const requestSchema = z.object({
-  amount: z.number().positive(),
+  planId: z.string().optional(),
+  sku: z.string().optional(),
   currency: z.string().length(3).default('AED'),
-  description: z.string().default('Charge'),
   returnUrl: z.string().url().optional(),
 });
 
 export async function POST(req: NextRequest) {
   try {
-    await requireRole(req, ADMIN_ROLES);
+    const { tenantId } = await requireRole(req, ADMIN_ROLES);
     if (!API_KEY) {
       return NextResponse.json({ error: 'Ziina is not configured' }, { status: 500 });
     }
 
     const payload = requestSchema.parse(await req.json());
+    const sku = resolveBillingSku(payload.sku || payload.planId);
+    if (!sku || !BILLING_SKUS[sku]) {
+      return NextResponse.json({ error: 'Unknown billing SKU' }, { status: 400 });
+    }
+    const skuInfo = BILLING_SKUS[sku];
+    if (sku === 'agency_os') {
+      return NextResponse.json({ error: 'Agency OS is sold manually' }, { status: 400 });
+    }
+    const amountAed = skuInfo.priceAed;
 
     const response = await fetch(`${BASE_URL}/v1/charges`, {
       method: 'POST',
@@ -29,10 +39,15 @@ export async function POST(req: NextRequest) {
         Authorization: `Bearer ${API_KEY}`,
       },
       body: JSON.stringify({
-        amount: Math.round(payload.amount * 100),
+        amount: Math.round(amountAed * 100),
         currency: payload.currency.toUpperCase(),
-        description: payload.description,
-        return_url: payload.returnUrl || 'https://entrestate.com/payment-complete',
+        description: skuInfo.label,
+        return_url: payload.returnUrl || 'https://entrestate.com/dashboard/billing?payment=success',
+        metadata: {
+          tenantId,
+          sku,
+          plan: skuInfo.plan || null,
+        },
       }),
     });
 

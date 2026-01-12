@@ -4,6 +4,12 @@ import { requireRole, UnauthorizedError, ForbiddenError } from '@/server/auth';
 import { getAdminDb } from '@/server/firebase-admin';
 import { CAP } from '@/lib/capabilities';
 import { ADMIN_ROLES } from '@/lib/server/roles';
+import {
+  checkUsageLimit,
+  enforceUsageLimit,
+  PlanLimitError,
+  planLimitErrorResponse,
+} from '@/lib/server/billing';
 
 const VERCEL_TOKEN = process.env.VERCEL_API_TOKEN;
 const PROJECT_ID = process.env.VERCEL_PROJECT_ID;
@@ -25,6 +31,7 @@ export async function POST(req: NextRequest) {
 
     const { domain, siteId } = requestSchema.parse(await req.json());
     const normalizedDomain = normalizeDomain(domain);
+    await checkUsageLimit(getAdminDb(), tenantId, 'domains');
 
     const response = await fetch(`https://api.vercel.com/v9/projects/${PROJECT_ID}/domains${TEAM_ID ? `?teamId=${TEAM_ID}` : ''}`, {
       method: 'POST',
@@ -65,6 +72,8 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    await enforceUsageLimit(getAdminDb(), tenantId, 'domains', 1);
+
     return NextResponse.json({
       success: true,
       status: 'pending_verification',
@@ -76,6 +85,9 @@ export async function POST(req: NextRequest) {
     });
   } catch (error) {
     console.error('Domain connection error:', error);
+    if (error instanceof PlanLimitError) {
+      return NextResponse.json(planLimitErrorResponse(error), { status: 402 });
+    }
     if (error instanceof z.ZodError) {
       return NextResponse.json({ error: error.errors }, { status: 400 });
     }

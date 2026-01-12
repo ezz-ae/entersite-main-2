@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { filterProjects, paginateProjects } from '@/lib/projects/filter';
 import { loadInventoryProjects } from '@/server/inventory';
-import { requireRole, UnauthorizedError, ForbiddenError } from '@/server/auth';
-import { ALL_ROLES } from '@/lib/server/roles';
+import { enforceRateLimit, getRequestIp } from '@/lib/server/rateLimit';
 
 const MAX_DATA_LOAD = 8000;
 
@@ -25,13 +24,17 @@ function parseFilters(searchParams: URLSearchParams) {
 }
 
 export async function GET(req: NextRequest) {
+  // Public read-only inventory search; no auth or tenant writes allowed.
   const { searchParams } = new URL(req.url);
   const filters = parseFilters(searchParams);
 
   console.log("[projects/search] Incoming Request:", filters);
 
   try {
-    await requireRole(req, ALL_ROLES);
+    const ip = getRequestIp(req);
+    if (!(await enforceRateLimit(`projects:search:${ip}`, 120, 60_000))) {
+      return NextResponse.json({ message: 'Rate limit exceeded' }, { status: 429 });
+    }
     const source = await loadInventoryProjects(MAX_DATA_LOAD);
     
     if (!source.length) {
@@ -53,12 +56,6 @@ export async function GET(req: NextRequest) {
     });
   } catch (error: any) {
     console.error('[projects/search] Critical Database Error:', error.message);
-    if (error instanceof UnauthorizedError) {
-      return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
-    }
-    if (error instanceof ForbiddenError) {
-      return NextResponse.json({ message: 'Forbidden' }, { status: 403 });
-    }
     return NextResponse.json(
         { message: 'Could not load projects right now. Please try again.' },
         { status: 500 }

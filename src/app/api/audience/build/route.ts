@@ -4,6 +4,11 @@ import { FieldValue } from 'firebase-admin/firestore';
 import { getAdminDb } from '@/server/firebase-admin';
 import { requireRole, UnauthorizedError, ForbiddenError } from '@/server/auth';
 import { ADMIN_ROLES } from '@/lib/server/roles';
+import {
+  FeatureAccessError,
+  featureAccessErrorResponse,
+  requirePlanFeature,
+} from '@/lib/server/billing';
 
 const payloadSchema = z.object({
   listType: z.enum(['imported', 'pilot']).default('imported'),
@@ -19,6 +24,9 @@ export async function POST(req: NextRequest) {
     const { tenantId } = await requireRole(req, ADMIN_ROLES);
 
     const db = getAdminDb();
+    if (payload.listType === 'imported') {
+      await requirePlanFeature(db, tenantId, 'meta_custom_audiences');
+    }
     const requestRef = db
       .collection('tenants')
       .doc(tenantId)
@@ -43,6 +51,9 @@ export async function POST(req: NextRequest) {
     console.error('[audience/build] error', error);
     if (error instanceof z.ZodError) {
       return NextResponse.json({ error: 'Invalid payload', details: error.errors }, { status: 400 });
+    }
+    if (error instanceof FeatureAccessError) {
+      return NextResponse.json(featureAccessErrorResponse(error), { status: 403 });
     }
     if (error instanceof UnauthorizedError) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

@@ -6,6 +6,13 @@ import { requireRole, UnauthorizedError, ForbiddenError } from '@/server/auth';
 import { CAP } from '@/lib/capabilities';
 import { resend, fromEmail } from '@/lib/resend';
 import { ADMIN_ROLES } from '@/lib/server/roles';
+import {
+  PlanLimitError,
+  ensureSubscription,
+  getEffectiveLimit,
+  getSuggestedUpgrade,
+  planLimitErrorResponse,
+} from '@/lib/server/billing';
 
 const payloadSchema = z.object({
   email: z.string().email(),
@@ -45,6 +52,32 @@ export async function POST(req: NextRequest) {
     const { tenantId, email: inviterEmail, uid } = await requireRole(req, ADMIN_ROLES);
 
     const db = getAdminDb();
+    const subscription = await ensureSubscription(db, tenantId);
+    const seatLimit = getEffectiveLimit(subscription.plan, 'seats', subscription.addOns);
+
+    if (seatLimit !== null) {
+      const [membersSnap, invitesSnap] = await Promise.all([
+        db.collection('tenants').doc(tenantId).collection('members').get(),
+        db
+          .collection('tenants')
+          .doc(tenantId)
+          .collection('teamInvites')
+          .where('status', '==', 'pending')
+          .get(),
+      ]);
+      const baseSeats = Math.max(1, membersSnap.size + 1);
+      const seatsUsed = baseSeats + invitesSnap.size;
+      if (seatsUsed + 1 > seatLimit) {
+        throw new PlanLimitError({
+          metric: 'seats',
+          limit: seatLimit,
+          currentUsage: seatsUsed,
+          plan: subscription.plan,
+          status: subscription.status,
+          suggestedUpgrade: getSuggestedUpgrade(subscription.plan),
+        });
+      }
+    }
     const inviteRef = db
       .collection('tenants')
       .doc(tenantId)
@@ -80,6 +113,9 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ success: true, invite: { id: inviteRef.id, ...inviteData } });
   } catch (error) {
     console.error('[team/invites] error', error);
+    if (error instanceof PlanLimitError) {
+      return NextResponse.json(planLimitErrorResponse(error), { status: 402 });
+    }
     if (error instanceof z.ZodError) {
       return NextResponse.json({ error: 'Invalid payload', details: error.errors }, { status: 400 });
     }

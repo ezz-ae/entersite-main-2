@@ -1,5 +1,6 @@
 import { NextRequest } from 'next/server';
 import { randomUUID } from 'crypto';
+import * as Sentry from '@sentry/nextjs';
 
 export type ApiLogLevel = 'info' | 'error';
 
@@ -14,10 +15,12 @@ interface LogPayload {
   level: ApiLogLevel;
   route: string;
   requestId: string;
+  timestamp: string;
   tenantId?: string;
   userId?: string;
   method: string;
   message: string;
+  outcome: 'success' | 'failure' | 'rate_limited';
   status?: number;
   durationMs?: number;
   error?: string;
@@ -36,10 +39,12 @@ export function createApiLogger(req: NextRequest, context: { route: string }) {
       level: payload.level,
       route: context.route,
       requestId,
+      timestamp: new Date().toISOString(),
       method,
       tenantId: tenantId || payload.tenantId,
       userId: userId || payload.userId,
       message: payload.message,
+      outcome: payload.outcome,
       status: payload.status,
       durationMs: payload.durationMs,
       error: payload.error,
@@ -60,6 +65,7 @@ export function createApiLogger(req: NextRequest, context: { route: string }) {
       commit({
         level: 'info',
         message: 'api.success',
+        outcome: 'success',
         status,
         durationMs: Date.now() - start,
         metadata,
@@ -72,9 +78,21 @@ export function createApiLogger(req: NextRequest, context: { route: string }) {
           : error instanceof Error
           ? error.message
           : 'Unknown error';
+      Sentry.captureException(error, {
+        tags: {
+          route: context.route,
+          tenantId: tenantId || undefined,
+        },
+        extra: {
+          requestId,
+          status,
+          metadata,
+        },
+      });
       commit({
         level: 'error',
         message: 'api.error',
+        outcome: 'failure',
         status,
         durationMs: Date.now() - start,
         error: message,
@@ -85,6 +103,7 @@ export function createApiLogger(req: NextRequest, context: { route: string }) {
       commit({
         level: 'error',
         message: 'api.rate_limited',
+        outcome: 'rate_limited',
         status: 429,
         durationMs: Date.now() - start,
       });

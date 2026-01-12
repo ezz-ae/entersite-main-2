@@ -1,17 +1,17 @@
-import { 
-  collection, 
-  doc, 
-  setDoc, 
-  addDoc, 
-  getDoc, 
-  onSnapshot, 
-  serverTimestamp, 
-  query, 
-  where, 
-  getDocs 
+import {
+  collection,
+  doc,
+  addDoc,
+  onSnapshot,
+  serverTimestamp,
+  query,
+  where,
+  getDocs,
+  setDoc,
 } from 'firebase/firestore';
 import { db } from '@/firebase';
 import type { SitePage } from './types';
+import { authorizedFetch } from '@/lib/auth-fetch';
 
 // --- Types ---
 
@@ -37,19 +37,17 @@ export interface UserProfile {
 // --- Site Operations ---
 
 export const saveSite = async (ownerUid: string, site: SitePage) => {
-  const siteRef = doc(collection(db, 'sites'));
-  const siteId = site.id || siteRef.id;
-  
-  await setDoc(doc(db, 'sites', siteId), {
-    ...site,
-    ownerUid,
-    tenantId: site.tenantId || ownerUid,
-    id: siteId,
-    updatedAt: serverTimestamp(),
-    createdAt: site.createdAt || serverTimestamp(),
-  }, { merge: true });
-
-  return siteId;
+  const response = await authorizedFetch('/api/sites', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ site }),
+  });
+  if (!response.ok) {
+    const data = await response.json().catch(() => null);
+    throw new Error(data?.error || 'Failed to save site');
+  }
+  const data = await response.json();
+  return data.siteId as string;
 };
 
 export const updateSiteMetadata = async (siteId: string, data: Partial<SitePage>) => {

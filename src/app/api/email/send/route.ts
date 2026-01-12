@@ -8,7 +8,12 @@ import { createApiLogger } from '@/lib/logger';
 import { CAP } from '@/lib/capabilities';
 import { resend, fromEmail } from '@/lib/resend';
 import { ADMIN_ROLES } from '@/lib/server/roles';
-import { enforceUsageLimit, PlanLimitError } from '@/lib/server/billing';
+import {
+  checkUsageLimit,
+  enforceUsageLimit,
+  PlanLimitError,
+  planLimitErrorResponse,
+} from '@/lib/server/billing';
 import { getAdminDb } from '@/server/firebase-admin';
 
 const RATE_LIMIT_WINDOW_MS = 60_000;
@@ -30,13 +35,14 @@ export async function POST(req: NextRequest) {
     }
 
     const ip = getRequestIp(req);
-    if (!enforceRateLimit(`email:send:${tenantId}:${ip}`, RATE_LIMIT_MAX, RATE_LIMIT_WINDOW_MS)) {
+    if (!(await enforceRateLimit(`email:send:${tenantId}:${ip}`, RATE_LIMIT_MAX, RATE_LIMIT_WINDOW_MS))) {
       logger.logRateLimit();
       return NextResponse.json({ error: 'Rate limit exceeded' }, { status: 429 });
     }
 
     const payload = payloadSchema.parse(await req.json());
-    await enforceUsageLimit(getAdminDb(), tenantId, 'email_sends', 1);
+    const db = getAdminDb();
+    await checkUsageLimit(db, tenantId, 'email_sends');
     logger.setTenant(tenantId);
     logger.setActor(uid);
 
@@ -51,6 +57,13 @@ export async function POST(req: NextRequest) {
       logger.logError(new Error(error.message), 500, { provider: 'resend', details: error });
       return NextResponse.json({ error: 'Failed to send email', details: error }, { status: 500 });
     }
+
+    try {
+      await enforceUsageLimit(db, tenantId, 'email_sends', 1);
+    } catch (usageError) {
+      // Email already sent; log and continue without failing the request.
+      logger.logError(usageError, 200, { metric: 'email_sends' });
+    }
     
     logger.logSuccess(200, { to: payload.to, resend_id: data?.id });
     return NextResponse.json({ success: true, messageId: data?.id });
@@ -58,10 +71,7 @@ export async function POST(req: NextRequest) {
   } catch (error: any) {
     if (error instanceof PlanLimitError) {
       logger.logError(error, 402, { metric: error.metric, limit: error.limit });
-      return NextResponse.json(
-        { error: 'Plan limit reached', metric: error.metric, limit: error.limit },
-        { status: 402 }
-      );
+      return NextResponse.json(planLimitErrorResponse(error), { status: 402 });
     }
     if (error instanceof z.ZodError) {
       logger.logError(error, 400, { validation_errors: error.errors })

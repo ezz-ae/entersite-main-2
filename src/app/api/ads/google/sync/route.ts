@@ -7,7 +7,14 @@ import { CAP } from '@/lib/capabilities';
 import { resend, fromEmail } from '@/lib/resend';
 import { ADMIN_ROLES } from '@/lib/server/roles';
 import { enforceRateLimit, getRequestIp } from '@/lib/server/rateLimit';
-import { enforceUsageLimit, PlanLimitError } from '@/lib/server/billing';
+import {
+  enforceUsageLimit,
+  FeatureAccessError,
+  PlanLimitError,
+  featureAccessErrorResponse,
+  planLimitErrorResponse,
+  requirePlanFeature,
+} from '@/lib/server/billing';
 
 const requestSchema = z.object({
   name: z.string().min(1),
@@ -40,10 +47,12 @@ export async function POST(req: NextRequest) {
     try {
         const { tenantId, email, uid } = await requireRole(req, ADMIN_ROLES);
         const ip = getRequestIp(req);
-        if (!enforceRateLimit(`ads:sync:${tenantId}:${ip}`, 5, 60_000)) {
+        if (!(await enforceRateLimit(`ads:sync:${tenantId}:${ip}`, 5, 60_000))) {
           return NextResponse.json({ error: 'Rate limit exceeded' }, { status: 429 });
         }
         const body = requestSchema.parse(await req.json());
+        const db = getAdminDb();
+        await requirePlanFeature(db, tenantId, 'google_ads');
         
         // This would implement the Google Ads API OAuth flow and mutate the campaign.
         // We simulate a successful sync for the OS interface.
@@ -57,7 +66,6 @@ export async function POST(req: NextRequest) {
         };
 
         try {
-            const db = getAdminDb();
             await enforceUsageLimit(db, tenantId, 'campaigns', 1);
             const campaignsRef = db
               .collection('tenants')
@@ -142,10 +150,10 @@ export async function POST(req: NextRequest) {
         return NextResponse.json(responsePayload);
     } catch (error) {
         if (error instanceof PlanLimitError) {
-            return NextResponse.json(
-              { error: 'Plan limit reached', metric: error.metric, limit: error.limit },
-              { status: 402 }
-            );
+            return NextResponse.json(planLimitErrorResponse(error), { status: 402 });
+        }
+        if (error instanceof FeatureAccessError) {
+            return NextResponse.json(featureAccessErrorResponse(error), { status: 403 });
         }
         if (error instanceof z.ZodError) {
             return NextResponse.json({ error: error.errors }, { status: 400 });

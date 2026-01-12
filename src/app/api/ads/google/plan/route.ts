@@ -4,6 +4,12 @@ import { requireRole, UnauthorizedError, ForbiddenError } from '@/server/auth';
 import { generateCampaignStructure } from '@/lib/ai/marketing-os';
 import { ALL_ROLES } from '@/lib/server/roles';
 import { enforceRateLimit, getRequestIp } from '@/lib/server/rateLimit';
+import {
+  FeatureAccessError,
+  featureAccessErrorResponse,
+  requirePlanFeature,
+} from '@/lib/server/billing';
+import { getAdminDb } from '@/server/firebase-admin';
 
 const requestSchema = z.object({
   goal: z.string().min(1),
@@ -77,10 +83,11 @@ export async function POST(req: NextRequest) {
   try {
     const { tenantId } = await requireRole(req, ALL_ROLES);
     const ip = getRequestIp(req);
-    if (!enforceRateLimit(`ads:plan:${tenantId}:${ip}`, 20, 60_000)) {
+    if (!(await enforceRateLimit(`ads:plan:${tenantId}:${ip}`, 20, 60_000))) {
       return NextResponse.json({ error: 'Rate limit exceeded' }, { status: 429 });
     }
     const payload = requestSchema.parse(await req.json());
+    await requirePlanFeature(getAdminDb(), tenantId, 'google_ads');
 
     const goal = GOAL_MAP[payload.goal] || 'leads';
     const siteUrl = payload.landingPage || 'https://entrestate.com';
@@ -142,6 +149,9 @@ export async function POST(req: NextRequest) {
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json({ error: 'Invalid payload', details: error.errors }, { status: 400 });
+    }
+    if (error instanceof FeatureAccessError) {
+      return NextResponse.json(featureAccessErrorResponse(error), { status: 403 });
     }
     if (error instanceof UnauthorizedError) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

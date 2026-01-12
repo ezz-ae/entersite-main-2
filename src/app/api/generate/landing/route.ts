@@ -4,7 +4,11 @@ import { generateSiteStructure } from '@/lib/ai/vertex-service';
 import { getAdminDb } from '@/server/firebase-admin';
 import { requireRole, UnauthorizedError, ForbiddenError } from '@/server/auth';
 import { ALL_ROLES } from '@/lib/server/roles';
-import { enforceUsageLimit, PlanLimitError } from '@/lib/server/billing';
+import {
+  enforceUsageLimit,
+  PlanLimitError,
+  planLimitErrorResponse,
+} from '@/lib/server/billing';
 import { SitePage, Block } from '@/lib/types';
 
 export async function POST(req: NextRequest) {
@@ -58,8 +62,8 @@ export async function POST(req: NextRequest) {
 
         if (error instanceof PlanLimitError) {
             return NextResponse.json(
-                { error: 'Plan limit reached', metric: error.metric, limit: error.limit },
-                { status: 402 }
+                planLimitErrorResponse(error),
+                { status: 402 },
             );
         }
         if (error instanceof UnauthorizedError) {

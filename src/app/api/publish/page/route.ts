@@ -4,6 +4,12 @@ import { FieldValue } from 'firebase-admin/firestore';
 import { getAdminDb } from '@/server/firebase-admin';
 import { requireRole, UnauthorizedError, ForbiddenError } from '@/server/auth';
 import { ALL_ROLES } from '@/lib/server/roles';
+import {
+  checkUsageLimit,
+  PlanLimitError,
+  planLimitErrorResponse,
+  recordTrialEvent,
+} from '@/lib/server/billing';
 
 const slugify = (value: string) =>
   value
@@ -50,6 +56,8 @@ export async function POST(request: NextRequest) {
     const customDomain = typeof siteData.customDomain === 'string' ? siteData.customDomain : '';
     const publishedUrl = customDomain ? `https://${customDomain}` : `https://${subdomain}.${siteDomain}`;
 
+    await checkUsageLimit(db, tenantId, 'landing_pages');
+
     await siteRef.set(
       {
         published: true,
@@ -60,6 +68,8 @@ export async function POST(request: NextRequest) {
       { merge: true }
     );
 
+    await recordTrialEvent(db, tenantId, 'landing_page_published');
+
     return NextResponse.json({
       siteId,
       publishedUrl,
@@ -67,6 +77,9 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     console.error('[publish/page] error', error);
+    if (error instanceof PlanLimitError) {
+      return NextResponse.json(planLimitErrorResponse(error), { status: 402 });
+    }
     if (error instanceof UnauthorizedError) {
       return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
     }

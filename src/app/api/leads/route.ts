@@ -7,9 +7,16 @@ import { CAP } from '@/lib/capabilities';
 import { sendLeadEmail } from '@/lib/notifications/email';
 import { sendLeadSMS } from '@/lib/notifications/sms';
 import { upsertHubspotLead } from '@/lib/integrations/hubspot-leads';
-import { requireRole } from '@/server/auth';
+import { requireRole, UnauthorizedError, ForbiddenError } from '@/server/auth';
 import { ALL_ROLES } from '@/lib/server/roles';
-import { enforceUsageLimit, PlanLimitError } from '@/lib/server/billing';
+import { createApiLogger } from '@/lib/logger';
+import {
+  enforceUsageLimit,
+  PlanLimitError,
+  planLimitErrorResponse,
+} from '@/lib/server/billing';
+import { enforceRateLimit, getRequestIp } from '@/lib/server/rateLimit';
+import { getPublishedSite } from '@/server/publish-service';
 
 const NOTIFY_EMAIL_TO = process.env.NOTIFY_EMAIL_TO;
 const NOTIFY_SMS_TO = process.env.NOTIFY_SMS_TO;
@@ -23,6 +30,7 @@ const payloadSchema = z.object({
   project: z.string().optional(),
   projectId: z.string().optional(),
   pageSlug: z.string().optional(),
+  honeypot: z.string().optional(),
   context: z.record(z.any()).optional(),
   attribution: z.record(z.any()).optional(),
   metadata: z.record(z.any()).optional(),
@@ -39,31 +47,96 @@ const parseEmailList = (value?: string | null) => {
     .filter(Boolean);
 };
 
-async function resolveTenant(db: Firestore, payload: LeadPayload, fallbackTenantId: string) {
-  if (payload.siteId) {
-    const siteSnap = await db.collection('sites').doc(payload.siteId).get();
-    if (siteSnap.exists) {
-      const data = siteSnap.data() || {};
-      return (data.tenantId as string) || (data.ownerUid as string) || 'public';
-    }
-  }
-
-  return fallbackTenantId;
+async function resolvePublicTenant(payload: LeadPayload) {
+  const siteKey =
+    payload.siteId ||
+    payload.pageSlug ||
+    (payload.metadata?.pageSlug as string | undefined) ||
+    (payload.context?.pageSlug as string | undefined);
+  if (!siteKey) return null;
+  const publishedSite = await getPublishedSite(siteKey);
+  if (!publishedSite?.published) return null;
+  const tenantId = publishedSite.tenantId || publishedSite.ownerUid || null;
+  if (!tenantId) return null;
+  return { tenantId, siteId: publishedSite.id };
 }
 
 export async function POST(req: NextRequest) {
+  const logger = createApiLogger(req, { route: 'POST /api/leads' });
   try {
     const payload = payloadSchema.parse(await req.json());
     const db = getAdminDb();
-    const context = await requireRole(req, ALL_ROLES);
-    const tenantId = await resolveTenant(db, payload, context.tenantId);
-    const agentEmail = context.email;
+    const ip = getRequestIp(req);
+
+    // Public lead capture is allowed only for published sites; tenantId is never accepted from client input.
+    let context: Awaited<ReturnType<typeof requireRole>> | null = null;
+    const authHeader = req.headers.get('authorization') || '';
+    if (authHeader.startsWith('Bearer ')) {
+      context = await requireRole(req, ALL_ROLES);
+    }
+
+    const honeypot =
+      payload.honeypot ||
+      (payload.metadata?.honeypot as string | undefined) ||
+      (payload.metadata?.website as string | undefined) ||
+      (payload.context?.honeypot as string | undefined) ||
+      (payload.context?.website as string | undefined);
+    if (honeypot && String(honeypot).trim()) {
+      return NextResponse.json({ error: 'Invalid submission' }, { status: 400 });
+    }
+    const elapsedMs = Number(payload.metadata?.elapsedMs || payload.metadata?.timeOnPageMs || 0);
+    if (elapsedMs && elapsedMs < 800) {
+      return NextResponse.json({ error: 'Invalid submission' }, { status: 400 });
+    }
+
+    if (!context) {
+      if (!(await enforceRateLimit(`leads:public:${ip}`, 8, 60_000))) {
+        return NextResponse.json({ error: 'Rate limit exceeded' }, { status: 429 });
+      }
+    }
+
+    let tenantId = context?.tenantId || null;
+    let siteId = payload.siteId || null;
+    if (!tenantId) {
+      const resolved = await resolvePublicTenant(payload);
+      if (!resolved) {
+        return NextResponse.json({ error: 'Published site not found' }, { status: 404 });
+      }
+      tenantId = resolved.tenantId;
+      siteId = resolved.siteId;
+    }
+    if (!tenantId) {
+      return NextResponse.json({ error: 'Tenant resolution failed' }, { status: 400 });
+    }
+    const agentEmail = context?.email ?? null;
+
+    logger.setTenant(tenantId);
+    if (context?.uid) {
+      logger.setActor(context.uid);
+    }
+
+    if (context && siteId) {
+      const siteSnap = await db.collection('sites').doc(siteId).get();
+      if (siteSnap.exists) {
+        const siteData = siteSnap.data() || {};
+        const siteTenant = siteData.tenantId as string | undefined;
+        const siteOwner = siteData.ownerUid as string | undefined;
+        if (siteTenant && siteTenant !== tenantId) {
+          return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+        }
+        if (!siteTenant && siteOwner && siteOwner !== context.uid) {
+          return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+        }
+      } else {
+        siteId = null;
+      }
+    }
 
     await enforceUsageLimit(db, tenantId, 'leads', 1);
 
     const leadData = {
       tenantId,
-      siteId: payload.siteId || null,
+      siteId,
       project: payload.project || null,
       projectId: payload.projectId || null,
       pageSlug: payload.pageSlug || null,
@@ -182,18 +255,27 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    return NextResponse.json({ id: leadRef.id, tenantId });
+    logger.logSuccess(201, { leadId: leadRef.id, siteId });
+    return NextResponse.json({ id: leadRef.id, tenantId }, { status: 201 });
   } catch (error) {
     console.error('[leads] capture error', error);
     if (error instanceof PlanLimitError) {
-      return NextResponse.json(
-        { error: 'Plan limit reached', metric: error.metric, limit: error.limit },
-        { status: 402 }
-      );
+      logger.logError(error, 402, { metric: error.metric, limit: error.limit });
+      return NextResponse.json(planLimitErrorResponse(error), { status: 402 });
     }
     if (error instanceof z.ZodError) {
+      logger.logError(error, 400, { validation_errors: error.errors });
       return NextResponse.json({ error: 'Invalid payload', details: error.errors }, { status: 400 });
     }
+    if (error instanceof UnauthorizedError) {
+      logger.logError(error, 401);
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+    if (error instanceof ForbiddenError) {
+      logger.logError(error, 403);
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
+    logger.logError(error, 500);
     return NextResponse.json({ error: 'An unexpected error occurred.' }, { status: 500 });
   }
 }

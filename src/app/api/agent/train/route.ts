@@ -6,10 +6,17 @@ import { tmpdir } from 'os';
 import { join } from 'path';
 import { requireRole, UnauthorizedError, ForbiddenError } from '@/server/auth';
 import { ADMIN_ROLES } from '@/lib/server/roles';
+import {
+  enforceUsageLimit,
+  PlanLimitError,
+  planLimitErrorResponse,
+} from '@/lib/server/billing';
+import { getAdminDb } from '@/server/firebase-admin';
 
 export async function POST(req: NextRequest) {
   try {
-    await requireRole(req, ADMIN_ROLES);
+    const { tenantId } = await requireRole(req, ADMIN_ROLES);
+    await enforceUsageLimit(getAdminDb(), tenantId, 'ai_agents', 1);
     const formData = await req.formData();
     const file = formData.get('file') as File | null;
 
@@ -36,6 +43,9 @@ export async function POST(req: NextRequest) {
 
   } catch (error) {
     console.error('Agent Training API Error:', error);
+    if (error instanceof PlanLimitError) {
+      return NextResponse.json(planLimitErrorResponse(error), { status: 402 });
+    }
     if (error instanceof UnauthorizedError) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }

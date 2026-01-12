@@ -15,7 +15,7 @@ export async function POST(req: NextRequest) {
   try {
     const { tenantId } = await requireRole(req, ADMIN_ROLES);
     const ip = getRequestIp(req);
-    if (!enforceRateLimit(`sms:import:${tenantId}:${ip}`, 5, 60_000)) {
+    if (!(await enforceRateLimit(`sms:import:${tenantId}:${ip}`, 5, 60_000))) {
       return NextResponse.json({ error: 'Rate limit exceeded' }, { status: 429 });
     }
     const formData = await req.formData();
