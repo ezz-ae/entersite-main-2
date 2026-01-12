@@ -1,0 +1,1 @@
+export const EXPECTED_FIREBASE_PROJECT_ID = 'studio-7730943652-a28e0';

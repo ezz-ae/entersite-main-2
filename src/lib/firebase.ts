@@ -1,16 +1,6 @@
 import { initializeApp, getApps, getApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
-import { env } from '@/lib/env';
-
-const firebaseConfig = {
-  apiKey: env("NEXT_PUBLIC_FIREBASE_API_KEY", "AIzaSyAUfgRu9b1oGt_4G0BmDSSvh8F_l3HkdDE"),
-  authDomain: env("NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN", "studio-400579658-555a8.firebaseapp.com"),
-  projectId: env("NEXT_PUBLIC_FIREBASE_PROJECT_ID", "studio-400579658-555a8"),
-  storageBucket: env("NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET", "studio-400579658-555a8.appspot.com"),
-  messagingSenderId: env("NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID", "1041936976898"),
-  appId: env("NEXT_PUBLIC_FIREBASE_APP_ID", "1:1041936976898:web:221ec0c2844dbcd5576b1b"),
-  measurementId: env("NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID", "G-69V86H7B1N"),
-};
+import { firebaseConfig } from '@/firebase/config';
 
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 const auth = getAuth(app);
