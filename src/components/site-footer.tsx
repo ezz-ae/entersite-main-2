@@ -3,122 +3,196 @@
 import React from 'react';
 import Link from 'next/link';
 import { EntrestateLogo } from '@/components/icons';
-import { Twitter, Linkedin, Instagram, ArrowUpRight, Github, Globe, ShieldCheck, Zap } from 'lucide-react';
+import { ArrowUpRight, Instagram, Linkedin, Mail, MapPin, ShieldCheck, Users, Zap } from 'lucide-react';
 
 const PLATFORM_LINKS = [
-    { href: "/instagram-assistant", label: "Instagram Assistant" },
-    { href: "/google-ads", label: "Google Ads" },
-    { href: "/audience-network", label: "Buyer Audience" },
+  { href: '/instagram-assistant', label: 'Instagram Assistant' },
+  { href: '/google-ads', label: 'Google Ads' },
+  { href: '/audience-network', label: 'Buyer Audience' },
+  { href: '/discover', label: 'Market Feed' },
 ];
 
-const RESOURCE_LINKS = [
-    { href: "/discover", label: "Market Feed" },
-    { href: "/support", label: "Support" },
-    { href: "/docs", label: "Guides" },
-    { href: "/status", label: "System Status" },
-    { href: "/start", label: "Get Started" },
+const COMPANY_LINKS = [
+  { href: '/start', label: 'Get Started' },
+  { href: '/dashboard', label: 'Dashboard' },
+  { href: '/blog', label: 'Insights' },
+];
+
+const SUPPORT_LINKS = [
+  { href: '/support', label: 'Support Center' },
+  { href: '/docs', label: 'Guides' },
+  { href: '/status', label: 'System Status' },
+];
+
+const TRUST_ITEMS = [
+  {
+    icon: ShieldCheck,
+    title: 'Secure Workspaces',
+    description: 'Private access with clear team roles.',
+  },
+  {
+    icon: Users,
+    title: 'Team-Ready',
+    description: 'Assign leads and follow-up together.',
+  },
+  {
+    icon: Zap,
+    title: 'Fast Launch',
+    description: 'Pages and campaigns ready in minutes.',
+  },
 ];
 
 export function SiteFooter() {
   return (
-    <footer className="bg-black text-white border-t border-white/5 pb-12 pt-40">
+    <footer className="bg-black text-white border-t border-white/10 pb-12 pt-16">
       <div className="container mx-auto px-6 max-w-[1800px]">
-        
-        {/* Dynamic Watermark */}
-        <div className="mb-40 overflow-hidden">
-            <h2 className="text-[20vw] font-black leading-none tracking-tighter text-white/5 select-none -mb-[0.15em] whitespace-nowrap italic uppercase">
-                ENTRESTATE
-            </h2>
+        <div className="rounded-3xl border border-white/10 bg-white/5 px-8 py-10 md:flex md:items-center md:justify-between md:gap-10">
+          <div className="space-y-3">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.35em] text-zinc-500">
+              Built for broker teams
+            </p>
+            <h3 className="text-2xl md:text-3xl font-semibold text-white">
+              Launch listings, capture leads, follow up fast.
+            </h3>
+            <p className="text-zinc-400 max-w-2xl">
+              Entrestate keeps your listings, follow-up, and campaigns in one clear workflow designed for mobile-first teams.
+            </p>
+          </div>
+          <div className="mt-6 md:mt-0">
+            <FooterCta href="/start">Start Now</FooterCta>
+          </div>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-12 gap-16 md:gap-12 border-t border-white/5 pt-20">
-          
-          {/* Brand Info */}
-          <div className="col-span-2 md:col-span-4 flex flex-col justify-between">
-            <div className="space-y-12">
-                <Link href="/" className="hover:opacity-80 transition-opacity w-fit block">
-                  <EntrestateLogo />
-                </Link>
-                <p className="text-zinc-500 max-w-sm leading-relaxed text-xl font-light">
-                  The all-in-one platform for real estate professionals to design, market, and manage their properties with the power of AI.
-                </p>
-                <div className="flex gap-8">
-                  <SocialLink href="#" icon={Twitter} />
-                  <SocialLink href="#" icon={Linkedin} />
-                  <SocialLink href="#" icon={Instagram} />
-                </div>
+        <div className="mt-12 grid gap-6 md:grid-cols-3">
+          {TRUST_ITEMS.map((item) => (
+            <div key={item.title} className="rounded-2xl border border-white/10 bg-white/5 p-6">
+              <div className="flex items-center gap-3 text-white">
+                <item.icon className="h-5 w-5" />
+                <p className="font-semibold">{item.title}</p>
+              </div>
+              <p className="text-sm text-zinc-400 mt-3">{item.description}</p>
+            </div>
+          ))}
+        </div>
+
+        <div className="mt-14 grid grid-cols-2 md:grid-cols-12 gap-10 border-t border-white/10 pt-12">
+          <div className="col-span-2 md:col-span-4 space-y-6">
+            <Link href="/" className="hover:opacity-80 transition-opacity w-fit block">
+              <EntrestateLogo />
+            </Link>
+            <p className="text-zinc-400 max-w-sm leading-relaxed">
+              A real estate growth platform built for brokers who want simple tools, clean reporting, and fast execution.
+            </p>
+            <div className="flex gap-4">
+              <SocialLink href="https://www.linkedin.com" icon={Linkedin} label="LinkedIn" />
+              <SocialLink href="https://www.instagram.com" icon={Instagram} label="Instagram" />
+              <SocialLink href="mailto:support@entrestate.com" icon={Mail} label="Email Support" />
             </div>
           </div>
 
-          {/* Menus */}
-          <div className="col-span-1 md:col-span-2 space-y-10">
-            <h4 className="font-black text-[10px] text-zinc-600 uppercase tracking-[0.4em]">Platform</h4>
-            <ul className="space-y-5 text-zinc-400 font-bold uppercase text-[10px] tracking-widest">
-              {PLATFORM_LINKS.map(link => (
+          <div className="col-span-1 md:col-span-2 space-y-4">
+            <h4 className="text-[11px] font-semibold uppercase tracking-[0.3em] text-zinc-500">Platform</h4>
+            <ul className="space-y-3 text-sm text-zinc-400">
+              {PLATFORM_LINKS.map((link) => (
                 <li key={link.href}>
-                    <Link href={link.href} className="hover:text-blue-500 transition-colors flex items-center gap-2 group">
-                        {link.label} <ArrowUpRight className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity" />
-                    </Link>
+                  <FooterLink href={link.href}>
+                    {link.label}
+                    <ArrowUpRight className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  </FooterLink>
                 </li>
               ))}
             </ul>
           </div>
 
-          <div className="col-span-1 md:col-span-2 space-y-10 border-r border-white/5 pr-8">
-            <h4 className="font-black text-[10px] text-zinc-600 uppercase tracking-[0.4em]">Resources</h4>
-            <ul className="space-y-5 text-zinc-400 font-bold uppercase text-[10px] tracking-widest">
-              {RESOURCE_LINKS.map(link => (
+          <div className="col-span-1 md:col-span-2 space-y-4">
+            <h4 className="text-[11px] font-semibold uppercase tracking-[0.3em] text-zinc-500">Company</h4>
+            <ul className="space-y-3 text-sm text-zinc-400">
+              {COMPANY_LINKS.map((link) => (
                 <li key={link.href}>
-                    <Link href={link.href} className="hover:text-white transition-colors flex items-center gap-2 group">
-                        {link.label} <ArrowUpRight className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity" />
-                    </Link>
+                  <FooterLink href={link.href}>
+                    {link.label}
+                    <ArrowUpRight className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  </FooterLink>
                 </li>
               ))}
             </ul>
           </div>
 
-          {/* Master Node Info */}
-          <div className="col-span-2 md:col-span-4 flex flex-col justify-between items-end text-right space-y-12">
-             <div className="p-8 rounded-3xl bg-blue-600/5 border border-blue-500/10 text-left w-full max-w-sm">
-                <div className="flex items-center gap-2 text-blue-500 mb-4">
-                    <Zap className="h-4 w-4 fill-blue-500" />
-                    <span className="text-[10px] font-black uppercase tracking-widest">System Status</span>
-                </div>
-                <p className="text-zinc-400 text-xs leading-relaxed font-medium mb-4">Core platform is online. Some features are still in pilot or getting ready.</p>
-                <Link href="/status" className="text-white text-[10px] font-black uppercase tracking-widest hover:underline flex items-center gap-2">
-                    Live Status Page <ArrowUpRight className="h-3 w-3" />
-                </Link>
-             </div>
+          <div className="col-span-2 md:col-span-4 space-y-6">
+            <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
+              <div className="flex items-center gap-2 text-white">
+                <Mail className="h-4 w-4" />
+                <p className="text-sm font-semibold">Support</p>
+              </div>
+              <p className="text-sm text-zinc-400 mt-3">
+                Need help onboarding your team or launching a listing?
+              </p>
+              <div className="mt-4 space-y-2">
+                {SUPPORT_LINKS.map((link) => (
+                  <FooterLink key={link.href} href={link.href}>
+                    {link.label}
+                    <ArrowUpRight className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  </FooterLink>
+                ))}
+              </div>
+            </div>
 
-             <div className="space-y-3">
-                 <p className="text-zinc-500 text-[10px] font-black uppercase tracking-[0.3em]">Headquarters</p>
-                 <p className="text-white text-sm font-black italic uppercase">Innovation Hub, DIFC</p>
-                 <p className="text-zinc-600 text-sm font-medium">Dubai, UAE</p>
-             </div>
-             
-             <div className="flex items-center gap-6 pt-4 border-t border-white/5 w-full justify-end">
-                <div className="flex items-center gap-2 text-zinc-800 text-[9px] font-black uppercase tracking-widest">
-                    <ShieldCheck className="h-3 w-3" /> SECURE
-                </div>
-                <div className="flex items-center gap-2 text-zinc-800 text-[9px] font-black uppercase tracking-widest">
-                    <Globe className="h-3 w-3" /> FAST WORLDWIDE
-                </div>
-                <div className="text-zinc-800 text-[9px] font-black uppercase tracking-[0.6em]">
-                    © 2024
-                </div>
-             </div>
+            <div className="flex items-start gap-3 text-sm text-zinc-400">
+              <MapPin className="h-4 w-4 mt-0.5" />
+              <div>
+                <p className="text-white font-semibold">Dubai, UAE</p>
+                <p>Serving brokers across the UAE market.</p>
+              </div>
+            </div>
           </div>
+        </div>
 
+        <div className="mt-12 border-t border-white/10 pt-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4 text-xs text-zinc-600">
+          <p>© 2024 Entrestate. All rights reserved.</p>
+          <p>Entrestate is built for real estate teams who need clarity and speed.</p>
         </div>
       </div>
     </footer>
   );
 }
 
-function SocialLink({ href, icon: Icon }: { href: string, icon: any }) {
+function FooterLink({ href, children }: { href: string; children: React.ReactNode }) {
+  const isExternal = href.startsWith('http') || href.startsWith('mailto:');
   return (
-    <Link href={href} className="text-zinc-700 hover:text-white transition-all hover:scale-110">
-      <Icon className="h-6 w-6" strokeWidth={2.5} />
+    <Link
+      href={href}
+      target={isExternal ? '_blank' : undefined}
+      rel={isExternal ? 'noreferrer' : undefined}
+      className="text-zinc-400 hover:text-white transition-colors inline-flex items-center gap-2 group"
+    >
+      {children}
     </Link>
-  )
+  );
+}
+
+function FooterCta({ href, children }: { href: string; children: React.ReactNode }) {
+  return (
+    <Link
+      href={href}
+      className="inline-flex items-center gap-2 rounded-full bg-white text-black px-6 py-3 text-sm font-semibold hover:bg-white/90 transition-colors"
+    >
+      {children}
+      <ArrowUpRight className="h-4 w-4" />
+    </Link>
+  );
+}
+
+function SocialLink({ href, icon: Icon, label }: { href: string; icon: any; label: string }) {
+  const isExternal = href.startsWith('http') || href.startsWith('mailto:');
+  return (
+    <Link
+      href={href}
+      target={isExternal ? '_blank' : undefined}
+      rel={isExternal ? 'noreferrer' : undefined}
+      aria-label={label}
+      className="text-zinc-500 hover:text-white transition-all hover:scale-105"
+    >
+      <Icon className="h-5 w-5" strokeWidth={2} />
+    </Link>
+  );
 }
