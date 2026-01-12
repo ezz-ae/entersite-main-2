@@ -88,6 +88,11 @@ service cloud.firestore {
         allow read: if isTenantMember(tenantId);
         allow write: if isTenantAdmin(tenantId);
       }
+
+      match /billing_events/{docId} {
+        allow read: if isTenantAdmin(tenantId);
+        allow write: if isTenantAdmin(tenantId);
+      }
     }
 
     match /subscriptions/{tenantId} {
@@ -97,9 +102,7 @@ service cloud.firestore {
 
     // Sites owned by a tenant or legacy ownerUid-only entries
     match /sites/{siteId} {
-      allow create: if isSignedIn()
-        && request.resource.data.ownerUid == request.auth.uid
-        && request.resource.data.tenantId == tenantFromToken();
+      allow create: if false;
 
       allow read, update, delete: if isSignedIn() && (
         (resource.data.tenantId == tenantFromToken()) ||

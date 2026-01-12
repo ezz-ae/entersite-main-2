@@ -68,6 +68,15 @@
 | Payments | Partial | Webhook verification missing | Implement verified webhooks |
 | Support | Partial | Depends on Resend | Gate + logs |
 
+## P0 Launch Fixes Completed
+- Public lead capture allows unauthenticated submissions for published sites only, with rate limit and honeypot checks.
+- Public inventory search and project detail APIs are read-only and rate-limited.
+- Marketing chat preview is public, stateless, and rate-limited.
+- Audience request GET no longer crashes and returns safe empty state.
+- Webhook processing is idempotent and will not overwrite plans without valid plan SKUs.
+- Usage counters now increment only after provider success for email/SMS sends and campaigns.
+- Local Firebase Admin SDK JSON removed; server uses env-based credentials only.
+
 ## Architecture Summary
 TBD (Phase 2+)
 
@@ -78,10 +87,23 @@ TBD (Phase 2+)
 TBD (Phase 2+)
 
 ## Deployment Steps (Staging -> Production)
-TBD (Phase 10)
+See `DEPLOYMENT.md`.
 
 ## QA Test Plan (Manual + Scripts)
-TBD (Phase 10)
+See `DEPLOYMENT.md` and `RELEASE_CHECKLIST.md`.
 
 ## Security Model
 TBD (Phase 1/2)
+
+## Deployment Runbook
+See `DEPLOYMENT.md` for the staging → production runbook, env tiers, and rollback steps.
+
+## Go/No-Go Checklist
+- [ ] `/api/health` and `/api/health/monetization` return 200 with admin token.
+- [ ] Webhooks verified with test events (PayPal + Ziina).
+- [ ] Public flows verified (lead capture, discover search, project detail, chat preview).
+- [ ] Rate limiting verified on public endpoints.
+- [ ] Billing flow verified (trial → upgrade → unlock).
+- [ ] Usage counters accurate (failed sends do not increment).
+- [ ] Error tracking receiving events.
+- [ ] No secrets committed to the repo.
