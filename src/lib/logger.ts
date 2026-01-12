@@ -34,12 +34,16 @@ export function createApiLogger(req: NextRequest, context: { route: string }) {
   let tenantId: string | undefined;
   let userId: string | undefined;
 
-  const commit = (payload: Omit<LogPayload, 'route' | 'requestId' | 'method'>) => {
+  const commit = (
+    payload: Omit<LogPayload, 'route' | 'requestId' | 'method' | 'timestamp'> & {
+      timestamp?: string;
+    }
+  ) => {
     const body: LogPayload = {
       level: payload.level,
       route: context.route,
       requestId,
-      timestamp: new Date().toISOString(),
+      timestamp: payload.timestamp ?? new Date().toISOString(),
       method,
       tenantId: tenantId || payload.tenantId,
       userId: userId || payload.userId,

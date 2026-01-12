@@ -140,7 +140,7 @@ async function resolveTenantAndRoles(claims: DecodedIdToken) {
   }
 
   if (tenantId && !roles.length) {
-    memberProfile = await loadTenantMember(tenantId, claims.uid);
+    memberProfile = (await loadTenantMember(tenantId, claims.uid)) ?? null;
     if (memberProfile?.role) {
       roles = normalizeRoles(memberProfile.role);
     }

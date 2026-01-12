@@ -6,7 +6,7 @@
     "dev": "next dev -p 3005",
     "build": "next build --webpack",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "smoke": "ts-node --esm scripts/smoke/projects-filter-smoke.ts",
     "ingest": "ts-node --esm scripts/ingest-entrestate.ts"
   },

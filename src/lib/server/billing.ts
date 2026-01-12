@@ -312,15 +312,18 @@ function normalizeSubscription(
   data: Record<string, unknown> | undefined,
   now = new Date(),
 ): SubscriptionRecord {
-  const plan = normalizePlanId(data?.plan) || DEFAULT_PLAN;
-  const status = normalizeStatus(data?.status);
+  const rawPlan = typeof data?.plan === 'string' ? data.plan : null;
+  const rawStatus = typeof data?.status === 'string' ? data.status : null;
+  const plan = normalizePlanId(rawPlan) || DEFAULT_PLAN;
+  const status = normalizeStatus(rawStatus);
   const trial = normalizeTrial(data?.trial, now, status);
   return {
     plan,
     status,
     currentPeriodStart: data?.currentPeriodStart ? String(data.currentPeriodStart) : null,
     currentPeriodEnd: data?.currentPeriodEnd ? String(data.currentPeriodEnd) : null,
-    cancelAtPeriodEnd: data?.cancelAtPeriodEnd ?? false,
+    cancelAtPeriodEnd:
+      typeof data?.cancelAtPeriodEnd === 'boolean' ? data.cancelAtPeriodEnd : false,
     trial,
     addOns: normalizeAddOns(data?.addOns),
   };
