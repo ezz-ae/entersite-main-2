@@ -19,7 +19,8 @@ import {
   Zap,
   Clock,
   Loader2,
-  X
+  X,
+  Copy
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { formatDistanceToNow } from 'date-fns';
@@ -514,6 +515,10 @@ function LeadDetailPanel({ lead, onClose, onUpdate }: { lead: LeadRecord, onClos
     const [newNote, setNewNote] = useState('');
     const [loadingNotes, setLoadingNotes] = useState(true);
     const [isUpdating, setIsUpdating] = useState(false);
+    const [drafting, setDrafting] = useState<'sms' | 'email' | null>(null);
+    const [draftSms, setDraftSms] = useState('');
+    const [draftEmail, setDraftEmail] = useState<{ subject: string; body: string } | null>(null);
+    const [draftError, setDraftError] = useState<string | null>(null);
 
     const loadNotes = useCallback(async () => {
         try {
@@ -576,6 +581,74 @@ function LeadDetailPanel({ lead, onClose, onUpdate }: { lead: LeadRecord, onClos
         }
     }
 
+    const buildContext = () => {
+        const parts = [
+            lead.project ? `Project: ${lead.project}` : null,
+            lead.source ? `Source: ${lead.source}` : null,
+            lead.message ? `Message: ${lead.message}` : null,
+        ].filter(Boolean);
+        return parts.join(' | ');
+    };
+
+    const handleDraftSms = async () => {
+        setDrafting('sms');
+        setDraftError(null);
+        try {
+            const res = await authorizedFetch('/api/sms/generate', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    topic: `Follow up with ${lead.name || 'a lead'} about their inquiry`,
+                    context: buildContext(),
+                    maxChars: 220,
+                }),
+            });
+            if (!res.ok) {
+                const data = await res.json().catch(() => ({}));
+                throw new Error(data?.error || 'Could not draft SMS');
+            }
+            const data = await res.json();
+            setDraftSms(data.message || '');
+        } catch (error: any) {
+            setDraftError(error?.message || 'Could not draft SMS');
+        } finally {
+            setDrafting(null);
+        }
+    };
+
+    const handleDraftEmail = async () => {
+        setDrafting('email');
+        setDraftError(null);
+        try {
+            const res = await authorizedFetch('/api/email/generate', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    topic: `Follow up with ${lead.name || 'a lead'} about their inquiry`,
+                    context: buildContext(),
+                }),
+            });
+            if (!res.ok) {
+                const data = await res.json().catch(() => ({}));
+                throw new Error(data?.error || 'Could not draft email');
+            }
+            const data = await res.json();
+            setDraftEmail({ subject: data.subject || 'Follow-up', body: data.body || '' });
+        } catch (error: any) {
+            setDraftError(error?.message || 'Could not draft email');
+        } finally {
+            setDrafting(null);
+        }
+    };
+
+    const handleCopy = async (value: string) => {
+        try {
+            await navigator.clipboard.writeText(value);
+        } catch (error) {
+            console.error('Failed to copy', error);
+        }
+    };
+
     return (
         <Dialog open={true} onOpenChange={onClose}>
             <DialogContent className="sm:max-w-md bg-zinc-950 border-white/10 text-white rounded-3xl">
@@ -591,6 +664,92 @@ function LeadDetailPanel({ lead, onClose, onUpdate }: { lead: LeadRecord, onClos
                              <p className="text-sm text-zinc-300 italic">{lead.message}</p>
                         </div>
                     )}
+
+                    <div className="space-y-4">
+                        <h3 className="text-sm font-bold uppercase tracking-widest text-zinc-500">Quick follow-up</h3>
+                        <div className="grid grid-cols-2 gap-2">
+                            <Button
+                                variant="outline"
+                                className="h-10"
+                                onClick={handleDraftSms}
+                                disabled={drafting === 'sms'}
+                            >
+                                <MessageCircle className="h-4 w-4 mr-2" />
+                                {drafting === 'sms' ? 'Drafting…' : 'Draft SMS'}
+                            </Button>
+                            <Button
+                                variant="outline"
+                                className="h-10"
+                                onClick={handleDraftEmail}
+                                disabled={drafting === 'email'}
+                            >
+                                <Mail className="h-4 w-4 mr-2" />
+                                {drafting === 'email' ? 'Drafting…' : 'Draft Email'}
+                            </Button>
+                        </div>
+                        {draftError && (
+                            <p className="text-xs text-red-400">{draftError}</p>
+                        )}
+                        {draftSms && (
+                            <div className="rounded-xl border border-white/5 bg-zinc-900/80 p-4 space-y-3">
+                                <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">SMS draft</p>
+                                <p className="text-sm text-zinc-200">{draftSms}</p>
+                                <div className="flex flex-wrap gap-2">
+                                    <Button
+                                        size="sm"
+                                        variant="outline"
+                                        onClick={() => handleCopy(draftSms)}
+                                    >
+                                        <Copy className="h-3 w-3 mr-2" /> Copy
+                                    </Button>
+                                    <Button
+                                        size="sm"
+                                        asChild
+                                        disabled={!lead.phone}
+                                    >
+                                        <a
+                                            href={
+                                                lead.phone
+                                                    ? `sms:${lead.phone}?body=${encodeURIComponent(draftSms)}`
+                                                    : '#'
+                                            }
+                                        >
+                                            Send SMS
+                                        </a>
+                                    </Button>
+                                </div>
+                            </div>
+                        )}
+                        {draftEmail && (
+                            <div className="rounded-xl border border-white/5 bg-zinc-900/80 p-4 space-y-3">
+                                <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">Email draft</p>
+                                <p className="text-xs text-zinc-400">Subject: {draftEmail.subject}</p>
+                                <p className="text-sm text-zinc-200 whitespace-pre-line">{draftEmail.body}</p>
+                                <div className="flex flex-wrap gap-2">
+                                    <Button
+                                        size="sm"
+                                        variant="outline"
+                                        onClick={() => handleCopy(`${draftEmail.subject}\n\n${draftEmail.body}`)}
+                                    >
+                                        <Copy className="h-3 w-3 mr-2" /> Copy
+                                    </Button>
+                                    <Button size="sm" asChild disabled={!lead.email}>
+                                        <a
+                                            href={
+                                                lead.email
+                                                    ? `mailto:${lead.email}?subject=${encodeURIComponent(
+                                                        draftEmail.subject
+                                                      )}&body=${encodeURIComponent(draftEmail.body)}`
+                                                    : '#'
+                                            }
+                                        >
+                                            Send Email
+                                        </a>
+                                    </Button>
+                                </div>
+                            </div>
+                        )}
+                    </div>
                     
                     <div className="space-y-4">
                         <h3 className="text-sm font-bold uppercase tracking-widest text-zinc-500">Notes</h3>

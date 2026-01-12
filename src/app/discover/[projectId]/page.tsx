@@ -14,7 +14,8 @@ import {
     BarChart, 
     CheckCircle2, 
     Globe,
-    Home
+    Home,
+    ArrowRight
 } from 'lucide-react';
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -106,6 +107,9 @@ const ProjectDetailPage: NextPage = () => {
         ? 'Softening'
         : 'Steady'
     : 'Not shared';
+  const launchPackHref = project?.id
+    ? `/start?intent=website&project=${encodeURIComponent(project.id)}`
+    : '/start?intent=website';
 
   return (
     <div className="bg-black text-white min-h-screen">
@@ -204,6 +208,17 @@ const ProjectDetailPage: NextPage = () => {
             </div>
 
             <div className="space-y-6">
+                <Card className="bg-white text-black rounded-2xl p-6 sm:p-8 sticky top-6">
+                    <h3 className="text-xl sm:text-2xl font-black mb-3">Launch Pack</h3>
+                    <p className="text-sm text-zinc-600 mb-6">
+                      Generate a listing page, follow-up message, and share link in minutes.
+                    </p>
+                    <Button asChild className="w-full h-12 rounded-full bg-black text-white font-bold">
+                      <a href={launchPackHref} className="inline-flex items-center justify-center gap-2">
+                        Build a launch pack <ArrowRight className="h-4 w-4" />
+                      </a>
+                    </Button>
+                </Card>
                 <Card className="bg-blue-600 text-white rounded-2xl p-6 sm:p-8 text-center">
                     <h3 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4">Interested in this project?</h3>
                     <p className="text-blue-200 mb-5 sm:mb-6 text-sm sm:text-base">Contact our sales team for a private consultation.</p>
@@ -238,6 +253,11 @@ const ProjectDetailPage: NextPage = () => {
                 </Card>
             </div>
         </div>
+      </div>
+      <div className="pointer-events-none fixed bottom-4 left-1/2 z-40 w-[min(92vw,420px)] -translate-x-1/2 sm:hidden">
+        <Button asChild className="pointer-events-auto h-12 w-full rounded-full bg-white text-black font-bold shadow-xl">
+          <a href={launchPackHref}>Launch Pack for this project</a>
+        </Button>
       </div>
     </div>
   );

@@ -107,6 +107,7 @@ export default function DiscoverPage() {
   const canLoadMore = showingSample
     ? projects.length < ENTRESTATE_INVENTORY.length
     : projects.length < totalProjects;
+  const launchPackHref = '/start?intent=website';
 
   return (
     <main className="min-h-screen bg-black text-white flex flex-col font-sans selection:bg-blue-500/30">
@@ -291,6 +292,17 @@ export default function DiscoverPage() {
               </div>
           </div>
       </section>
+
+      <div className="pointer-events-none fixed bottom-4 left-1/2 z-40 w-[min(92vw,420px)] -translate-x-1/2 sm:hidden">
+        <Button asChild className="pointer-events-auto h-12 w-full rounded-full bg-white text-black font-bold shadow-xl">
+          <a href={launchPackHref}>Launch Pack for a listing</a>
+        </Button>
+      </div>
+      <div className="pointer-events-none fixed bottom-6 right-6 z-40 hidden sm:flex">
+        <Button asChild className="pointer-events-auto h-12 rounded-full bg-white text-black font-bold shadow-xl">
+          <a href={launchPackHref}>Launch Pack</a>
+        </Button>
+      </div>
 
     </main>
   );

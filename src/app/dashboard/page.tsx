@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { DashboardCards } from '@/components/dashboard/dashboard-cards';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Loader2, MapPin } from 'lucide-react';
+import { Loader2, MapPin, Sparkles } from 'lucide-react';
 
 type InventoryMeta = {
   total?: number;
@@ -39,6 +39,26 @@ export default function DashboardPage() {
   const totalListings = meta?.total ?? 0;
   const cities = meta?.citiesCount ?? 0;
   const areas = meta?.areasCount ?? 0;
+  const nextAction = loading
+    ? {
+        label: 'Preparing your next step…',
+        description: 'Checking your inventory and launches.',
+        href: '#',
+        disabled: true,
+      }
+    : totalListings === 0
+      ? {
+          label: 'Connect listings',
+          description: 'Add your inventory to unlock market insights and launches.',
+          href: '/docs#inventory',
+          disabled: false,
+        }
+      : {
+          label: 'Start your first launch',
+          description: 'Publish a listing page and capture your next lead.',
+          href: '/start?intent=website',
+          disabled: false,
+        };
 
   return (
     <div className="space-y-12">
@@ -46,6 +66,29 @@ export default function DashboardPage() {
             <h1 className="text-4xl font-bold tracking-tight text-white">Dashboard</h1>
             <p className="text-xl text-muted-foreground font-light">Choose what you want to work on today.</p>
         </div>
+
+        <Card className="bg-white/5 border border-blue-500/20 rounded-3xl">
+          <CardContent className="p-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div className="flex items-start gap-4">
+              <div className="w-12 h-12 rounded-2xl bg-blue-600/10 border border-blue-500/20 flex items-center justify-center text-blue-400">
+                <Sparkles className="h-6 w-6" />
+              </div>
+              <div className="space-y-1">
+                <p className="text-xs font-bold uppercase tracking-widest text-zinc-500">Next best action</p>
+                <p className="text-lg font-semibold text-white">{nextAction.description}</p>
+              </div>
+            </div>
+            {nextAction.disabled ? (
+              <Button className="h-11 rounded-full bg-white text-black font-bold" disabled>
+                {nextAction.label}
+              </Button>
+            ) : (
+              <Button asChild className="h-11 rounded-full bg-white text-black font-bold">
+                <a href={nextAction.href}>{nextAction.label}</a>
+              </Button>
+            )}
+          </CardContent>
+        </Card>
 
         <Card className="bg-zinc-900/60 border border-white/5 rounded-3xl">
           <CardContent className="p-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">

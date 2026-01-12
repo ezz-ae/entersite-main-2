@@ -5,7 +5,6 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import {
@@ -21,42 +20,16 @@ const PLAN_CARDS = [
     id: 'agent_pro',
     name: 'Agent Pro',
     price: '299 AED / month',
-    description: 'For solo brokers who want leads fast.',
-    features: [
-      '1 AI Instagram DM agent',
-      '3 landing pages',
-      'UAE projects access',
-      'Meta audience templates',
-      'Email: 1,000/month',
-      'Leads up to 300',
-      '1 custom domain',
-      'AI conversations: 1,000/month',
-      'Seats: 1',
-    ],
   },
   {
     id: 'agent_growth',
     name: 'Agent Growth',
     price: '799 AED / month',
-    description: 'For teams scaling lead volume.',
-    features: [
-      '3 AI agents',
-      '10 landing pages',
-      'Google Ads launcher',
-      'Meta custom audiences + lookalikes',
-      'Email: 5,000/month',
-      'SMS credits included',
-      'Leads up to 2,000',
-      'Seats: 3',
-      'AI conversations: 5,000/month',
-    ],
   },
   {
     id: 'agency_os',
     name: 'Agency OS',
     price: 'From 2,499 AED / month',
-    description: 'Custom setup for agencies.',
-    features: ['Multi-tenant rollout', 'Custom SLAs', 'Dedicated onboarding'],
   },
 ];
 
@@ -68,13 +41,6 @@ const USAGE_ITEMS = [
   { key: 'email_sends', label: 'Emails sent', cadence: 'Monthly' },
   { key: 'sms_sends', label: 'SMS sent', cadence: 'Monthly' },
   { key: 'domains', label: 'Custom domains', cadence: 'Total' },
-];
-
-const ADD_ONS: { sku: BillingSku; label: string; price: string; hint: string }[] = [
-  { sku: 'addon_ai_conversations_1000', label: '+1,000 AI conversations', price: '99 AED', hint: 'Unlock more AI chats instantly.' },
-  { sku: 'addon_leads_500', label: '+500 leads storage', price: '49 AED', hint: 'Keep more buyers and sellers in your inbox.' },
-  { sku: 'addon_domain_1', label: 'Extra domain', price: '39 AED', hint: 'Connect another branded domain.' },
-  { sku: 'addon_sms_bundle', label: 'SMS bundle', price: '99 AED', hint: 'Add more SMS credits.' },
 ];
 
 const UPGRADE_MESSAGES: Record<string, string> = {
@@ -178,6 +144,9 @@ export function BillingManager() {
   const currentPlan = summary?.subscription?.plan || 'agent_pro';
   const status = summary?.subscription?.status || 'trial';
   const trialDaysLeft = getTrialDaysLeft(summary);
+  const suggestedUpgrade =
+    summary?.suggestedUpgrade || (currentPlan === 'agent_pro' ? 'agent_growth' : 'agency_os');
+  const upgradePlan = PLAN_CARDS.find((plan) => plan.id === suggestedUpgrade) || PLAN_CARDS[1];
 
   const warningMetric = useMemo(() => {
     if (!summary) return null;
@@ -268,32 +237,9 @@ export function BillingManager() {
         </CardContent>
       </Card>
 
-      {warningMetric && summary.suggestedUpgrade && (
-        <Card className="border-amber-500/30 bg-amber-500/5">
-          <CardHeader>
-            <CardTitle className="text-base">Upgrade moment</CardTitle>
-            <CardDescription>{UPGRADE_MESSAGES[warningMetric.key]}</CardDescription>
-          </CardHeader>
-          <CardContent className="flex items-center justify-between">
-            <span className="text-sm text-muted-foreground">
-              {summary.suggestedUpgrade === 'agent_growth' ? 'Upgrade to Agent Growth' : 'Contact sales for Agency OS'}
-            </span>
-            {summary.suggestedUpgrade === 'agent_growth' ? (
-              <Button onClick={() => handleCheckout('agent_growth')} disabled={actionSku === 'agent_growth'}>
-                {actionSku === 'agent_growth' ? 'Starting…' : 'Upgrade now'}
-              </Button>
-            ) : (
-              <Button variant="outline" asChild>
-                <a href="mailto:sales@entrestate.com">Contact sales</a>
-              </Button>
-            )}
-          </CardContent>
-        </Card>
-      )}
-
       <Card>
         <CardHeader>
-          <CardTitle>Usage</CardTitle>
+          <CardTitle>Usage snapshot</CardTitle>
           <CardDescription>We’ll warn you at 70% and 90% usage.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -325,72 +271,30 @@ export function BillingManager() {
         </CardContent>
       </Card>
 
-      <Card>
+      <Card className="border-blue-500/30 bg-blue-500/5">
         <CardHeader>
-          <CardTitle>Plans</CardTitle>
-          <CardDescription>Upgrade only when you’re ready.</CardDescription>
+          <CardTitle className="text-base">Upgrade when you are winning</CardTitle>
+          <CardDescription>
+            {warningMetric ? UPGRADE_MESSAGES[warningMetric.key] : 'Unlock more launches when you are ready.'}
+          </CardDescription>
         </CardHeader>
-        <CardContent className="grid gap-6 md:grid-cols-3">
-          {PLAN_CARDS.map((plan) => {
-            const isCurrent = plan.id === currentPlan;
-            return (
-              <div key={plan.id} className={cn('rounded-2xl border p-5 space-y-4', isCurrent && 'border-blue-500/40')}>
-                <div>
-                  <p className="text-lg font-semibold">{plan.name}</p>
-                  <p className="text-sm text-muted-foreground">{plan.description}</p>
-                </div>
-                <div className="text-xl font-bold">{plan.price}</div>
-                <ul className="space-y-2 text-sm text-muted-foreground">
-                  {plan.features.map((feature) => (
-                    <li key={feature}>• {feature}</li>
-                  ))}
-                </ul>
-                {plan.id === 'agency_os' ? (
-                  <Button variant="outline" asChild>
-                    <a href="mailto:sales@entrestate.com">Contact sales</a>
-                  </Button>
-                ) : (
-                  <Button
-                    disabled={isCurrent || actionSku === plan.id}
-                    onClick={() => handleCheckout(plan.id as BillingSku)}
-                  >
-                    {isCurrent ? 'Current plan' : actionSku === plan.id ? 'Starting…' : 'Upgrade'}
-                  </Button>
-                )}
-              </div>
-            );
-          })}
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Add-ons</CardTitle>
-          <CardDescription>Add only what you need, anytime.</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {ADD_ONS.map((addon, index) => (
-            <div key={addon.sku}>
-              <div className="flex items-center justify-between gap-4">
-                <div>
-                  <p className="font-medium">{addon.label}</p>
-                  <p className="text-xs text-muted-foreground">{addon.hint}</p>
-                </div>
-                <div className="flex items-center gap-3">
-                  <span className="text-sm font-semibold">{addon.price}</span>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    disabled={actionSku === addon.sku}
-                    onClick={() => handleCheckout(addon.sku)}
-                  >
-                    {actionSku === addon.sku ? 'Starting…' : 'Add'}
-                  </Button>
-                </div>
-              </div>
-              {index < ADD_ONS.length - 1 && <Separator className="my-4" />}
-            </div>
-          ))}
+        <CardContent className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <div>
+            <p className="text-sm font-semibold text-white">{upgradePlan.name}</p>
+            <p className="text-xs text-muted-foreground">{upgradePlan.price}</p>
+          </div>
+          {upgradePlan.id === 'agency_os' ? (
+            <Button variant="outline" asChild>
+              <a href="mailto:sales@entrestate.com">Contact sales</a>
+            </Button>
+          ) : (
+            <Button
+              onClick={() => handleCheckout(upgradePlan.id as BillingSku)}
+              disabled={actionSku === upgradePlan.id}
+            >
+              {actionSku === upgradePlan.id ? 'Starting…' : 'Upgrade now'}
+            </Button>
+          )}
         </CardContent>
       </Card>
     </div>

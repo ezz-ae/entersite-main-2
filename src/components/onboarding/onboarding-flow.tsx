@@ -68,12 +68,30 @@ export function OnboardingFlow() {
 
   return (
     <div className="bg-zinc-950 border border-white/5 rounded-[2rem] sm:rounded-[3rem] overflow-hidden shadow-2xl">
-      <div className="p-6 sm:p-8 border-b border-white/5 flex flex-col gap-3">
+      <div className="p-6 sm:p-8 border-b border-white/5 flex flex-col gap-4">
         <p className="text-[10px] font-bold uppercase tracking-[0.4em] text-zinc-500">Get Started</p>
-        <h1 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight text-white">Pick your next step.</h1>
+        <h1 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight text-white">
+          Start your first launch.
+        </h1>
         <p className="text-zinc-500 max-w-3xl">
-          Choose one path and we will take you to the right screen.
+          Choose the service you want to launch first. We will guide the rest.
         </p>
+        <div className="flex flex-col sm:flex-row sm:items-center gap-2 text-[10px] font-bold uppercase tracking-[0.3em] text-zinc-600">
+          <div className="flex items-center gap-2">
+            <span className="h-2 w-2 rounded-full bg-blue-500" />
+            Step 1: Choose
+          </div>
+          <div className="hidden sm:block h-4 w-px bg-white/10" />
+          <div className="flex items-center gap-2">
+            <span className="h-2 w-2 rounded-full bg-white/10" />
+            Step 2: Confirm
+          </div>
+          <div className="hidden sm:block h-4 w-px bg-white/10" />
+          <div className="flex items-center gap-2">
+            <span className="h-2 w-2 rounded-full bg-white/10" />
+            Step 3: Launch
+          </div>
+        </div>
       </div>
 
       <div className="p-6 sm:p-8 space-y-8 sm:space-y-10">
@@ -107,7 +125,7 @@ export function OnboardingFlow() {
             disabled={!selectedOption}
             className="h-11 sm:h-12 px-6 rounded-full bg-white text-black font-bold disabled:opacity-40"
           >
-            Continue <ArrowRight className="ml-2 h-4 w-4" />
+            Start your first launch <ArrowRight className="ml-2 h-4 w-4" />
           </Button>
         </div>
       </div>
