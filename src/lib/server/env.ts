@@ -25,6 +25,7 @@ const serverEnvSchema = z.object({
   VERCEL_TEAM_ID: z.string().optional(),
   CRON_SECRET: z.string().optional(),
   RATE_LIMIT_DISABLED: z.string().optional(),
+  USE_STATIC_INVENTORY: z.string().optional(),
 });
 
 export type ServerEnv = z.infer<typeof serverEnvSchema>;

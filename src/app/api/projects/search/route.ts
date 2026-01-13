@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { filterProjects, paginateProjects } from '@/lib/projects/filter';
 import { loadInventoryProjects } from '@/server/inventory';
 import { enforceRateLimit, getRequestIp } from '@/lib/server/rateLimit';
+        import { ENTRESTATE_INVENTORY } from '@/data/entrestate-inventory';
+import { SERVER_ENV } from '@/lib/server/env';
 
 const MAX_DATA_LOAD = 8000;
 
@@ -35,7 +37,22 @@ export async function GET(req: NextRequest) {
     if (!(await enforceRateLimit(`projects:search:${ip}`, 120, 60_000))) {
       return NextResponse.json({ message: 'Rate limit exceeded' }, { status: 429 });
     }
-    const source = await loadInventoryProjects(MAX_DATA_LOAD);
+    
+    let source = [];
+    let dataSource = 'database';
+
+    if (SERVER_ENV.USE_STATIC_INVENTORY !== 'false') {
+      source = ENTRESTATE_INVENTORY;
+      dataSource = 'static-env';
+    } else {
+      try {
+        source = await loadInventoryProjects(MAX_DATA_LOAD);
+      } catch (error) {
+        console.warn("[projects/search] Database load failed, falling back to static.", error);
+        source = ENTRESTATE_INVENTORY;
+        dataSource = 'static-fallback';
+      }
+    }
     
     if (!source.length) {
       console.warn("[projects/search] inventory_projects is empty.");
@@ -53,6 +70,8 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({
       data: pageItems,
       pagination: meta,
+    }, {
+      headers: { 'X-Inventory-Source': dataSource }
     });
   } catch (error: any) {
     console.error('[projects/search] Critical Database Error:', error.message);

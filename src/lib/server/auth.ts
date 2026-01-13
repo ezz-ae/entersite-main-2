@@ -2,7 +2,7 @@ import type { DecodedIdToken } from 'firebase-admin/auth';
 import type { NextRequest } from 'next/server';
 import { getAdminAuth, getAdminDb } from '@/server/firebase-admin';
 
-export type Role = 'agent' | 'team_admin' | 'agency_admin' | 'super_admin';
+export type Role = 'public' | 'agent' | 'team_admin' | 'agency_admin' | 'super_admin';
 
 export type AuthContext = {
   uid: string;
@@ -13,7 +13,7 @@ export type AuthContext = {
   claims: DecodedIdToken;
 };
 
-const ROLE_PRIORITY: Role[] = ['agent', 'team_admin', 'agency_admin', 'super_admin'];
+const ROLE_PRIORITY: Role[] = ['public', 'agent', 'team_admin', 'agency_admin', 'super_admin'];
 const ROLE_RANK = new Map<Role, number>(ROLE_PRIORITY.map((role, index) => [role, index]));
 
 export class UnauthorizedError extends Error {
@@ -33,6 +33,7 @@ export class ForbiddenError extends Error {
 function normalizeRole(value: string | null | undefined): Role | null {
   if (!value) return null;
   const raw = value.toLowerCase().replace(/[^a-z_]+/g, '');
+  if (raw === 'public' || raw === 'anon' || raw === 'anonymous') return 'public';
   if (raw === 'superadmin' || raw === 'super_admin' || raw === 'root') return 'super_admin';
   if (raw === 'agencyadmin' || raw === 'agency_admin' || raw === 'owner') return 'agency_admin';
   if (raw === 'teamadmin' || raw === 'team_admin' || raw === 'editor') return 'team_admin';
@@ -177,10 +178,27 @@ export async function requireRole(
   req: NextRequest | Request,
   allowedRoles: Role[],
 ): Promise<AuthContext> {
-  const context = await requireAuth(req);
-  const hasRole = context.roles.some((role) => allowedRoles.includes(role));
-  if (!hasRole) {
-    throw new ForbiddenError('Role access denied');
+  try {
+    const context = await requireAuth(req);
+    if (allowedRoles.includes('public')) {
+      return context;
+    }
+    const hasRole = context.roles.some((role) => allowedRoles.includes(role));
+    if (!hasRole) {
+      throw new ForbiddenError('Role access denied');
+    }
+    return context;
+  } catch (error) {
+    if (error instanceof UnauthorizedError && allowedRoles.includes('public')) {
+      return {
+        uid: 'anonymous',
+        email: null,
+        tenantId: 'public',
+        role: 'public',
+        roles: ['public'],
+        claims: {} as DecodedIdToken,
+      };
+    }
+    throw error;
   }
-  return context;
 }

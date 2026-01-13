@@ -2,7 +2,9 @@ import { getAdminDb } from '@/server/firebase-admin';
 import { ENTRESTATE_INVENTORY } from '@/data/entrestate-inventory';
 import { firebaseConfig } from '@/lib/firebase/config';
 import type { ProjectData } from '@/lib/types';
+import { SERVER_ENV } from '@/lib/server/env';
 
+// Cache settings
 const CACHE_TTL_MS = 5 * 60 * 1000;
 const DEFAULT_MAX = 8000;
 const PUBLIC_PROJECT_ID =
@@ -352,6 +354,10 @@ async function loadPublicProjectById(projectId: string): Promise<ProjectData | n
 }
 
 export async function loadInventoryProjects(max = DEFAULT_MAX, forceRefresh = false) {
+  if (SERVER_ENV.USE_STATIC_INVENTORY !== 'false') {
+    return ENTRESTATE_INVENTORY.slice(0, max).map((project) => normalizeProjectData(project, project.id));
+  }
+
   const now = Date.now();
   if (!forceRefresh && cachedProjects.length && now - cachedAt < CACHE_TTL_MS) {
     return cachedProjects.slice(0, max);
@@ -396,24 +402,37 @@ export async function loadInventoryProjectById(projectId: string) {
   if (!projectId) return null;
   const resolvedId = safeDecodeURIComponent(projectId);
 
-  try {
-    const db = getAdminDb();
-    const snapshot = await db.collection('inventory_projects').doc(resolvedId).get();
-    if (snapshot.exists) {
-      return normalizeProjectData(snapshot.data(), snapshot.id);
+  if (SERVER_ENV.USE_STATIC_INVENTORY === 'false') {
+    try {
+      const db = getAdminDb();
+      const snapshot = await db.collection('inventory_projects').doc(resolvedId).get();
+      if (snapshot.exists) {
+        return normalizeProjectData(snapshot.data(), snapshot.id);
+      }
+    } catch (error) {
+      console.error('[inventory] admin project lookup failed', error);
     }
-  } catch (error) {
-    console.error('[inventory] admin project lookup failed', error);
+
+    try {
+      const project = await loadPublicProjectById(resolvedId);
+      if (project) return project;
+    } catch (error) {
+      console.error('[inventory] public project lookup failed', error);
+    }
   }
 
-  try {
-    const project = await loadPublicProjectById(resolvedId);
-    if (project) return project;
-  } catch (error) {
-    console.error('[inventory] public project lookup failed', error);
+  // Fallback: Use cached or static data.
+  // We avoid calling loadInventoryProjects() in DB mode to prevent triggering a full 8k read
+  // just for a single ID lookup miss.
+  console.log(`[inventory] Safe fallback triggered for ID: ${projectId} - Skipping full DB load.`);
+  let fallback = cachedProjects;
+  const now = Date.now();
+  const isCacheValid = cachedProjects.length && now - cachedAt < CACHE_TTL_MS;
+
+  if (!isCacheValid || SERVER_ENV.USE_STATIC_INVENTORY !== 'false') {
+    fallback = ENTRESTATE_INVENTORY.map((p) => normalizeProjectData(p, p.id));
   }
 
-  const fallback = await loadInventoryProjects();
   const directMatch = fallback.find((project) => project.id === resolvedId);
   if (directMatch) return directMatch;
 

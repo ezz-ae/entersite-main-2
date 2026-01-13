@@ -2,7 +2,8 @@ import { NextResponse } from 'next/server';
 import { ENTRESTATE_INVENTORY } from '@/data/entrestate-inventory';
 import { loadInventoryProjects } from '@/server/inventory';
 import { requireRole, UnauthorizedError, ForbiddenError } from '@/server/auth';
-import { ALL_ROLES } from '@/lib/server/roles';
+import { PUBLIC_ROLES } from '@/lib/server/roles';
+import { SERVER_ENV } from '@/lib/server/env';
 
 function buildMetadata(projects: any[]) {
   const developerSet = new Set<string>();
@@ -41,11 +42,33 @@ function buildMetadata(projects: any[]) {
 }
 
 export async function GET(req: Request) {
+  let dataSource = 'static-fallback';
+  let source: any[] = [];
+
   try {
-    await requireRole(req, ALL_ROLES);
-    const projects = await loadInventoryProjects(8000);
-    if (projects.length) {
-      return NextResponse.json(buildMetadata(projects));
+    await requireRole(req, PUBLIC_ROLES);
+
+    if (SERVER_ENV.USE_STATIC_INVENTORY !== 'false') {
+      // 1. Static Mode (Default)
+      source = ENTRESTATE_INVENTORY;
+      dataSource = 'static-env';
+    } else {
+      try {
+        // 2. Try Database
+        source = await loadInventoryProjects(8000);
+        dataSource = 'database';
+      } catch (error) {
+        // 3. Catch Error & 4. Fallback
+        console.warn("[projects/meta] Database load failed, falling back to static.", error);
+        source = ENTRESTATE_INVENTORY;
+        dataSource = 'static-fallback';
+      }
+    }
+
+    if (source.length) {
+      return NextResponse.json(buildMetadata(source), {
+        headers: { 'X-Inventory-Source': dataSource }
+      });
     }
   } catch (error) {
     console.error('[projects/meta] failed to load metadata', error);
@@ -57,5 +80,7 @@ export async function GET(req: Request) {
     }
   }
 
-  return NextResponse.json(buildMetadata(ENTRESTATE_INVENTORY));
+  return NextResponse.json(buildMetadata(ENTRESTATE_INVENTORY), {
+    headers: { 'X-Inventory-Source': dataSource }
+  });
 }
