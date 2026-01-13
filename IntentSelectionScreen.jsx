@@ -9,7 +9,11 @@ const IntentSelectionScreen = ({ onSelect, onBack }) => {
     { id: 'metaLeadGen', label: 'Find Buyers on FB', icon: '∞', desc: 'Ads for Facebook & Instagram' },
     { id: 'smsCampaign', label: 'Wake Up Old Leads', icon: '💬', desc: 'Send SMS to your contacts' },
     { id: 'emailCampaign', label: 'Send Emails', icon: '✉️', desc: 'Automatic follow-up emails' },
-    { id: 'aiMarketExpert', label: 'Ask AI Expert', icon: '🤖', desc: 'Get help with pricing & data' },
+    { id: 'propertyValuation', label: 'Property Valuation', icon: '💰', desc: 'Get an instant price estimate' },
+    { id: 'commissionCalculator', label: 'Commission Calc', icon: '🧮', desc: 'Estimate your earnings' },
+    { id: 'mortgageCalculator', label: 'Mortgage Calc', icon: '🏦', desc: 'Estimate monthly payments' },
+    { id: 'marketTrends', label: 'Market Trends', icon: '📈', desc: 'View price & volume data' },
+    { id: 'aiMarketExpert', label: 'Ask AI Expert', icon: '🧠', desc: 'Get help with pricing & data' },
   ];
 
   return (

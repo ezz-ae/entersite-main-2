@@ -30,6 +30,11 @@ import MeetingSchedulerScreen from './MeetingSchedulerScreen';
 import CRMPipelineScreen from './CRMPipelineScreen';
 import VoiceAssistantScreen from './VoiceAssistantScreen';
 import DocumentScannerScreen from './DocumentScannerScreen';
+import PropertyValuationScreen from './PropertyValuationScreen';
+import CommissionCalculatorScreen from './CommissionCalculatorScreen';
+import MortgageCalculatorScreen from './MortgageCalculatorScreen';
+import MarketTrendsScreen from './MarketTrendsScreen';
+import BuilderScreen from './BuilderScreen';
 import ProgressBar from './ProgressBar';
 import './mobile-styles.css';
 
@@ -77,6 +82,22 @@ const App = () => {
       setCurrentScreen('campaignBuilder');
       return;
     }
+    if (intentId === 'propertyValuation') {
+      setCurrentScreen('propertyValuation');
+      return;
+    }
+    if (intentId === 'commissionCalculator') {
+      setCurrentScreen('commissionCalculator');
+      return;
+    }
+    if (intentId === 'mortgageCalculator') {
+      setCurrentScreen('mortgageCalculator');
+      return;
+    }
+    if (intentId === 'marketTrends') {
+      setCurrentScreen('marketTrends');
+      return;
+    }
     setCurrentScreen('inputs'); // Go to dynamic inputs
   };
 
@@ -91,7 +112,11 @@ const App = () => {
   const handleTemplateSelect = (template) => {
     console.log("Template Selected:", template);
     setToast({ message: "Template Applied" });
-    setCurrentScreen('payment'); // Go to payment before loading
+    if (selectedIntent === 'website') {
+      setCurrentScreen('builder');
+    } else {
+      setCurrentScreen('payment'); // Go to payment before loading
+    }
   };
 
   const handlePaymentComplete = () => {
@@ -101,6 +126,11 @@ const App = () => {
     setTimeout(() => {
       setCurrentScreen('success');
     }, 8000); 
+  };
+
+  const handlePublishWebsite = () => {
+    setToast({ message: "Website Published!" });
+    setCurrentScreen('success');
   };
 
   const handleDashboard = () => {
@@ -336,6 +366,16 @@ const App = () => {
         return <VoiceAssistantScreen onBack={handleDashboard} />;
       case 'documentScanner':
         return <DocumentScannerScreen onBack={handleDashboard} onScanComplete={handleScanComplete} />;
+      case 'propertyValuation':
+        return <PropertyValuationScreen onBack={() => setCurrentScreen('intent')} />;
+      case 'commissionCalculator':
+        return <CommissionCalculatorScreen onBack={() => setCurrentScreen('intent')} />;
+      case 'mortgageCalculator':
+        return <MortgageCalculatorScreen onBack={() => setCurrentScreen('intent')} />;
+      case 'marketTrends':
+        return <MarketTrendsScreen onBack={() => setCurrentScreen('intent')} />;
+      case 'builder':
+        return <BuilderScreen onBack={() => setCurrentScreen('templates')} onPublish={handlePublishWebsite} />;
     }
   };
 
