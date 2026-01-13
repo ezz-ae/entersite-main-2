@@ -3,7 +3,7 @@ import StickyFooter from './StickyFooter';
 import ForgivingInput from './ForgivingInput';
 import './mobile-styles.css';
 
-const SettingsScreen = ({ onBack, onSave, theme, onToggleTheme, onNavigateTo, onReferral, onSupport }) => {
+const SettingsScreen = ({ onBack, onSave, theme, onToggleTheme, onNavigateTo }) => {
   const [profile, setProfile] = useState({
     name: 'Agent Name',
     email: 'agent@example.com',
@@ -40,6 +40,21 @@ const SettingsScreen = ({ onBack, onSave, theme, onToggleTheme, onNavigateTo, on
           icon="👥" 
           label="Team Management" 
           onClick={() => onNavigateTo('teamManagement')} 
+        />
+        <SettingsMenuItem 
+          icon="📅" 
+          label="Meeting Availability" 
+          onClick={() => onNavigateTo('meetingScheduler')} 
+        />
+        <SettingsMenuItem 
+          icon="📊" 
+          label="CRM Pipeline" 
+          onClick={() => onNavigateTo('crmPipeline')} 
+        />
+        <SettingsMenuItem 
+          icon="🎯" 
+          label="Lead Scoring" 
+          onClick={() => onNavigateTo('leadScoring')} 
         />
         <SettingsMenuItem 
           icon="🔌" 

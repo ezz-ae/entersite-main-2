@@ -25,6 +25,11 @@ import ReferralProgramScreen from './ReferralProgramScreen';
 import SupportTicketScreen from './SupportTicketScreen';
 import MarketingDashboardScreen from './MarketingDashboardScreen';
 import CampaignBuilderScreen from './CampaignBuilderScreen';
+import LeadScoringScreen from './LeadScoringScreen';
+import MeetingSchedulerScreen from './MeetingSchedulerScreen';
+import CRMPipelineScreen from './CRMPipelineScreen';
+import VoiceAssistantScreen from './VoiceAssistantScreen';
+import DocumentScannerScreen from './DocumentScannerScreen';
 import ProgressBar from './ProgressBar';
 import './mobile-styles.css';
 
@@ -193,6 +198,40 @@ const App = () => {
     setCurrentScreen('marketingDashboard');
   };
 
+  const handleSaveScoring = (rules) => {
+    console.log("Scoring Rules Saved:", rules);
+    setToast({ message: "Scoring Updated!" });
+    handleSettings(); // Go back to settings
+  };
+
+  const handleMeetingScheduler = () => {
+    setCurrentScreen('meetingScheduler');
+  };
+
+  const handleCRMPipeline = () => {
+    setCurrentScreen('crmPipeline');
+  };
+
+  const handleSaveAvailability = (data) => {
+    console.log("Availability Saved:", data);
+    setToast({ message: "Availability Updated!" });
+    handleSettings();
+  };
+
+  const handleVoiceAssistant = () => {
+    setCurrentScreen('voiceAssistant');
+  };
+
+  const handleDocumentScanner = () => {
+    setCurrentScreen('documentScanner');
+  };
+
+  const handleScanComplete = (leadData) => {
+    console.log("Scanned Lead:", leadData);
+    setToast({ message: "Lead Added Successfully!" });
+    handleDashboard();
+  };
+
   // --- Screen Router ---
 
   const renderScreen = () => {
@@ -206,6 +245,8 @@ const App = () => {
           onLeadSelect={handleLeadSelect} 
           onNotifications={handleNotifications}
           onOpenMarketing={handleOpenMarketing}
+          onVoiceAssistant={handleVoiceAssistant}
+          onScanDocument={handleDocumentScanner}
         />;
       case 'intent':
         return <IntentSelectionScreen onSelect={handleIntentSelect} onBack={handleDashboard} />;
@@ -285,6 +326,16 @@ const App = () => {
             onSend={handleCampaignSend} 
           />
         );
+      case 'leadScoring':
+        return <LeadScoringScreen onBack={handleSettings} onSave={handleSaveScoring} />;
+      case 'meetingScheduler':
+        return <MeetingSchedulerScreen onBack={handleSettings} onSave={handleSaveAvailability} />;
+      case 'crmPipeline':
+        return <CRMPipelineScreen onBack={handleSettings} />;
+      case 'voiceAssistant':
+        return <VoiceAssistantScreen onBack={handleDashboard} />;
+      case 'documentScanner':
+        return <DocumentScannerScreen onBack={handleDashboard} onScanComplete={handleScanComplete} />;
     }
   };
 

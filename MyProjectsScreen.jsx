@@ -6,7 +6,7 @@ import LeadDetailsModal from './LeadDetailsModal';
 import AgentSuccessWidget from './AgentSuccessWidget';
 import './mobile-styles.css';
 
-const MyProjectsScreen = ({ onCreateNew, onSettings, onLeadSelect, onNotifications, onOpenMarketing }) => {
+const MyProjectsScreen = ({ onCreateNew, onSettings, onLeadSelect, onNotifications, onOpenMarketing, onVoiceAssistant, onScanDocument }) => {
   // 1. This would normally come from your database or API
   // We initialize it with data so you can see the stats and swipe action
   const [projects, setProjects] = useState([
@@ -116,6 +116,40 @@ const MyProjectsScreen = ({ onCreateNew, onSettings, onLeadSelect, onNotificatio
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
         <h1 className="screen-title" style={{ marginBottom: 0 }}>My Projects</h1>
         <div style={{ display: 'flex', gap: '8px' }}>
+          <button 
+            onClick={onScanDocument}
+            style={{ 
+              background: '#F3F4F6', 
+              border: 'none', 
+              borderRadius: '50%', 
+              width: '40px', 
+              height: '40px', 
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'center', 
+              fontSize: '20px', 
+              cursor: 'pointer' 
+            }}
+          >
+            📷
+          </button>
+          <button 
+            onClick={onVoiceAssistant}
+            style={{ 
+              background: '#F3F4F6', 
+              border: 'none', 
+              borderRadius: '50%', 
+              width: '40px', 
+              height: '40px', 
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'center', 
+              fontSize: '20px', 
+              cursor: 'pointer' 
+            }}
+          >
+            🎙️
+          </button>
           <button 
             onClick={onNotifications}
             style={{ 

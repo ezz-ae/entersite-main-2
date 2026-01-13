@@ -101,10 +101,6 @@ const MarketingDashboardScreen = ({ campaign, onBack }) => {
       )}
 
       {activeTab === 'design' && (
-        <div className="marketing-preview-card">
-          <div className="preview-header">
-            <span>PREVIEW</span>
-            <span>HTML / TEXT</span>
         isEditing ? (
           <TemplateEditor 
             initialContent={data.preview} 
@@ -123,10 +119,6 @@ const MarketingDashboardScreen = ({ campaign, onBack }) => {
               {data.preview}
             </div>
           </div>
-          <div className="preview-body" style={{ whiteSpace: 'pre-wrap' }}>
-            {data.preview}
-          </div>
-        </div>
         )
       )}
 
