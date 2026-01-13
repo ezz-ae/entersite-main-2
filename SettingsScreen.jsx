@@ -3,7 +3,7 @@ import StickyFooter from './StickyFooter';
 import ForgivingInput from './ForgivingInput';
 import './mobile-styles.css';
 
-const SettingsScreen = ({ onBack, onSave, theme, onToggleTheme }) => {
+const SettingsScreen = ({ onBack, onSave, theme, onToggleTheme, onNavigateTo, onReferral, onSupport }) => {
   const [profile, setProfile] = useState({
     name: 'Agent Name',
     email: 'agent@example.com',
@@ -33,8 +33,44 @@ const SettingsScreen = ({ onBack, onSave, theme, onToggleTheme }) => {
         <h1 className="screen-title" style={{ marginBottom: 0 }}>Settings</h1>
       </div>
 
+      {/* Workspace Section */}
+      <div className="settings-section-title">Workspace</div>
+      <div style={{ borderRadius: '12px', overflow: 'hidden', border: '1px solid var(--border-color)' }}>
+        <SettingsMenuItem 
+          icon="👥" 
+          label="Team Management" 
+          onClick={() => onNavigateTo('teamManagement')} 
+        />
+        <SettingsMenuItem 
+          icon="🔌" 
+          label="Integrations & API" 
+          onClick={() => onNavigateTo('integrations')} 
+        />
+        <SettingsMenuItem 
+          icon="💳" 
+          label="Billing & Invoices" 
+          onClick={() => onNavigateTo('billing')} 
+        />
+        <SettingsMenuItem 
+          icon="📦" 
+          label="My Services & Reports" 
+          onClick={() => onNavigateTo('services')} 
+        />
+        <SettingsMenuItem 
+          icon="🎁" 
+          label="Refer & Earn" 
+          onClick={() => onNavigateTo('referral')} 
+        />
+        <SettingsMenuItem 
+          icon="❓" 
+          label="Help & Support" 
+          onClick={() => onNavigateTo('support')} 
+        />
+      </div>
+
       {/* Profile Section */}
-      <h3 style={{ fontSize: '18px', fontWeight: '700', marginBottom: '16px', color: 'var(--text-primary)' }}>Profile</h3>
+      <div className="settings-section-title">Personal Profile</div>
+      <div style={{ backgroundColor: 'var(--bg-primary)', padding: '16px', borderRadius: '12px', border: '1px solid var(--border-color)' }}>
       <ForgivingInput 
         label="Full Name" 
         value={profile.name} 
@@ -51,15 +87,14 @@ const SettingsScreen = ({ onBack, onSave, theme, onToggleTheme }) => {
         value={profile.phone} 
         onChange={(e) => setProfile({...profile, phone: e.target.value})} 
       />
+      </div>
 
       {/* Appearance Section */}
-      <h3 style={{ fontSize: '18px', fontWeight: '700', marginTop: '32px', marginBottom: '16px', color: 'var(--text-primary)' }}>Appearance</h3>
+      <div className="settings-section-title">App Preferences</div>
+      <div style={{ backgroundColor: 'var(--bg-primary)', padding: '0 16px', borderRadius: '12px', border: '1px solid var(--border-color)' }}>
       <ToggleRow label="Dark Mode" checked={theme === 'dark'} onToggle={onToggleTheme} />
 
       {/* Notifications Section */}
-      <h3 style={{ fontSize: '18px', fontWeight: '700', marginTop: '32px', marginBottom: '16px', color: 'var(--text-primary)' }}>Notifications</h3>
-      
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
         <ToggleRow label="Email Notifications" checked={notifications.email} onToggle={() => handleToggle('email')} />
         <ToggleRow label="Push Notifications" checked={notifications.push} onToggle={() => handleToggle('push')} />
         <ToggleRow label="SMS Alerts" checked={notifications.sms} onToggle={() => handleToggle('sms')} />
@@ -69,6 +104,16 @@ const SettingsScreen = ({ onBack, onSave, theme, onToggleTheme }) => {
     </div>
   );
 };
+
+const SettingsMenuItem = ({ icon, label, onClick }) => (
+  <div className="settings-menu-item" onClick={onClick}>
+    <div style={{ display: 'flex', alignItems: 'center' }}>
+      <div className="settings-icon-container">{icon}</div>
+      <span style={{ fontSize: '16px', fontWeight: '500', color: 'var(--text-primary)' }}>{label}</span>
+    </div>
+    <span style={{ color: 'var(--text-tertiary)' }}>›</span>
+  </div>
+);
 
 const ToggleRow = ({ label, checked, onToggle }) => (
   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 0', borderBottom: '1px solid var(--bg-tertiary)' }}>

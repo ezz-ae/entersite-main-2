@@ -3,6 +3,7 @@ import './mobile-styles.css';
 
 const IntentSelectionScreen = ({ onSelect, onBack }) => {
   const intents = [
+    { id: 'chatAgent', label: 'AI Chat Agent', icon: '🤖', desc: 'Turn Instagram DMs into Deals', highlight: true },
     { id: 'website', label: 'Build a Website', icon: '🌐', desc: 'Create your professional profile' },
     { id: 'googleAds', label: 'Get Google Leads', icon: '🔍', desc: 'Be seen when buyers search' },
     { id: 'metaLeadGen', label: 'Find Buyers on FB', icon: '∞', desc: 'Ads for Facebook & Instagram' },
@@ -30,12 +31,13 @@ const IntentSelectionScreen = ({ onSelect, onBack }) => {
           <button
             key={item.id}
             onClick={() => onSelect(item.id)}
+            className={item.highlight ? 'intent-card-highlight' : ''}
             style={{
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'flex-start',
               padding: '20px',
-              backgroundColor: 'var(--bg-secondary)',
+              backgroundColor: item.highlight ? 'var(--bg-accent)' : 'var(--bg-secondary)',
               border: '1px solid var(--border-color)',
               borderRadius: '16px',
               textAlign: 'left',

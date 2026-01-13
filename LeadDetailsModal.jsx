@@ -1,8 +1,37 @@
-import React from 'react';
+import React, { useState } from 'react';
 import './mobile-styles.css';
 
-const LeadDetailsModal = ({ project, onClose }) => {
 const LeadDetailsModal = ({ project, onClose, onLeadSelect }) => {
+  const [recordingId, setRecordingId] = useState(null);
+  const [notes, setNotes] = useState({}); // Store notes by lead ID
+
+  const handleVoiceNote = (e, leadId) => {
+    e.stopPropagation();
+    
+    if (recordingId === leadId) {
+      // Stop recording
+      setRecordingId(null);
+      return;
+    }
+
+    // Start recording simulation (or actual API)
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (SpeechRecognition) {
+      const recognition = new SpeechRecognition();
+      recognition.lang = 'en-US';
+      recognition.start();
+      setRecordingId(leadId);
+      
+      recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        setNotes(prev => ({ ...prev, [leadId]: transcript }));
+        setRecordingId(null);
+      };
+    } else {
+      alert("Voice recording not supported on this browser.");
+    }
+  };
+
   if (!project) return null;
 
   // Dummy leads generator if not present in project data
@@ -44,16 +73,32 @@ const LeadDetailsModal = ({ project, onClose, onLeadSelect }) => {
             </div>
           ) : (
             displayLeads.map(lead => (
-              <div key={lead.id} className="lead-item">
-                <div className="lead-info">
               <div key={lead.id} className="lead-item" onClick={() => onLeadSelect(lead)} style={{ cursor: 'pointer' }}>
                 <div className="lead-info" style={{ flex: 1 }}>
                   <span className="lead-name">{lead.name}</span>
                   <span className="lead-time">{lead.time}</span>
+                  {notes[lead.id] && (
+                    <div style={{ fontSize: '12px', color: 'var(--text-tertiary)', marginTop: '4px', fontStyle: 'italic' }}>
+                      📝 "{notes[lead.id]}"
+                    </div>
+                  )}
+                  {recordingId === lead.id && (
+                    <div className="recording-ui">
+                      🔴 Listening...
+                    </div>
+                  )}
                 </div>
-                <a href={`tel:${lead.phone}`} className="lead-action">
-                  📞 Call
-                </a>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <button 
+                    onClick={(e) => handleVoiceNote(e, lead.id)}
+                    style={{ background: 'var(--bg-tertiary)', border: 'none', borderRadius: '50%', width: '36px', height: '36px', cursor: 'pointer', fontSize: '16px' }}
+                  >
+                    {recordingId === lead.id ? '⏹️' : '🎙️'}
+                  </button>
+                  <a href={`tel:${lead.phone}`} className="lead-action" onClick={e => e.stopPropagation()}>
+                    📞 Call
+                  </a>
+                </div>
               </div>
             ))
           )}

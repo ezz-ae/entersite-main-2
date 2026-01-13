@@ -9,6 +9,22 @@ import LoginScreen from './LoginScreen';
 import IntentSelectionScreen from './IntentSelectionScreen';
 import SettingsScreen from './SettingsScreen';
 import ToastNotification from './ToastNotification';
+import LeadNurtureScreen from './LeadNurtureScreen';
+import ChatAgentSetup from './ChatAgentSetup';
+import ChatAgentDashboard from './ChatAgentDashboard';
+import KnowledgeBaseScreen from './KnowledgeBaseScreen';
+import QRCodeScreen from './QRCodeScreen';
+import ConversationViewScreen from './ConversationViewScreen';
+import LiveSimulatorScreen from './LiveSimulatorScreen';
+import NotificationCenterScreen from './NotificationCenterScreen';
+import TeamManagementScreen from './TeamManagementScreen';
+import IntegrationsScreen from './IntegrationsScreen';
+import BillingScreen from './BillingScreen';
+import ServicesScreen from './ServicesScreen';
+import ReferralProgramScreen from './ReferralProgramScreen';
+import SupportTicketScreen from './SupportTicketScreen';
+import MarketingDashboardScreen from './MarketingDashboardScreen';
+import CampaignBuilderScreen from './CampaignBuilderScreen';
 import ProgressBar from './ProgressBar';
 import './mobile-styles.css';
 
@@ -17,11 +33,21 @@ const App = () => {
   const [currentScreen, setCurrentScreen] = useState('login');
   const [projectData, setProjectData] = useState(null);
   const [toast, setToast] = useState(null); // { message: string } or null
-  const [theme, setTheme] = useState('light');
+  
+  // Theme Persistence Logic
+  const [theme, setTheme] = useState(() => {
+    const savedTheme = localStorage.getItem('theme');
+    return savedTheme || 'light';
+  });
   const [selectedIntent, setSelectedIntent] = useState(null);
+  const [selectedLead, setSelectedLead] = useState(null);
+  const [selectedChat, setSelectedChat] = useState(null);
+  const [selectedCampaign, setSelectedCampaign] = useState(null);
 
   const toggleTheme = () => {
-    setTheme(prev => prev === 'light' ? 'dark' : 'light');
+    const newTheme = theme === 'light' ? 'dark' : 'light';
+    setTheme(newTheme);
+    localStorage.setItem('theme', newTheme);
   };
 
   // --- Navigation Handlers ---
@@ -38,6 +64,14 @@ const App = () => {
 
   const handleIntentSelect = (intentId) => {
     setSelectedIntent(intentId);
+    if (intentId === 'chatAgent') {
+      setCurrentScreen('chatAgentSetup');
+      return;
+    }
+    if (intentId === 'smsCampaign' || intentId === 'emailCampaign') {
+      setCurrentScreen('campaignBuilder');
+      return;
+    }
     setCurrentScreen('inputs'); // Go to dynamic inputs
   };
 
@@ -83,6 +117,82 @@ const App = () => {
     handleDashboard();
   };
 
+  const handleLeadSelect = (lead) => {
+    setSelectedLead(lead);
+    setCurrentScreen('leadNurture');
+  };
+
+  const handleKnowledgeBase = () => {
+    setToast({ message: "Knowledge Base Updated!" });
+    setCurrentScreen('chatAgentDashboard');
+  };
+
+  const handleViewChat = (chat) => {
+    setSelectedChat(chat);
+    setCurrentScreen('conversationView');
+  };
+
+  const handleShowQR = () => {
+    setCurrentScreen('qrCode');
+  };
+
+  const handleLiveSimulator = () => {
+    setCurrentScreen('liveSimulator');
+  };
+
+  const handleNotifications = () => {
+    setCurrentScreen('notifications');
+  };
+
+  const handleTeamManagement = () => {
+    setCurrentScreen('teamManagement');
+  };
+
+  const handleIntegrations = () => {
+    setCurrentScreen('integrations');
+  };
+
+  const handleBilling = () => {
+    setCurrentScreen('billing');
+  };
+
+  const handleServices = () => {
+    setCurrentScreen('services');
+  };
+
+  const handleReferral = () => {
+    setCurrentScreen('referral');
+  };
+
+  const handleSupport = () => {
+    setCurrentScreen('support');
+  };
+
+  const handleSupportSubmit = (ticket) => {
+    setToast({ message: "Ticket Submitted!" });
+    handleDashboard();
+  };
+
+  const handleOpenMarketing = (campaign) => {
+    setSelectedCampaign(campaign);
+    setCurrentScreen('marketingDashboard');
+  };
+
+  const handleCampaignSend = (campaignData) => {
+    setToast({ message: "Campaign Sent!" });
+    setSelectedCampaign({
+      name: campaignData.subject || (campaignData.type === 'sms' ? "SMS Blast" : "New Campaign"),
+      type: campaignData.type === 'email' ? "Email Campaign" : "SMS Campaign",
+      status: "Sent",
+      sent: campaignData.recipients === 'all' ? 1250 : 45,
+      delivered: 0,
+      opened: 0,
+      clicked: 0,
+      preview: campaignData.content
+    });
+    setCurrentScreen('marketingDashboard');
+  };
+
   // --- Screen Router ---
 
   const renderScreen = () => {
@@ -90,7 +200,13 @@ const App = () => {
       case 'login':
         return <LoginScreen onLogin={handleLogin} />;
       case 'home':
-        return <MyProjectsScreen onCreateNew={handleStartNew} onSettings={handleSettings} />;
+        return <MyProjectsScreen 
+          onCreateNew={handleStartNew} 
+          onSettings={handleSettings} 
+          onLeadSelect={handleLeadSelect} 
+          onNotifications={handleNotifications}
+          onOpenMarketing={handleOpenMarketing}
+        />;
       case 'intent':
         return <IntentSelectionScreen onSelect={handleIntentSelect} onBack={handleDashboard} />;
       case 'inputs':
@@ -111,8 +227,64 @@ const App = () => {
         );
       case 'settings':
         return <SettingsScreen onBack={handleDashboard} onSave={handleSaveSettings} theme={theme} onToggleTheme={toggleTheme} />;
+      case 'leadNurture':
+        return <LeadNurtureScreen lead={selectedLead} onBack={handleDashboard} />;
+      case 'chatAgentSetup':
+        return <ChatAgentSetup onBack={() => setCurrentScreen('intent')} onComplete={() => setCurrentScreen('chatAgentDashboard')} />;
+      case 'chatAgentDashboard':
+        return (
+          <ChatAgentDashboard 
+            onBack={handleDashboard} 
+            onUpdateKnowledge={() => setCurrentScreen('knowledgeBase')} 
+            onViewChat={handleViewChat}
+            onShowQR={handleShowQR}
+            onTestSimulator={handleLiveSimulator}
+          />
+        );
+      case 'knowledgeBase':
+        return <KnowledgeBaseScreen onBack={() => setCurrentScreen('chatAgentDashboard')} onSave={handleKnowledgeBase} />;
+      case 'qrCode':
+        return <QRCodeScreen onBack={() => setCurrentScreen('chatAgentDashboard')} />;
+      case 'conversationView':
+        return <ConversationViewScreen chat={selectedChat} onBack={() => setCurrentScreen('chatAgentDashboard')} />;
+      case 'liveSimulator':
+        return <LiveSimulatorScreen onBack={() => setCurrentScreen('chatAgentDashboard')} />;
+      case 'notifications':
+        return <NotificationCenterScreen onBack={handleDashboard} />;
       default:
         return <MyProjectsScreen onCreateNew={handleStartNew} onSettings={handleSettings} />;
+      case 'settings':
+        return (
+          <SettingsScreen 
+            onBack={handleDashboard} 
+            onSave={handleSaveSettings} 
+            theme={theme} 
+            onToggleTheme={toggleTheme}
+            onNavigateTo={setCurrentScreen}
+          />
+        );
+      case 'teamManagement':
+        return <TeamManagementScreen onBack={handleSettings} />;
+      case 'integrations':
+        return <IntegrationsScreen onBack={handleSettings} />;
+      case 'billing':
+        return <BillingScreen onBack={handleSettings} />;
+      case 'services':
+        return <ServicesScreen onBack={handleSettings} />;
+      case 'referral':
+        return <ReferralProgramScreen onBack={handleSettings} />;
+      case 'support':
+        return <SupportTicketScreen onBack={handleSettings} onSubmit={handleSupportSubmit} />;
+      case 'marketingDashboard':
+        return <MarketingDashboardScreen campaign={selectedCampaign} onBack={handleDashboard} />;
+      case 'campaignBuilder':
+        return (
+          <CampaignBuilderScreen 
+            type={selectedIntent === 'smsCampaign' ? 'sms' : 'email'} 
+            onBack={() => setCurrentScreen('intent')} 
+            onSend={handleCampaignSend} 
+          />
+        );
     }
   };
 

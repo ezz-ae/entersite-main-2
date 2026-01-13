@@ -3,15 +3,17 @@ import EmptyState from './EmptyState';
 import StickyFooter from './StickyFooter';
 import DashboardStats from './DashboardStats';
 import LeadDetailsModal from './LeadDetailsModal';
+import AgentSuccessWidget from './AgentSuccessWidget';
 import './mobile-styles.css';
 
-const MyProjectsScreen = ({ onCreateNew, onSettings }) => {
+const MyProjectsScreen = ({ onCreateNew, onSettings, onLeadSelect, onNotifications, onOpenMarketing }) => {
   // 1. This would normally come from your database or API
   // We initialize it with data so you can see the stats and swipe action
   const [projects, setProjects] = useState([
-    { id: 1, name: "Downtown Luxury Loft", status: "Live", views: 1240, leads: 45 },
-    { id: 2, name: "Palm Jumeirah Villa", status: "Draft", views: 0, leads: 0 },
-    { id: 3, name: "Marina 2-Bed", status: "Live", views: 850, leads: 12 }
+    { id: 1, name: "Downtown Luxury Loft", type: "website", status: "Live", views: 1240, leads: 45 },
+    { id: 2, name: "October Newsletter", type: "email", status: "Sent", views: 560, leads: 12 },
+    { id: 3, name: "Marina 2-Bed", type: "website", status: "Live", views: 850, leads: 12 },
+    { id: 4, name: "SMS Blast - Leads", type: "sms", status: "Completed", views: 980, leads: 5 }
   ]); 
 
   const [selectedProject, setSelectedProject] = useState(null);
@@ -65,6 +67,14 @@ const MyProjectsScreen = ({ onCreateNew, onSettings }) => {
     setProjects(projects.filter(p => p.id !== id));
   };
 
+  const handleProjectClick = (project) => {
+    if (project.type === 'email' || project.type === 'sms') {
+      onOpenMarketing(project);
+    } else {
+      setSelectedProject(project);
+    }
+  };
+
   // 2. The "Empty State" Logic
   // If the agent has no work saved, we guide them immediately to the action.
   if (projects.length === 0) {
@@ -105,25 +115,48 @@ const MyProjectsScreen = ({ onCreateNew, onSettings }) => {
 
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
         <h1 className="screen-title" style={{ marginBottom: 0 }}>My Projects</h1>
-        <button 
-          onClick={onSettings}
-          style={{ 
-            background: '#F3F4F6', 
-            border: 'none', 
-            borderRadius: '50%', 
-            width: '40px', 
-            height: '40px', 
-            display: 'flex', 
-            alignItems: 'center', 
-            justifyContent: 'center', 
-            fontSize: '20px', 
-            cursor: 'pointer' 
-          }}
-        >
-          ⚙️
-        </button>
+        <div style={{ display: 'flex', gap: '8px' }}>
+          <button 
+            onClick={onNotifications}
+            style={{ 
+              background: '#F3F4F6', 
+              border: 'none', 
+              borderRadius: '50%', 
+              width: '40px', 
+              height: '40px', 
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'center', 
+              fontSize: '20px', 
+              cursor: 'pointer',
+              position: 'relative'
+            }}
+          >
+            🔔
+            <span style={{ position: 'absolute', top: '8px', right: '8px', width: '8px', height: '8px', backgroundColor: '#EF4444', borderRadius: '50%', border: '1px solid white' }}></span>
+          </button>
+          <button 
+            onClick={onSettings}
+            style={{ 
+              background: '#F3F4F6', 
+              border: 'none', 
+              borderRadius: '50%', 
+              width: '40px', 
+              height: '40px', 
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'center', 
+              fontSize: '20px', 
+              cursor: 'pointer' 
+            }}
+          >
+            ⚙️
+          </button>
+        </div>
       </div>
       
+      <AgentSuccessWidget onAction={() => alert('Navigating to Sarah Miller...')} />
+
       <DashboardStats views={totalViews} leads={totalLeads} />
       
       <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
@@ -132,12 +165,18 @@ const MyProjectsScreen = ({ onCreateNew, onSettings }) => {
             key={project.id} 
             project={project} 
             onDelete={handleDelete} 
-            onSelect={() => setSelectedProject(project)}
+            onSelect={() => handleProjectClick(project)}
           />
         ))}
       </div>
 
-      {selectedProject && <LeadDetailsModal project={selectedProject} onClose={() => setSelectedProject(null)} />}
+      {selectedProject && (
+        <LeadDetailsModal 
+          project={selectedProject} 
+          onClose={() => setSelectedProject(null)} 
+          onLeadSelect={onLeadSelect}
+        />
+      )}
       <StickyFooter label="Start New Project" onClick={onCreateNew} />
     </div>
   );
