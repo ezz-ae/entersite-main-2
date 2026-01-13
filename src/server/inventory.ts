@@ -355,6 +355,7 @@ async function loadPublicProjectById(projectId: string): Promise<ProjectData | n
 
 export async function loadInventoryProjects(max = DEFAULT_MAX, forceRefresh = false) {
   if (SERVER_ENV.USE_STATIC_INVENTORY !== 'false') {
+    // Static mode (default) - prevents quota usage unless explicitly disabled
     return ENTRESTATE_INVENTORY.slice(0, max).map((project) => normalizeProjectData(project, project.id));
   }
 
