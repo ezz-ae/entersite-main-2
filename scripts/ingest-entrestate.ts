@@ -1,10 +1,29 @@
-import 'dotenv/config';
+import dotenv from 'dotenv';
 import fs from 'fs';
-import { initializeApp } from 'firebase-admin/app';
+import { initializeApp, cert } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
 
-// Initialize with default credentials
-const app = initializeApp();
+dotenv.config({ path: '.env.local' });
+dotenv.config();
+
+const serviceAccount = process.env.FIREBASE_ADMIN_SDK_CONFIG
+  ? JSON.parse(process.env.FIREBASE_ADMIN_SDK_CONFIG)
+  : process.env.FIREBASE_PROJECT_ID
+  ? {
+      projectId: process.env.FIREBASE_PROJECT_ID,
+      clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+      privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+    }
+  : undefined;
+
+if (serviceAccount) {
+  console.log(`[Ingest] Initializing Firebase for project: ${serviceAccount.projectId}`);
+} else {
+  console.error('[Ingest] No credentials found. Check .env.local');
+  process.exit(1);
+}
+
+const app = serviceAccount ? initializeApp({ credential: cert(serviceAccount) }) : initializeApp();
 const db = getFirestore(app);
 
 // --- INTELLIGENCE GENERATOR ---
@@ -56,10 +75,11 @@ async function ingest() {
   
   console.log(`Mapping ${rawData.length} projects with Synthetic Intelligence...`);
 
-  const CHUNK_SIZE = 450;
+  const CHUNK_SIZE = 100;
   for (let i = 0; i < rawData.length; i += CHUNK_SIZE) {
     const chunk = rawData.slice(i, i + CHUNK_SIZE);
     const batch = db.batch();
+    console.log(`[Ingest] Preparing chunk ${Math.floor(i / CHUNK_SIZE) + 1}...`);
 
     chunk.forEach((project: any) => {
       const cityMatch = project.publicUrl?.match(/cities\/uae-([^/]+)/);
@@ -105,8 +125,9 @@ async function ingest() {
       }, { merge: true });
     });
 
+    console.log(`[Ingest] Committing chunk ${Math.floor(i / CHUNK_SIZE) + 1}...`);
     await batch.commit();
-    console.log(`Processed chunk ${i / CHUNK_SIZE + 1} of ${Math.ceil(rawData.length / CHUNK_SIZE)}`);
+    console.log(`[Ingest] Success: Chunk ${Math.floor(i / CHUNK_SIZE) + 1} committed.`);
   }
 
   console.log('--- MASTER DATA INGESTION COMPLETE ---');

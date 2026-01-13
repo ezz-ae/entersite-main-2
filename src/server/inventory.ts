@@ -6,7 +6,7 @@ import { SERVER_ENV } from '@/lib/server/env';
 
 // Cache settings
 const CACHE_TTL_MS = 5 * 60 * 1000;
-const DEFAULT_MAX = 8000;
+const DEFAULT_MAX = 1000; // Reduced from 8000 to save Firestore quota during dev
 const PUBLIC_PROJECT_ID =
   process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID ||
   process.env.FIREBASE_PROJECT_ID ||
@@ -459,7 +459,7 @@ export async function getRelevantProjects(message: string, context?: string, max
   const terms = query.split(/[^a-z0-9]+/i).filter((term) => term.length > 2);
 
   if (!terms.length) {
-    return projects.slice(0, max);
+    return [];
   }
 
   const scored = projects

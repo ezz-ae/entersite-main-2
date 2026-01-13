@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { loadInventoryProjects } from '@/server/inventory';
 import { SERVER_ENV } from '@/lib/server/env';
 
-// Cache the response for 60 seconds to prevent redundant fetches during development.
+// Cache the response for 60 seconds
 export const revalidate = 60;
 
 function buildMetadata(projects: any[]) {
