@@ -6,7 +6,7 @@ import { SERVER_ENV } from '@/lib/server/env';
 
 // Cache settings
 const CACHE_TTL_MS = 5 * 60 * 1000;
-const DEFAULT_MAX = 1000; // Reduced from 8000 to save Firestore quota during dev
+const DEFAULT_MAX = 8000;
 const PUBLIC_PROJECT_ID =
   process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID ||
   process.env.FIREBASE_PROJECT_ID ||
@@ -32,6 +32,7 @@ const ADMIN_PROJECT_MISMATCH =
 
 let cachedProjects: ProjectData[] = [];
 let cachedAt = 0;
+let hasFullInventoryLoaded = false;
 
 type FirestoreValue = {
   stringValue?: string;
@@ -354,13 +355,16 @@ async function loadPublicProjectById(projectId: string): Promise<ProjectData | n
 }
 
 export async function loadInventoryProjects(max = DEFAULT_MAX, forceRefresh = false) {
-  if (SERVER_ENV.USE_STATIC_INVENTORY !== 'false') {
+  const useStatic = SERVER_ENV.USE_STATIC_INVENTORY !== 'false';
+  console.log(`[inventory] Loading mode: ${useStatic ? 'STATIC' : 'FIRESTORE'} (Env: '${SERVER_ENV.USE_STATIC_INVENTORY}')`);
+
+  if (useStatic) {
     // Static mode (default) - prevents quota usage unless explicitly disabled
     return ENTRESTATE_INVENTORY.slice(0, max).map((project) => normalizeProjectData(project, project.id));
   }
 
   const now = Date.now();
-  if (!forceRefresh && cachedProjects.length && now - cachedAt < CACHE_TTL_MS) {
+  if (!forceRefresh && (hasFullInventoryLoaded || cachedProjects.length >= max) && now - cachedAt < CACHE_TTL_MS) {
     return cachedProjects.slice(0, max);
   }
 
@@ -374,9 +378,14 @@ export async function loadInventoryProjects(max = DEFAULT_MAX, forceRefresh = fa
 
   try {
     const db = getAdminDb();
-    const snapshot = await db.collection('inventory_projects').limit(max).get();
+    // Order by ingestion time to ensure the latest "commits" (projects) appear first
+    const snapshot = await db.collection('inventory_projects')
+      .orderBy('ingestedAt', 'desc')
+      .limit(max)
+      .get();
     if (!snapshot.empty) {
       projects = snapshot.docs.map((doc) => normalizeProjectData(doc.data(), doc.id));
+      console.log(`[inventory] Successfully loaded ${projects.length} projects from Firestore.`);
     }
   } catch (error) {
     console.error('[inventory] admin load failed', error);
@@ -385,17 +394,20 @@ export async function loadInventoryProjects(max = DEFAULT_MAX, forceRefresh = fa
   if (!projects.length) {
     try {
       projects = await loadPublicInventory(max);
+      console.log(`[inventory] Public load returned ${projects.length} projects`);
     } catch (error) {
       console.error('[inventory] public load failed', error);
     }
   }
 
   if (!projects.length) {
+    console.warn('[inventory] No projects loaded from DB or Public API. Falling back to static inventory.');
     projects = ENTRESTATE_INVENTORY.map((project) => normalizeProjectData(project, project.id));
   }
 
   cachedProjects = projects;
   cachedAt = now;
+  hasFullInventoryLoaded = projects.length < max;
   return projects.slice(0, max);
 }
 

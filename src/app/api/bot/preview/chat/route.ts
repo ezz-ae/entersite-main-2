@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { generateText } from 'ai';
 import { z } from 'zod';
-import { getGoogleModel, FLASH_MODEL } from '@/lib/ai/google';
+import { getGoogleModel } from '@/lib/ai/google';
 import { formatProjectContext, getRelevantProjects } from '@/server/inventory';
 import { enforceRateLimit, getRequestIp } from '@/lib/server/rateLimit';
 
@@ -71,7 +71,7 @@ Agent:
 
   try {
     const { text } = await generateText({
-      model: getGoogleModel(FLASH_MODEL),
+      model: getGoogleModel('gemini-1.5-flash'),
       system:
         'You are the Entrestate real estate assistant. Use a friendly, professional tone. Never sound robotic.',
       prompt,

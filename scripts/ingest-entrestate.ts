@@ -1,25 +1,78 @@
 import dotenv from 'dotenv';
 import fs from 'fs';
+import path from 'path';
 import { initializeApp, cert } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
 
 dotenv.config({ path: '.env.local' });
 dotenv.config();
 
-const serviceAccount = process.env.FIREBASE_ADMIN_SDK_CONFIG
-  ? JSON.parse(process.env.FIREBASE_ADMIN_SDK_CONFIG)
-  : process.env.FIREBASE_PROJECT_ID
-  ? {
+console.log(`[Ingest] Current working directory: ${process.cwd()}`);
+
+let serviceAccount;
+try {
+  if (process.env.FIREBASE_ADMIN_SDK_CONFIG) {
+    serviceAccount = JSON.parse(process.env.FIREBASE_ADMIN_SDK_CONFIG);
+  }
+} catch (e) {
+  // Ignore invalid JSON and fall back to individual keys
+}
+
+if (!serviceAccount) {
+  console.log('[Ingest] Scanning directory for service account files...');
+  try {
+    const files = fs.readdirSync(process.cwd()).filter(f => f.endsWith('.json'));
+    for (const file of files) {
+      try {
+        const filePath = path.resolve(process.cwd(), file);
+        const content = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+        // Check for standard service account fields to identify the correct file
+        if (content.type === 'service_account' && content.project_id && content.private_key) {
+          console.log(`[Ingest] Auto-detected service account: ${file}`);
+          serviceAccount = content;
+          break;
+        }
+      } catch (e) {
+        // Ignore invalid JSON or non-service-account files
+      }
+    }
+  } catch (e) {
+    console.warn('[Ingest] Directory scan failed:', e);
+  }
+}
+
+if (!serviceAccount) {
+  console.log('[Ingest] Checking environment variables...');
+  console.log(`  - FIREBASE_PROJECT_ID: ${process.env.FIREBASE_PROJECT_ID ? 'Found' : 'Missing'}`);
+  console.log(`  - FIREBASE_PRIVATE_KEY: ${process.env.FIREBASE_PRIVATE_KEY ? 'Found' : 'Missing'}`);
+
+  if (process.env.FIREBASE_PROJECT_ID) {
+    console.log('[Ingest] Falling back to .env variables (FIREBASE_PROJECT_ID detected)...');
+    if (!process.env.FIREBASE_PRIVATE_KEY) {
+      console.warn('[Ingest] Warning: FIREBASE_PRIVATE_KEY is missing in .env variables.');
+    }
+    serviceAccount = {
       projectId: process.env.FIREBASE_PROJECT_ID,
       clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
       privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
-    }
-  : undefined;
+    };
+  } else {
+    console.log('[Ingest] FIREBASE_PROJECT_ID not found in .env.local or environment.');
+  }
+}
 
 if (serviceAccount) {
-  console.log(`[Ingest] Initializing Firebase for project: ${serviceAccount.projectId}`);
+  // Validate key presence to prevent obscure cert() errors
+  if (!serviceAccount.privateKey && !serviceAccount.private_key) {
+    console.error('[Ingest] Error: Credentials found but missing "private_key". Check your JSON file or .env variables.');
+    process.exit(1);
+  }
+  console.log(`[Ingest] Initializing Firebase for project: ${serviceAccount.projectId || serviceAccount.project_id}`);
 } else {
-  console.error('[Ingest] No credentials found. Check .env.local');
+  console.error('[Ingest] No credentials found.');
+  console.error('  - Ensure service-account.json is in the root directory.');
+  console.error('  - If you downloaded it as "service-account (1).json", rename it to "service-account.json" or ensure the script is updated.');
+  console.error('  - OR set FIREBASE_PROJECT_ID, FIREBASE_CLIENT_EMAIL, FIREBASE_PRIVATE_KEY in .env.local');
   process.exit(1);
 }
 
