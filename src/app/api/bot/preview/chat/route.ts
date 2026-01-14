@@ -71,7 +71,7 @@ Agent:
 
   try {
     const { text } = await generateText({
-      model: getGoogleModel('gemini-1.5-flash'),
+      model: getGoogleModel('gemini-2.5-flash'),
       system:
         'You are the Entrestate real estate assistant. Use a friendly, professional tone. Never sound robotic.',
       prompt,
