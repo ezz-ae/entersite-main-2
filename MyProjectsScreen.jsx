@@ -4,7 +4,7 @@ import StickyFooter from './StickyFooter';
 import DashboardStats from './DashboardStats';
 import LeadDetailsModal from './LeadDetailsModal';
 import AgentSuccessWidget from './AgentSuccessWidget';
-import './mobile-styles.css';
+
 
 const MyProjectsScreen = ({ onCreateNew, onSettings, onLeadSelect, onNotifications, onOpenMarketing, onVoiceAssistant, onScanDocument }) => {
   // 1. This would normally come from your database or API

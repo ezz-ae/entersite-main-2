@@ -1,5 +1,5 @@
 import React from 'react';
-import './mobile-styles.css';
+
 
 const PreviewModal = ({ template, onClose, onSelect }) => {
   if (!template) return null;

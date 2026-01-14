@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import './mobile-styles.css';
+
 
 const DomainSearch = ({ onSelect }) => {
   const [query, setQuery] = useState('');

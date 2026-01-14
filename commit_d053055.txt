@@ -1,0 +1,835 @@
+commit d053055fd87e0a91d4b77cd1e115f811f94828b3
+Author: Mahmoud Ezz <m-ezz@outlook.com>
+Date:   Wed Jan 14 08:44:03 2026 +0400
+
+    Gemini 10
+
+diff --git a/package-lock.json b/package-lock.json
+index c6de5c9..94ca930 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -8,7 +8,7 @@
+       "name": "entrestate-os",
+       "version": "2.0.0",
+       "dependencies": {
+-        "@ai-sdk/google": "^1.0.0",
++        "@ai-sdk/google": "^1.1.0",
+         "@dnd-kit/core": "^6.3.1",
+         "@dnd-kit/sortable": "^10.0.0",
+         "@dnd-kit/utilities": "^3.2.2",
+@@ -94,6 +94,7 @@
+         "postcss": "^8",
+         "tailwindcss": "^3.4.1",
+         "ts-node": "^10.9.2",
++        "tsx": "^4.16.2",
+         "typescript": "^5"
+       }
+     },
+@@ -616,6 +617,448 @@
+         "tslib": "^2.4.0"
+       }
+     },
++    "node_modules/@esbuild/aix-ppc64": {
++      "version": "0.27.2",
++      "resolved": "https://registry.npmjs.org/@esbuild/aix-ppc64/-/aix-ppc64-0.27.2.tgz",
++      "integrity": "sha512-GZMB+a0mOMZs4MpDbj8RJp4cw+w1WV5NYD6xzgvzUJ5Ek2jerwfO2eADyI6ExDSUED+1X8aMbegahsJi+8mgpw==",
++      "cpu": [
++        "ppc64"
++      ],
++      "dev": true,
++      "license": "MIT",
++      "optional": true,
++      "os": [
++        "aix"
++      ],
++      "engines": {
++        "node": ">=18"
++      }
++    },
++    "node_modules/@esbuild/android-arm": {
++      "version": "0.27.2",
++      "resolved": "https://registry.npmjs.org/@esbuild/android-arm/-/android-arm-0.27.2.tgz",
++      "integrity": "sha512-DVNI8jlPa7Ujbr1yjU2PfUSRtAUZPG9I1RwW4F4xFB1Imiu2on0ADiI/c3td+KmDtVKNbi+nffGDQMfcIMkwIA==",
++      "cpu": [
++        "arm"
++      ],
++      "dev": true,
++      "license": "MIT",
++      "optional": true,
++      "os": [
++        "android"
++      ],
++      "engines": {
++        "node": ">=18"
++      }
++    },
++    "node_modules/@esbuild/android-arm64": {
++      "version": "0.27.2",
++      "resolved": "https://registry.npmjs.org/@esbuild/android-arm64/-/android-arm64-0.27.2.tgz",
++      "integrity": "sha512-pvz8ZZ7ot/RBphf8fv60ljmaoydPU12VuXHImtAs0XhLLw+EXBi2BLe3OYSBslR4rryHvweW5gmkKFwTiFy6KA==",
++      "cpu": [
++        "arm64"
++      ],
++      "dev": true,
++      "license": "MIT",
++      "optional": true,
++      "os": [
++        "android"
++      ],
++      "engines": {
++        "node": ">=18"
++      }
++    },
++    "node_modules/@esbuild/android-x64": {
++      "version": "0.27.2",
++      "resolved": "https://registry.npmjs.org/@esbuild/android-x64/-/android-x64-0.27.2.tgz",
++      "integrity": "sha512-z8Ank4Byh4TJJOh4wpz8g2vDy75zFL0TlZlkUkEwYXuPSgX8yzep596n6mT7905kA9uHZsf/o2OJZubl2l3M7A==",
++      "cpu": [
++        "x64"
++      ],
++      "dev": true,
++      "license": "MIT",
++      "optional": true,
++      "os": [
++        "android"
++      ],
++      "engines": {
++        "node": ">=18"
++      }
++    },
++    "node_modules/@esbuild/darwin-arm64": {
++      "version": "0.27.2",
++      "resolved": "https://registry.npmjs.org/@esbuild/darwin-arm64/-/darwin-arm64-0.27.2.tgz",
++      "integrity": "sha512-davCD2Zc80nzDVRwXTcQP/28fiJbcOwvdolL0sOiOsbwBa72kegmVU0Wrh1MYrbuCL98Omp5dVhQFWRKR2ZAlg==",
++      "cpu": [
++        "arm64"
++      ],
++      "dev": true,
++      "license": "MIT",
++      "optional": true,
++      "os": [
++        "darwin"
++      ],
++      "engines": {
++        "node": ">=18"
++      }
++    },
++    "node_modules/@esbuild/darwin-x64": {
++      "version": "0.27.2",
++      "resolved": "https://registry.npmjs.org/@esbuild/darwin-x64/-/darwin-x64-0.27.2.tgz",
++      "integrity": "sha512-ZxtijOmlQCBWGwbVmwOF/UCzuGIbUkqB1faQRf5akQmxRJ1ujusWsb3CVfk/9iZKr2L5SMU5wPBi1UWbvL+VQA==",
++      "cpu": [
++        "x64"
++      ],
++      "dev": true,
++      "license": "MIT",
++      "optional": true,
++      "os": [
++        "darwin"
++      ],
++      "engines": {
++        "node": ">=18"
++      }
++    },
++    "node_modules/@esbuild/freebsd-arm64": {
++      "version": "0.27.2",
++      "resolved": "https://registry.npmjs.org/@esbuild/freebsd-arm64/-/freebsd-arm64-0.27.2.tgz",
++      "integrity": "sha512-lS/9CN+rgqQ9czogxlMcBMGd+l8Q3Nj1MFQwBZJyoEKI50XGxwuzznYdwcav6lpOGv5BqaZXqvBSiB/kJ5op+g==",
++      "cpu": [
++        "arm64"
++      ],
++      "dev": true,
++      "license": "MIT",
++      "optional": true,
++      "os": [
++        "freebsd"
++      ],
++      "engines": {
++        "node": ">=18"
++      }
++    },
++    "node_modules/@esbuild/freebsd-x64": {
++      "version": "0.27.2",
++      "resolved": "https://registry.npmjs.org/@esbuild/freebsd-x64/-/freebsd-x64-0.27.2.tgz",
++      "integrity": "sha512-tAfqtNYb4YgPnJlEFu4c212HYjQWSO/w/h/lQaBK7RbwGIkBOuNKQI9tqWzx7Wtp7bTPaGC6MJvWI608P3wXYA==",
++      "cpu": [
++        "x64"
++      ],
++      "dev": true,
++      "license": "MIT",
++      "optional": true,
++      "os": [
++        "freebsd"
++      ],
++      "engines": {
++        "node": ">=18"
++      }
++    },
++    "node_modules/@esbuild/linux-arm": {
++      "version": "0.27.2",
++      "resolved": "https://registry.npmjs.org/@esbuild/linux-arm/-/linux-arm-0.27.2.tgz",
++      "integrity": "sha512-vWfq4GaIMP9AIe4yj1ZUW18RDhx6EPQKjwe7n8BbIecFtCQG4CfHGaHuh7fdfq+y3LIA2vGS/o9ZBGVxIDi9hw==",
++      "cpu": [
++        "arm"
++      ],
++      "dev": true,
++      "license": "MIT",
++      "optional": true,
++      "os": [
++        "linux"
++      ],
++      "engines": {
++        "node": ">=18"
++      }
++    },
++    "node_modules/@esbuild/linux-arm64": {
++      "version": "0.27.2",
++      "resolved": "https://registry.npmjs.org/@esbuild/linux-arm64/-/linux-arm64-0.27.2.tgz",
++      "integrity": "sha512-hYxN8pr66NsCCiRFkHUAsxylNOcAQaxSSkHMMjcpx0si13t1LHFphxJZUiGwojB1a/Hd5OiPIqDdXONia6bhTw==",
++      "cpu": [
++        "arm64"
++      ],
++      "dev": true,
++      "license": "MIT",
++      "optional": true,
++      "os": [
++        "linux"
++      ],
++      "engines": {
++        "node": ">=18"
++      }
++    },
++    "node_modules/@esbuild/linux-ia32": {
++      "version": "0.27.2",
++      "resolved": "https://registry.npmjs.org/@esbuild/linux-ia32/-/linux-ia32-0.27.2.tgz",
++      "integrity": "sha512-MJt5BRRSScPDwG2hLelYhAAKh9imjHK5+NE/tvnRLbIqUWa+0E9N4WNMjmp/kXXPHZGqPLxggwVhz7QP8CTR8w==",
++      "cpu": [
++        "ia32"
++      ],
++      "dev": true,
++      "license": "MIT",
++      "optional": true,
++      "os": [
++        "linux"
++      ],
++      "engines": {
++        "node": ">=18"
++      }
++    },
++    "node_modules/@esbuild/linux-loong64": {
++      "version": "0.27.2",
++      "resolved": "https://registry.npmjs.org/@esbuild/linux-loong64/-/linux-loong64-0.27.2.tgz",
++      "integrity": "sha512-lugyF1atnAT463aO6KPshVCJK5NgRnU4yb3FUumyVz+cGvZbontBgzeGFO1nF+dPueHD367a2ZXe1NtUkAjOtg==",
++      "cpu": [
++        "loong64"
++      ],
++      "dev": true,
++      "license": "MIT",
++      "optional": true,
++      "os": [
++        "linux"
++      ],
++      "engines": {
++        "node": ">=18"
++      }
++    },
++    "node_modules/@esbuild/linux-mips64el": {
++      "version": "0.27.2",
++      "resolved": "https://registry.npmjs.org/@esbuild/linux-mips64el/-/linux-mips64el-0.27.2.tgz",
++      "integrity": "sha512-nlP2I6ArEBewvJ2gjrrkESEZkB5mIoaTswuqNFRv/WYd+ATtUpe9Y09RnJvgvdag7he0OWgEZWhviS1OTOKixw==",
++      "cpu": [
++        "mips64el"
++      ],
++      "dev": true,
++      "license": "MIT",
++      "optional": true,
++      "os": [
++        "linux"
++      ],
++      "engines": {
++        "node": ">=18"
++      }
++    },
++    "node_modules/@esbuild/linux-ppc64": {
++      "version": "0.27.2",
++      "resolved": "https://registry.npmjs.org/@esbuild/linux-ppc64/-/linux-ppc64-0.27.2.tgz",
++      "integrity": "sha512-C92gnpey7tUQONqg1n6dKVbx3vphKtTHJaNG2Ok9lGwbZil6DrfyecMsp9CrmXGQJmZ7iiVXvvZH6Ml5hL6XdQ==",
++      "cpu": [
++        "ppc64"
++      ],
++      "dev": true,
++      "license": "MIT",
++      "optional": true,
++      "os": [
++        "linux"
++      ],
++      "engines": {
++        "node": ">=18"
++      }
++    },
++    "node_modules/@esbuild/linux-riscv64": {
++      "version": "0.27.2",
++      "resolved": "https://registry.npmjs.org/@esbuild/linux-riscv64/-/linux-riscv64-0.27.2.tgz",
++      "integrity": "sha512-B5BOmojNtUyN8AXlK0QJyvjEZkWwy/FKvakkTDCziX95AowLZKR6aCDhG7LeF7uMCXEJqwa8Bejz5LTPYm8AvA==",
++      "cpu": [
++        "riscv64"
++      ],
++      "dev": true,
++      "license": "MIT",
++      "optional": true,
++      "os": [
++        "linux"
++      ],
++      "engines": {
++        "node": ">=18"
++      }
++    },
++    "node_modules/@esbuild/linux-s390x": {
++      "version": "0.27.2",
++      "resolved": "https://registry.npmjs.org/@esbuild/linux-s390x/-/linux-s390x-0.27.2.tgz",
++      "integrity": "sha512-p4bm9+wsPwup5Z8f4EpfN63qNagQ47Ua2znaqGH6bqLlmJ4bx97Y9JdqxgGZ6Y8xVTixUnEkoKSHcpRlDnNr5w==",
++      "cpu": [
++        "s390x"
++      ],
++      "dev": true,
++      "license": "MIT",
++      "optional": true,
++      "os": [
++        "linux"
++      ],
++      "engines": {
++        "node": ">=18"
++      }
++    },
++    "node_modules/@esbuild/linux-x64": {
++      "version": "0.27.2",
++      "resolved": "https://registry.npmjs.org/@esbuild/linux-x64/-/linux-x64-0.27.2.tgz",
++      "integrity": "sha512-uwp2Tip5aPmH+NRUwTcfLb+W32WXjpFejTIOWZFw/v7/KnpCDKG66u4DLcurQpiYTiYwQ9B7KOeMJvLCu/OvbA==",
++      "cpu": [
++        "x64"
++      ],
++      "dev": true,
++      "license": "MIT",
++      "optional": true,
++      "os": [
++        "linux"
++      ],
++      "engines": {
++        "node": ">=18"
++      }
++    },
++    "node_modules/@esbuild/netbsd-arm64": {
++      "version": "0.27.2",
++      "resolved": "https://registry.npmjs.org/@esbuild/netbsd-arm64/-/netbsd-arm64-0.27.2.tgz",
++      "integrity": "sha512-Kj6DiBlwXrPsCRDeRvGAUb/LNrBASrfqAIok+xB0LxK8CHqxZ037viF13ugfsIpePH93mX7xfJp97cyDuTZ3cw==",
++      "cpu": [
++        "arm64"
++      ],
++      "dev": true,
++      "license": "MIT",
++      "optional": true,
++      "os": [
++        "netbsd"
++      ],
++      "engines": {
++        "node": ">=18"
++      }
++    },
++    "node_modules/@esbuild/netbsd-x64": {
++      "version": "0.27.2",
++      "resolved": "https://registry.npmjs.org/@esbuild/netbsd-x64/-/netbsd-x64-0.27.2.tgz",
++      "integrity": "sha512-HwGDZ0VLVBY3Y+Nw0JexZy9o/nUAWq9MlV7cahpaXKW6TOzfVno3y3/M8Ga8u8Yr7GldLOov27xiCnqRZf0tCA==",
++      "cpu": [
++        "x64"
++      ],
++      "dev": true,
++      "license": "MIT",
++      "optional": true,
++      "os": [
++        "netbsd"
++      ],
++      "engines": {
++        "node": ">=18"
++      }
++    },
++    "node_modules/@esbuild/openbsd-arm64": {
++      "version": "0.27.2",
++      "resolved": "https://registry.npmjs.org/@esbuild/openbsd-arm64/-/openbsd-arm64-0.27.2.tgz",
++      "integrity": "sha512-DNIHH2BPQ5551A7oSHD0CKbwIA/Ox7+78/AWkbS5QoRzaqlev2uFayfSxq68EkonB+IKjiuxBFoV8ESJy8bOHA==",
++      "cpu": [
++        "arm64"
++      ],
++      "dev": true,
++      "license": "MIT",
++      "optional": true,
++      "os": [
++        "openbsd"
++      ],
++      "engines": {
++        "node": ">=18"
++      }
++    },
++    "node_modules/@esbuild/openbsd-x64": {
++      "version": "0.27.2",
++      "resolved": "https://registry.npmjs.org/@esbuild/openbsd-x64/-/openbsd-x64-0.27.2.tgz",
++      "integrity": "sha512-/it7w9Nb7+0KFIzjalNJVR5bOzA9Vay+yIPLVHfIQYG/j+j9VTH84aNB8ExGKPU4AzfaEvN9/V4HV+F+vo8OEg==",
++      "cpu": [
++        "x64"
++      ],
++      "dev": true,
++      "license": "MIT",
++      "optional": true,
++      "os": [
++        "openbsd"
++      ],
++      "engines": {
++        "node": ">=18"
++      }
++    },
++    "node_modules/@esbuild/openharmony-arm64": {
++      "version": "0.27.2",
++      "resolved": "https://registry.npmjs.org/@esbuild/openharmony-arm64/-/openharmony-arm64-0.27.2.tgz",
++      "integrity": "sha512-LRBbCmiU51IXfeXk59csuX/aSaToeG7w48nMwA6049Y4J4+VbWALAuXcs+qcD04rHDuSCSRKdmY63sruDS5qag==",
++      "cpu": [
++        "arm64"
++      ],
++      "dev": true,
++      "license": "MIT",
++      "optional": true,
++      "os": [
++        "openharmony"
++      ],
++      "engines": {
++        "node": ">=18"
++      }
++    },
++    "node_modules/@esbuild/sunos-x64": {
++      "version": "0.27.2",
++      "resolved": "https://registry.npmjs.org/@esbuild/sunos-x64/-/sunos-x64-0.27.2.tgz",
++      "integrity": "sha512-kMtx1yqJHTmqaqHPAzKCAkDaKsffmXkPHThSfRwZGyuqyIeBvf08KSsYXl+abf5HDAPMJIPnbBfXvP2ZC2TfHg==",
++      "cpu": [
++        "x64"
++      ],
++      "dev": true,
++      "license": "MIT",
++      "optional": true,
++      "os": [
++        "sunos"
++      ],
++      "engines": {
++        "node": ">=18"
++      }
++    },
++    "node_modules/@esbuild/win32-arm64": {
++      "version": "0.27.2",
++      "resolved": "https://registry.npmjs.org/@esbuild/win32-arm64/-/win32-arm64-0.27.2.tgz",
++      "integrity": "sha512-Yaf78O/B3Kkh+nKABUF++bvJv5Ijoy9AN1ww904rOXZFLWVc5OLOfL56W+C8F9xn5JQZa3UX6m+IktJnIb1Jjg==",
++      "cpu": [
++        "arm64"
++      ],
++      "dev": true,
++      "license": "MIT",
++      "optional": true,
++      "os": [
++        "win32"
++      ],
++      "engines": {
++        "node": ">=18"
++      }
++    },
++    "node_modules/@esbuild/win32-ia32": {
++      "version": "0.27.2",
++      "resolved": "https://registry.npmjs.org/@esbuild/win32-ia32/-/win32-ia32-0.27.2.tgz",
++      "integrity": "sha512-Iuws0kxo4yusk7sw70Xa2E2imZU5HoixzxfGCdxwBdhiDgt9vX9VUCBhqcwY7/uh//78A1hMkkROMJq9l27oLQ==",
++      "cpu": [
++        "ia32"
++      ],
++      "dev": true,
++      "license": "MIT",
++      "optional": true,
++      "os": [
++        "win32"
++      ],
++      "engines": {
++        "node": ">=18"
++      }
++    },
++    "node_modules/@esbuild/win32-x64": {
++      "version": "0.27.2",
++      "resolved": "https://registry.npmjs.org/@esbuild/win32-x64/-/win32-x64-0.27.2.tgz",
++      "integrity": "sha512-sRdU18mcKf7F+YgheI/zGf5alZatMUTKj/jNS6l744f9u3WFu4v7twcUI9vu4mknF4Y9aDlblIie0IM+5xxaqQ==",
++      "cpu": [
++        "x64"
++      ],
++      "dev": true,
++      "license": "MIT",
++      "optional": true,
++      "os": [
++        "win32"
++      ],
++      "engines": {
++        "node": ">=18"
++      }
++    },
+     "node_modules/@eslint-community/eslint-utils": {
+       "version": "4.9.1",
+       "resolved": "https://registry.npmjs.org/@eslint-community/eslint-utils/-/eslint-utils-4.9.1.tgz",
+@@ -10877,6 +11320,48 @@
+       "integrity": "sha512-HJDGx5daxeIvxdBxvG2cb9g4tEvwIk3i8+nhX0yGrYmZUzbkdg8QbDevheDB8gd0//uPj4c1EQua8Q+MViT0/w==",
+       "license": "MIT"
+     },
++    "node_modules/esbuild": {
++      "version": "0.27.2",
++      "resolved": "https://registry.npmjs.org/esbuild/-/esbuild-0.27.2.tgz",
++      "integrity": "sha512-HyNQImnsOC7X9PMNaCIeAm4ISCQXs5a5YasTXVliKv4uuBo1dKrG0A+uQS8M5eXjVMnLg3WgXaKvprHlFJQffw==",
++      "devOptional": true,
++      "hasInstallScript": true,
++      "license": "MIT",
++      "bin": {
++        "esbuild": "bin/esbuild"
++      },
++      "engines": {
++        "node": ">=18"
++      },
++      "optionalDependencies": {
++        "@esbuild/aix-ppc64": "0.27.2",
++        "@esbuild/android-arm": "0.27.2",
++        "@esbuild/android-arm64": "0.27.2",
++        "@esbuild/android-x64": "0.27.2",
++        "@esbuild/darwin-arm64": "0.27.2",
++        "@esbuild/darwin-x64": "0.27.2",
++        "@esbuild/freebsd-arm64": "0.27.2",
++        "@esbuild/freebsd-x64": "0.27.2",
++        "@esbuild/linux-arm": "0.27.2",
++        "@esbuild/linux-arm64": "0.27.2",
++        "@esbuild/linux-ia32": "0.27.2",
++        "@esbuild/linux-loong64": "0.27.2",
++        "@esbuild/linux-mips64el": "0.27.2",
++        "@esbuild/linux-ppc64": "0.27.2",
++        "@esbuild/linux-riscv64": "0.27.2",
++        "@esbuild/linux-s390x": "0.27.2",
++        "@esbuild/linux-x64": "0.27.2",
++        "@esbuild/netbsd-arm64": "0.27.2",
++        "@esbuild/netbsd-x64": "0.27.2",
++        "@esbuild/openbsd-arm64": "0.27.2",
++        "@esbuild/openbsd-x64": "0.27.2",
++        "@esbuild/openharmony-arm64": "0.27.2",
++        "@esbuild/sunos-x64": "0.27.2",
++        "@esbuild/win32-arm64": "0.27.2",
++        "@esbuild/win32-ia32": "0.27.2",
++        "@esbuild/win32-x64": "0.27.2"
++      }
++    },
+     "node_modules/escalade": {
+       "version": "3.2.0",
+       "resolved": "https://registry.npmjs.org/escalade/-/escalade-3.2.0.tgz",
+@@ -12498,7 +12983,7 @@
+       "version": "4.13.0",
+       "resolved": "https://registry.npmjs.org/get-tsconfig/-/get-tsconfig-4.13.0.tgz",
+       "integrity": "sha512-1VKTZJCwBrvbd+Wn3AOgQP/2Av+TfTCOlE4AcRJE72W1ksZXbAx8PPBR9RzgTeSPzlPMHrbANMH3LbltH73wxQ==",
+-      "dev": true,
++      "devOptional": true,
+       "license": "MIT",
+       "dependencies": {
+         "resolve-pkg-maps": "^1.0.0"
+@@ -15760,7 +16245,7 @@
+       "version": "1.0.0",
+       "resolved": "https://registry.npmjs.org/resolve-pkg-maps/-/resolve-pkg-maps-1.0.0.tgz",
+       "integrity": "sha512-seS2Tj26TBVOC2NIc2rOe2y2ZO7efxITtLZcGSOnHHNOQ7CkiUBfw0Iw2ck6xkIhPwLhKNLS8BO+hEpngQlqzw==",
+-      "dev": true,
++      "devOptional": true,
+       "license": "MIT",
+       "funding": {
+         "url": "https://github.com/privatenumber/resolve-pkg-maps?sponsor=1"
+@@ -17296,6 +17781,26 @@
+       "integrity": "sha512-oJFu94HQb+KVduSUQL7wnpmqnfmLsOA/nAh6b6EH0wCEoK0/mPeXU6c3wKDV83MkOuHPRHtSXKKU99IBazS/2w==",
+       "license": "0BSD"
+     },
++    "node_modules/tsx": {
++      "version": "4.21.0",
++      "resolved": "https://registry.npmjs.org/tsx/-/tsx-4.21.0.tgz",
++      "integrity": "sha512-5C1sg4USs1lfG0GFb2RLXsdpXqBSEhAaA/0kPL01wxzpMqLILNxIxIOKiILz+cdg/pLnOUxFYOR5yhHU666wbw==",
++      "devOptional": true,
++      "license": "MIT",
++      "dependencies": {
++        "esbuild": "~0.27.0",
++        "get-tsconfig": "^4.7.5"
++      },
++      "bin": {
++        "tsx": "dist/cli.mjs"
++      },
++      "engines": {
++        "node": ">=18.0.0"
++      },
++      "optionalDependencies": {
++        "fsevents": "~2.3.3"
++      }
++    },
+     "node_modules/twilio": {
+       "version": "5.11.2",
+       "resolved": "https://registry.npmjs.org/twilio/-/twilio-5.11.2.tgz",
+diff --git a/scripts/ingest-entrestate.ts b/scripts/ingest-entrestate.ts
+index 73dbf96..1d5e35a 100644
+--- a/scripts/ingest-entrestate.ts
++++ b/scripts/ingest-entrestate.ts
+@@ -1,25 +1,78 @@
+ import dotenv from 'dotenv';
+ import fs from 'fs';
++import path from 'path';
+ import { initializeApp, cert } from 'firebase-admin/app';
+ import { getFirestore } from 'firebase-admin/firestore';
+ 
+ dotenv.config({ path: '.env.local' });
+ dotenv.config();
+ 
+-const serviceAccount = process.env.FIREBASE_ADMIN_SDK_CONFIG
+-  ? JSON.parse(process.env.FIREBASE_ADMIN_SDK_CONFIG)
+-  : process.env.FIREBASE_PROJECT_ID
+-  ? {
++console.log(`[Ingest] Current working directory: ${process.cwd()}`);
++
++let serviceAccount;
++try {
++  if (process.env.FIREBASE_ADMIN_SDK_CONFIG) {
++    serviceAccount = JSON.parse(process.env.FIREBASE_ADMIN_SDK_CONFIG);
++  }
++} catch (e) {
++  // Ignore invalid JSON and fall back to individual keys
++}
++
++if (!serviceAccount) {
++  console.log('[Ingest] Scanning directory for service account files...');
++  try {
++    const files = fs.readdirSync(process.cwd()).filter(f => f.endsWith('.json'));
++    for (const file of files) {
++      try {
++        const filePath = path.resolve(process.cwd(), file);
++        const content = JSON.parse(fs.readFileSync(filePath, 'utf8'));
++        // Check for standard service account fields to identify the correct file
++        if (content.type === 'service_account' && content.project_id && content.private_key) {
++          console.log(`[Ingest] Auto-detected service account: ${file}`);
++          serviceAccount = content;
++          break;
++        }
++      } catch (e) {
++        // Ignore invalid JSON or non-service-account files
++      }
++    }
++  } catch (e) {
++    console.warn('[Ingest] Directory scan failed:', e);
++  }
++}
++
++if (!serviceAccount) {
++  console.log('[Ingest] Checking environment variables...');
++  console.log(`  - FIREBASE_PROJECT_ID: ${process.env.FIREBASE_PROJECT_ID ? 'Found' : 'Missing'}`);
++  console.log(`  - FIREBASE_PRIVATE_KEY: ${process.env.FIREBASE_PRIVATE_KEY ? 'Found' : 'Missing'}`);
++
++  if (process.env.FIREBASE_PROJECT_ID) {
++    console.log('[Ingest] Falling back to .env variables (FIREBASE_PROJECT_ID detected)...');
++    if (!process.env.FIREBASE_PRIVATE_KEY) {
++      console.warn('[Ingest] Warning: FIREBASE_PRIVATE_KEY is missing in .env variables.');
++    }
++    serviceAccount = {
+       projectId: process.env.FIREBASE_PROJECT_ID,
+       clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+       privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+-    }
+-  : undefined;
++    };
++  } else {
++    console.log('[Ingest] FIREBASE_PROJECT_ID not found in .env.local or environment.');
++  }
++}
+ 
+ if (serviceAccount) {
+-  console.log(`[Ingest] Initializing Firebase for project: ${serviceAccount.projectId}`);
++  // Validate key presence to prevent obscure cert() errors
++  if (!serviceAccount.privateKey && !serviceAccount.private_key) {
++    console.error('[Ingest] Error: Credentials found but missing "private_key". Check your JSON file or .env variables.');
++    process.exit(1);
++  }
++  console.log(`[Ingest] Initializing Firebase for project: ${serviceAccount.projectId || serviceAccount.project_id}`);
+ } else {
+-  console.error('[Ingest] No credentials found. Check .env.local');
++  console.error('[Ingest] No credentials found.');
++  console.error('  - Ensure service-account.json is in the root directory.');
++  console.error('  - If you downloaded it as "service-account (1).json", rename it to "service-account.json" or ensure the script is updated.');
++  console.error('  - OR set FIREBASE_PROJECT_ID, FIREBASE_CLIENT_EMAIL, FIREBASE_PRIVATE_KEY in .env.local');
+   process.exit(1);
+ }
+ 
+diff --git a/scripts/route.ts b/scripts/route.ts
+new file mode 100644
+index 0000000..e69de29
+diff --git a/src/app/api/bot/preview/chat/route.ts b/src/app/api/bot/preview/chat/route.ts
+index d23bb10..a4602b0 100644
+--- a/src/app/api/bot/preview/chat/route.ts
++++ b/src/app/api/bot/preview/chat/route.ts
+@@ -1,7 +1,7 @@
+ import { NextRequest, NextResponse } from 'next/server';
+ import { generateText } from 'ai';
+ import { z } from 'zod';
+-import { getGoogleModel, FLASH_MODEL } from '@/lib/ai/google';
++import { getGoogleModel } from '@/lib/ai/google';
+ import { formatProjectContext, getRelevantProjects } from '@/server/inventory';
+ import { enforceRateLimit, getRequestIp } from '@/lib/server/rateLimit';
+ 
+@@ -71,7 +71,7 @@ Agent:
+ 
+   try {
+     const { text } = await generateText({
+-      model: getGoogleModel(FLASH_MODEL),
++      model: getGoogleModel('gemini-1.5-flash'),
+       system:
+         'You are the Entrestate real estate assistant. Use a friendly, professional tone. Never sound robotic.',
+       prompt,
+diff --git a/src/server/firebase-admin.ts b/src/server/firebase-admin.ts
+index 6ecebf7..f402a4c 100644
+--- a/src/server/firebase-admin.ts
++++ b/src/server/firebase-admin.ts
+@@ -2,31 +2,54 @@ import { cert, getApps, initializeApp, ServiceAccount } from 'firebase-admin/app
+ import { getFirestore } from 'firebase-admin/firestore';
+ import { getAuth } from 'firebase-admin/auth';
+ import { SERVER_ENV } from '@/lib/server/env';
++import fs from 'fs';
++import path from 'path';
+ 
++// This function is now the single source of truth for admin credentials.
++// It ONLY looks for a service account JSON file in the project root.
++// This bypasses all .env parsing issues that have caused the loop of errors.
+ function getServiceAccount(): ServiceAccount {
+-    const serviceAccountString = SERVER_ENV.FIREBASE_ADMIN_SDK_CONFIG;
+-    if (serviceAccountString) {
+-        try {
+-            return JSON.parse(serviceAccountString) as ServiceAccount;
+-        } catch (e) {
+-            console.error("Error parsing FIREBASE_ADMIN_SDK_CONFIG:", e);
+-            throw new Error('Could not parse the FIREBASE_ADMIN_SDK_CONFIG. Please ensure it is a valid JSON string.');
++    // --- PRIMARY METHOD: Load service account from file (for Local Dev) ---
++    // This matches the logic used by the ingestion script which we know works.
++    try {
++        const files = fs.readdirSync(process.cwd()).filter(f => f.endsWith('.json'));
++        for (const file of files) {
++            try {
++                const filePath = path.resolve(process.cwd(), file);
++                const content = fs.readFileSync(filePath, 'utf-8');
++                const key = JSON.parse(content);
++                if (key.type === 'service_account' && key.project_id && key.private_key) {
++                    console.log(`[Firebase Admin] Loaded credentials from local file: ${file}`);
++                    return {
++                        projectId: key.project_id,
++                        clientEmail: key.client_email,
++                        privateKey: key.private_key
++                    };
++                }
++            } catch (e) {
++                // Ignore non-JSON or malformed files
++            }
+         }
++    } catch (e) {
++        // Ignore directory scan errors
+     }
+ 
+-    const projectId = SERVER_ENV.FIREBASE_PROJECT_ID || SERVER_ENV.project_id;
+-    const clientEmail = SERVER_ENV.FIREBASE_CLIENT_EMAIL || SERVER_ENV.client_email;
+-    const privateKey = SERVER_ENV.FIREBASE_PRIVATE_KEY || SERVER_ENV.private_key;
++    // --- SECONDARY METHOD: Load from Environment Variables (Production/Vercel) ---
++    const projectId = process.env.FIREBASE_PROJECT_ID || SERVER_ENV.FIREBASE_PROJECT_ID;
++    const clientEmail = process.env.FIREBASE_CLIENT_EMAIL || SERVER_ENV.FIREBASE_CLIENT_EMAIL;
++    const privateKey = process.env.FIREBASE_PRIVATE_KEY || SERVER_ENV.FIREBASE_PRIVATE_KEY;
+ 
+     if (projectId && clientEmail && privateKey) {
++        console.log('[Firebase Admin] Loaded credentials from Environment Variables (Production).');
++        const sanitizedKey = privateKey.replace(/\\n/g, '\n');
+         return {
+             projectId,
+             clientEmail,
+-            privateKey: privateKey.replace(/\\n/g, '\n'),
+-        } as ServiceAccount;
++            privateKey: sanitizedKey,
++        };
+     }
+ 
+-    throw new Error('Firebase admin credentials missing. Set FIREBASE_ADMIN_SDK_CONFIG or FIREBASE_PROJECT_ID/FIREBASE_CLIENT_EMAIL/FIREBASE_PRIVATE_KEY.');
++    throw new Error('CRITICAL: Firebase Admin credentials not found. Checked for local JSON file and production environment variables.');
+ }
+ 
+ function initAdmin() {
+diff --git a/src/server/inventory.ts b/src/server/inventory.ts
+index 755cc12..e20ea8a 100644
+--- a/src/server/inventory.ts
++++ b/src/server/inventory.ts
+@@ -6,7 +6,7 @@ import { SERVER_ENV } from '@/lib/server/env';
+ 
+ // Cache settings
+ const CACHE_TTL_MS = 5 * 60 * 1000;
+-const DEFAULT_MAX = 1000; // Reduced from 8000 to save Firestore quota during dev
++const DEFAULT_MAX = 8000;
+ const PUBLIC_PROJECT_ID =
+   process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID ||
+   process.env.FIREBASE_PROJECT_ID ||
+@@ -32,6 +32,7 @@ const ADMIN_PROJECT_MISMATCH =
+ 
+ let cachedProjects: ProjectData[] = [];
+ let cachedAt = 0;
++let hasFullInventoryLoaded = false;
+ 
+ type FirestoreValue = {
+   stringValue?: string;
+@@ -354,13 +355,16 @@ async function loadPublicProjectById(projectId: string): Promise<ProjectData | n
+ }
+ 
+ export async function loadInventoryProjects(max = DEFAULT_MAX, forceRefresh = false) {
+-  if (SERVER_ENV.USE_STATIC_INVENTORY !== 'false') {
++  const useStatic = SERVER_ENV.USE_STATIC_INVENTORY !== 'false';
++  console.log(`[inventory] Loading mode: ${useStatic ? 'STATIC' : 'FIRESTORE'} (Env: '${SERVER_ENV.USE_STATIC_INVENTORY}')`);
++
++  if (useStatic) {
+     // Static mode (default) - prevents quota usage unless explicitly disabled
+     return ENTRESTATE_INVENTORY.slice(0, max).map((project) => normalizeProjectData(project, project.id));
+   }
+ 
+   const now = Date.now();
+-  if (!forceRefresh && cachedProjects.length && now - cachedAt < CACHE_TTL_MS) {
++  if (!forceRefresh && (hasFullInventoryLoaded || cachedProjects.length >= max) && now - cachedAt < CACHE_TTL_MS) {
+     return cachedProjects.slice(0, max);
+   }
+ 
+@@ -374,9 +378,14 @@ export async function loadInventoryProjects(max = DEFAULT_MAX, forceRefresh = fa
+ 
+   try {
+     const db = getAdminDb();
+-    const snapshot = await db.collection('inventory_projects').limit(max).get();
++    // Order by ingestion time to ensure the latest "commits" (projects) appear first
++    const snapshot = await db.collection('inventory_projects')
++      .orderBy('ingestedAt', 'desc')
++      .limit(max)
++      .get();
+     if (!snapshot.empty) {
+       projects = snapshot.docs.map((doc) => normalizeProjectData(doc.data(), doc.id));
++      console.log(`[inventory] Successfully loaded ${projects.length} projects from Firestore.`);
+     }
+   } catch (error) {
+     console.error('[inventory] admin load failed', error);
+@@ -385,17 +394,20 @@ export async function loadInventoryProjects(max = DEFAULT_MAX, forceRefresh = fa
+   if (!projects.length) {
+     try {
+       projects = await loadPublicInventory(max);
++      console.log(`[inventory] Public load returned ${projects.length} projects`);
+     } catch (error) {
+       console.error('[inventory] public load failed', error);
+     }
+   }
+ 
+   if (!projects.length) {
++    console.warn('[inventory] No projects loaded from DB or Public API. Falling back to static inventory.');
+     projects = ENTRESTATE_INVENTORY.map((project) => normalizeProjectData(project, project.id));
+   }
+ 
+   cachedProjects = projects;
+   cachedAt = now;
++  hasFullInventoryLoaded = projects.length < max;
+   return projects.slice(0, max);
+ }
+ 

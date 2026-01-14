@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import TemplateCard from './TemplateCard';
 import PreviewModal from './PreviewModal';
-import './mobile-styles.css';
+
 
 const TemplateLibraryScreen = ({ onSelect, onBack }) => {
   const [activeFilter, setActiveFilter] = useState('All');

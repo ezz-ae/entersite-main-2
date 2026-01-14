@@ -36,7 +36,7 @@ import MortgageCalculatorScreen from './MortgageCalculatorScreen';
 import MarketTrendsScreen from './MarketTrendsScreen';
 import BuilderScreen from './BuilderScreen';
 import ProgressBar from './ProgressBar';
-import './mobile-styles.css';
+
 
 const App = () => {
   // Simple State Machine: 'home' | 'inputs' | 'loading' | 'success'
@@ -264,119 +264,84 @@ const App = () => {
 
   // --- Screen Router ---
 
+  const screens = {
+    login: <LoginScreen onLogin={handleLogin} />,
+    home: (
+      <MyProjectsScreen 
+        onCreateNew={handleStartNew} 
+        onSettings={handleSettings} 
+        onLeadSelect={handleLeadSelect} 
+        onNotifications={handleNotifications}
+        onOpenMarketing={handleOpenMarketing}
+        onVoiceAssistant={handleVoiceAssistant}
+        onScanDocument={handleDocumentScanner}
+      />
+    ),
+    intent: <IntentSelectionScreen onSelect={handleIntentSelect} onBack={handleDashboard} />,
+    inputs: <UniversalInputsScreen onNext={handleGenerate} onBack={() => setCurrentScreen('intent')} serviceType={selectedIntent} />,
+    templates: <TemplateLibraryScreen onSelect={handleTemplateSelect} onBack={() => setCurrentScreen('inputs')} />,
+    payment: <PaymentScreen amount={projectData?.budget} onPaymentComplete={handlePaymentComplete} onBack={() => setCurrentScreen('templates')} />,
+    loading: <LoadingScreen />,
+    success: (
+      <SuccessScreen 
+        publishedUrl="https://agent-site.com/p/dubai-hills-estate" 
+        onDashboardClick={handleDashboard}
+        onNextStepClick={handleNextStep}
+      />
+    ),
+    settings: (
+      <SettingsScreen 
+        onBack={handleDashboard} 
+        onSave={handleSaveSettings} 
+        theme={theme} 
+        onToggleTheme={toggleTheme}
+        onNavigateTo={setCurrentScreen}
+      />
+    ),
+    leadNurture: <LeadNurtureScreen lead={selectedLead} onBack={handleDashboard} />,
+    chatAgentSetup: <ChatAgentSetup onBack={() => setCurrentScreen('intent')} onComplete={() => setCurrentScreen('chatAgentDashboard')} />,
+    chatAgentDashboard: (
+      <ChatAgentDashboard 
+        onBack={handleDashboard} 
+        onUpdateKnowledge={() => setCurrentScreen('knowledgeBase')} 
+        onViewChat={handleViewChat}
+        onShowQR={handleShowQR}
+        onTestSimulator={handleLiveSimulator}
+      />
+    ),
+    knowledgeBase: <KnowledgeBaseScreen onBack={() => setCurrentScreen('chatAgentDashboard')} onSave={handleKnowledgeBase} />,
+    qrCode: <QRCodeScreen onBack={() => setCurrentScreen('chatAgentDashboard')} />,
+    conversationView: <ConversationViewScreen chat={selectedChat} onBack={() => setCurrentScreen('chatAgentDashboard')} />,
+    liveSimulator: <LiveSimulatorScreen onBack={() => setCurrentScreen('chatAgentDashboard')} />,
+    notifications: <NotificationCenterScreen onBack={handleDashboard} />,
+    teamManagement: <TeamManagementScreen onBack={handleSettings} />,
+    integrations: <IntegrationsScreen onBack={handleSettings} />,
+    billing: <BillingScreen onBack={handleSettings} />,
+    services: <ServicesScreen onBack={handleSettings} />,
+    referral: <ReferralProgramScreen onBack={handleSettings} />,
+    support: <SupportTicketScreen onBack={handleSettings} onSubmit={handleSupportSubmit} />,
+    marketingDashboard: <MarketingDashboardScreen campaign={selectedCampaign} onBack={handleDashboard} />,
+    campaignBuilder: (
+      <CampaignBuilderScreen 
+        type={selectedIntent === 'smsCampaign' ? 'sms' : 'email'} 
+        onBack={() => setCurrentScreen('intent')} 
+        onSend={handleCampaignSend} 
+      />
+    ),
+    leadScoring: <LeadScoringScreen onBack={handleSettings} onSave={handleSaveScoring} />,
+    meetingScheduler: <MeetingSchedulerScreen onBack={handleSettings} onSave={handleSaveAvailability} />,
+    crmPipeline: <CRMPipelineScreen onBack={handleSettings} />,
+    voiceAssistant: <VoiceAssistantScreen onBack={handleDashboard} />,
+    documentScanner: <DocumentScannerScreen onBack={handleDashboard} onScanComplete={handleScanComplete} />,
+    propertyValuation: <PropertyValuationScreen onBack={() => setCurrentScreen('intent')} />,
+    commissionCalculator: <CommissionCalculatorScreen onBack={() => setCurrentScreen('intent')} />,
+    mortgageCalculator: <MortgageCalculatorScreen onBack={() => setCurrentScreen('intent')} />,
+    marketTrends: <MarketTrendsScreen onBack={() => setCurrentScreen('intent')} />,
+    builder: <BuilderScreen onBack={() => setCurrentScreen('templates')} onPublish={handlePublishWebsite} />
+  };
+
   const renderScreen = () => {
-    switch (currentScreen) {
-      case 'login':
-        return <LoginScreen onLogin={handleLogin} />;
-      case 'home':
-        return <MyProjectsScreen 
-          onCreateNew={handleStartNew} 
-          onSettings={handleSettings} 
-          onLeadSelect={handleLeadSelect} 
-          onNotifications={handleNotifications}
-          onOpenMarketing={handleOpenMarketing}
-          onVoiceAssistant={handleVoiceAssistant}
-          onScanDocument={handleDocumentScanner}
-        />;
-      case 'intent':
-        return <IntentSelectionScreen onSelect={handleIntentSelect} onBack={handleDashboard} />;
-      case 'inputs':
-        return <UniversalInputsScreen onNext={handleGenerate} onBack={() => setCurrentScreen('intent')} serviceType={selectedIntent} />;
-      case 'templates':
-        return <TemplateLibraryScreen onSelect={handleTemplateSelect} onBack={() => setCurrentScreen('inputs')} />;
-      case 'payment':
-        return <PaymentScreen amount={projectData?.budget} onPaymentComplete={handlePaymentComplete} onBack={() => setCurrentScreen('templates')} />;
-      case 'loading':
-        return <LoadingScreen />;
-      case 'success':
-        return (
-          <SuccessScreen 
-            publishedUrl="https://agent-site.com/p/dubai-hills-estate" 
-            onDashboardClick={handleDashboard}
-            onNextStepClick={handleNextStep}
-          />
-        );
-      case 'settings':
-        return <SettingsScreen onBack={handleDashboard} onSave={handleSaveSettings} theme={theme} onToggleTheme={toggleTheme} />;
-      case 'leadNurture':
-        return <LeadNurtureScreen lead={selectedLead} onBack={handleDashboard} />;
-      case 'chatAgentSetup':
-        return <ChatAgentSetup onBack={() => setCurrentScreen('intent')} onComplete={() => setCurrentScreen('chatAgentDashboard')} />;
-      case 'chatAgentDashboard':
-        return (
-          <ChatAgentDashboard 
-            onBack={handleDashboard} 
-            onUpdateKnowledge={() => setCurrentScreen('knowledgeBase')} 
-            onViewChat={handleViewChat}
-            onShowQR={handleShowQR}
-            onTestSimulator={handleLiveSimulator}
-          />
-        );
-      case 'knowledgeBase':
-        return <KnowledgeBaseScreen onBack={() => setCurrentScreen('chatAgentDashboard')} onSave={handleKnowledgeBase} />;
-      case 'qrCode':
-        return <QRCodeScreen onBack={() => setCurrentScreen('chatAgentDashboard')} />;
-      case 'conversationView':
-        return <ConversationViewScreen chat={selectedChat} onBack={() => setCurrentScreen('chatAgentDashboard')} />;
-      case 'liveSimulator':
-        return <LiveSimulatorScreen onBack={() => setCurrentScreen('chatAgentDashboard')} />;
-      case 'notifications':
-        return <NotificationCenterScreen onBack={handleDashboard} />;
-      default:
-        return <MyProjectsScreen onCreateNew={handleStartNew} onSettings={handleSettings} />;
-      case 'settings':
-        return (
-          <SettingsScreen 
-            onBack={handleDashboard} 
-            onSave={handleSaveSettings} 
-            theme={theme} 
-            onToggleTheme={toggleTheme}
-            onNavigateTo={setCurrentScreen}
-          />
-        );
-      case 'teamManagement':
-        return <TeamManagementScreen onBack={handleSettings} />;
-      case 'integrations':
-        return <IntegrationsScreen onBack={handleSettings} />;
-      case 'billing':
-        return <BillingScreen onBack={handleSettings} />;
-      case 'services':
-        return <ServicesScreen onBack={handleSettings} />;
-      case 'referral':
-        return <ReferralProgramScreen onBack={handleSettings} />;
-      case 'support':
-        return <SupportTicketScreen onBack={handleSettings} onSubmit={handleSupportSubmit} />;
-      case 'marketingDashboard':
-        return <MarketingDashboardScreen campaign={selectedCampaign} onBack={handleDashboard} />;
-      case 'campaignBuilder':
-        return (
-          <CampaignBuilderScreen 
-            type={selectedIntent === 'smsCampaign' ? 'sms' : 'email'} 
-            onBack={() => setCurrentScreen('intent')} 
-            onSend={handleCampaignSend} 
-          />
-        );
-      case 'leadScoring':
-        return <LeadScoringScreen onBack={handleSettings} onSave={handleSaveScoring} />;
-      case 'meetingScheduler':
-        return <MeetingSchedulerScreen onBack={handleSettings} onSave={handleSaveAvailability} />;
-      case 'crmPipeline':
-        return <CRMPipelineScreen onBack={handleSettings} />;
-      case 'voiceAssistant':
-        return <VoiceAssistantScreen onBack={handleDashboard} />;
-      case 'documentScanner':
-        return <DocumentScannerScreen onBack={handleDashboard} onScanComplete={handleScanComplete} />;
-      case 'propertyValuation':
-        return <PropertyValuationScreen onBack={() => setCurrentScreen('intent')} />;
-      case 'commissionCalculator':
-        return <CommissionCalculatorScreen onBack={() => setCurrentScreen('intent')} />;
-      case 'mortgageCalculator':
-        return <MortgageCalculatorScreen onBack={() => setCurrentScreen('intent')} />;
-      case 'marketTrends':
-        return <MarketTrendsScreen onBack={() => setCurrentScreen('intent')} />;
-      case 'builder':
-        return <BuilderScreen onBack={() => setCurrentScreen('templates')} onPublish={handlePublishWebsite} />;
-    }
+    return screens[currentScreen] || screens['home'];
   };
 
   // Calculate Progress based on screen

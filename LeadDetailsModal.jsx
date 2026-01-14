@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import './mobile-styles.css';
+
 
 const LeadDetailsModal = ({ project, onClose, onLeadSelect }) => {
   const [recordingId, setRecordingId] = useState(null);

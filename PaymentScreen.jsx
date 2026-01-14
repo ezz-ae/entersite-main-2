@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import StickyFooter from './StickyFooter';
-import './mobile-styles.css';
+
 
 const PaymentScreen = ({ amount, onPaymentComplete, onBack }) => {
   const [selectedMethod, setSelectedMethod] = useState('apple');

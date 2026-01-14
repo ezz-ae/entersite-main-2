@@ -6,7 +6,7 @@ import SmartAdPlanner from './SmartAdPlanner';
 import DomainSearch from './DomainSearch';
 import CompetitorAnalysis from './CompetitorAnalysis';
 import PersonaSelector from './PersonaSelector';
-import '../mobile-styles.css';
+
 
 const UniversalInputsScreen = ({ onNext, onBack, serviceType }) => {
   // State matches the questions in your flow-spec.json

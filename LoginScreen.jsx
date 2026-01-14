@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import ForgivingInput from './ForgivingInput';
 import StickyFooter from './StickyFooter';
-import './mobile-styles.css';
+
 
 const LoginScreen = ({ onLogin }) => {
   const [isSignup, setIsSignup] = useState(false);

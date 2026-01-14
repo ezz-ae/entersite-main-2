@@ -1,5 +1,5 @@
 import React from 'react';
-import './mobile-styles.css';
+
 
 const ProgressBar = ({ progress }) => {
   return (

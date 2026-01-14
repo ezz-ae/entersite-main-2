@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import './mobile-styles.css';
+
 
 const ShareModal = ({ url, onClose }) => {
   const [copied, setCopied] = useState(false);

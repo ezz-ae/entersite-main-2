@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import './mobile-styles.css';
+
 
 const CompetitorAnalysis = ({ competitors = [], onUpdate }) => {
   const [currentUrl, setCurrentUrl] = useState('');

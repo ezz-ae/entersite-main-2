@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import BudgetCalculator from './BudgetCalculator';
-import './mobile-styles.css';
+
 
 const SmartAdPlanner = ({ market, budget, onBudgetChange }) => {
   const [analyzing, setAnalyzing] = useState(true);

@@ -1,5 +1,5 @@
 import React from 'react';
-import '../mobile-styles.css';
+
 
 const StickyFooter = ({ label, onClick, disabled = false }) => {
   return (

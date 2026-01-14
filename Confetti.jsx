@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import './mobile-styles.css';
+
 
 const Confetti = () => {
   const [particles, setParticles] = useState([]);

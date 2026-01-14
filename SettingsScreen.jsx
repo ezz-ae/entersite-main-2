@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import StickyFooter from './StickyFooter';
 import ForgivingInput from './ForgivingInput';
-import './mobile-styles.css';
+
 
 const SettingsScreen = ({ onBack, onSave, theme, onToggleTheme, onNavigateTo }) => {
   const [profile, setProfile] = useState({

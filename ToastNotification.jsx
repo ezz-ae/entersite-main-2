@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import './mobile-styles.css';
+
 
 const ToastNotification = ({ message, onClose, duration = 3000 }) => {
   useEffect(() => {

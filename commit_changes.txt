@@ -1,0 +1,2984 @@
+commit 0f41d63ad45e4ac65fdc46425c7a76e92b2bfe1e
+Author: Mahmoud Ezz <m-ezz@outlook.com>
+Date:   Tue Jan 13 06:47:40 2026 +0400
+
+    Gemini
+
+diff --git a/App.jsx b/App.jsx
+new file mode 100644
+index 0000000..621265e
+--- /dev/null
++++ b/App.jsx
+@@ -0,0 +1,148 @@
++import React, { useState } from 'react';
++import MyProjectsScreen from './MyProjectsScreen';
++import UniversalInputsScreen from './UniversalInputsScreen';
++import LoadingScreen from './LoadingScreen';
++import TemplateLibraryScreen from './TemplateLibraryScreen';
++import SuccessScreen from './SuccessScreen';
++import PaymentScreen from './PaymentScreen';
++import LoginScreen from './LoginScreen';
++import IntentSelectionScreen from './IntentSelectionScreen';
++import SettingsScreen from './SettingsScreen';
++import ToastNotification from './ToastNotification';
++import ProgressBar from './ProgressBar';
++import './mobile-styles.css';
++
++const App = () => {
++  // Simple State Machine: 'home' | 'inputs' | 'loading' | 'success'
++  const [currentScreen, setCurrentScreen] = useState('login');
++  const [projectData, setProjectData] = useState(null);
++  const [toast, setToast] = useState(null); // { message: string } or null
++  const [theme, setTheme] = useState('light');
++  const [selectedIntent, setSelectedIntent] = useState(null);
++
++  const toggleTheme = () => {
++    setTheme(prev => prev === 'light' ? 'dark' : 'light');
++  };
++
++  // --- Navigation Handlers ---
++
++  const handleLogin = (userData) => {
++    console.log("User Logged In:", userData);
++    setToast({ message: `Welcome, ${userData.name || 'Agent'}!` });
++    setCurrentScreen('intent'); // Go to Start Here screen
++  };
++
++  const handleStartNew = () => {
++    setCurrentScreen('intent');
++  };
++
++  const handleIntentSelect = (intentId) => {
++    setSelectedIntent(intentId);
++    setCurrentScreen('inputs'); // Go to dynamic inputs
++  };
++
++  const handleGenerate = (data) => {
++    console.log("User Data Submitted:", data);
++    setProjectData(data);
++    setToast({ message: "Details Saved!" });
++    // Go to Template Selection instead of loading immediately
++    setCurrentScreen('templates');
++  };
++
++  const handleTemplateSelect = (template) => {
++    console.log("Template Selected:", template);
++    setToast({ message: "Template Applied" });
++    setCurrentScreen('payment'); // Go to payment before loading
++  };
++
++  const handlePaymentComplete = () => {
++    setToast({ message: "Payment Successful!" });
++    setCurrentScreen('loading');
++    // Simulate AI Generation (matches the LoadingScreen text duration)
++    setTimeout(() => {
++      setCurrentScreen('success');
++    }, 8000); 
++  };
++
++  const handleDashboard = () => {
++    setCurrentScreen('home');
++  };
++
++  const handleNextStep = (type) => {
++    // In a real app, this would route to the specific ad builder
++    alert(`Opening ${type === 'meta' ? 'Facebook' : 'Google'} Ads Builder...`);
++  };
++
++  const handleSettings = () => {
++    setCurrentScreen('settings');
++  };
++
++  const handleSaveSettings = (data) => {
++    console.log("Settings Saved:", data);
++    setToast({ message: "Settings Updated" });
++    handleDashboard();
++  };
++
++  // --- Screen Router ---
++
++  const renderScreen = () => {
++    switch (currentScreen) {
++      case 'login':
++        return <LoginScreen onLogin={handleLogin} />;
++      case 'home':
++        return <MyProjectsScreen onCreateNew={handleStartNew} onSettings={handleSettings} />;
++      case 'intent':
++        return <IntentSelectionScreen onSelect={handleIntentSelect} onBack={handleDashboard} />;
++      case 'inputs':
++        return <UniversalInputsScreen onNext={handleGenerate} onBack={() => setCurrentScreen('intent')} serviceType={selectedIntent} />;
++      case 'templates':
++        return <TemplateLibraryScreen onSelect={handleTemplateSelect} onBack={() => setCurrentScreen('inputs')} />;
++      case 'payment':
++        return <PaymentScreen amount={projectData?.budget} onPaymentComplete={handlePaymentComplete} onBack={() => setCurrentScreen('templates')} />;
++      case 'loading':
++        return <LoadingScreen />;
++      case 'success':
++        return (
++          <SuccessScreen 
++            publishedUrl="https://agent-site.com/p/dubai-hills-estate" 
++            onDashboardClick={handleDashboard}
++            onNextStepClick={handleNextStep}
++          />
++        );
++      case 'settings':
++        return <SettingsScreen onBack={handleDashboard} onSave={handleSaveSettings} theme={theme} onToggleTheme={toggleTheme} />;
++      default:
++        return <MyProjectsScreen onCreateNew={handleStartNew} onSettings={handleSettings} />;
++    }
++  };
++
++  // Calculate Progress based on screen
++  const getProgress = () => {
++    switch (currentScreen) {
++      case 'login': return 0;
++      case 'home': return 0;
++      case 'intent': return 10;
++      case 'inputs': return 30;
++      case 'templates': return 50;
++      case 'payment': return 65;
++      case 'loading': return 80;
++      case 'success': return 100;
++      default: return 0;
++    }
++  };
++
++  return (
++    // Mobile Container Wrapper
++    <div data-theme={theme} style={{ maxWidth: '480px', margin: '0 auto', minHeight: '100vh', backgroundColor: 'var(--bg-primary)', color: 'var(--text-primary)', position: 'relative', fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif' }}>
++      {/* Top Progress Bar */}
++      {currentScreen !== 'home' && currentScreen !== 'login' && <ProgressBar progress={getProgress()} />}
++      
++      {/* Toast Notification Layer */}
++      {toast && <ToastNotification message={toast.message} onClose={() => setToast(null)} />}
++      
++      {renderScreen()}
++    </div>
++  );
++};
++
++export default App;
+\ No newline at end of file
+diff --git a/BudgetCalculator.jsx b/BudgetCalculator.jsx
+new file mode 100644
+index 0000000..d711dde
+--- /dev/null
++++ b/BudgetCalculator.jsx
+@@ -0,0 +1,78 @@
++import React from 'react';
++import './mobile-styles.css';
++
++const BudgetCalculator = ({ value, onChange, platform }) => {
++  const budget = parseFloat(value) || 0;
++  
++  // Estimation logic (Approximate values for Real Estate in AED)
++  // Meta: Lower CPC, generally lower CPL but lower intent
++  // Google: Higher CPC, higher CPL but higher intent
++  const cpc = platform === 'googleAds' ? 15 : 4; 
++  const cpl = platform === 'googleAds' ? 80 : 35;
++  
++  const estimatedClicks = Math.floor(budget / cpc);
++  const estimatedLeads = (budget / cpl).toFixed(1); // Show decimal for daily estimates
++
++  return (
++    <div style={{ 
++      backgroundColor: 'var(--bg-secondary)', 
++      padding: '20px', 
++      borderRadius: '16px', 
++      border: '1px solid var(--border-color)',
++      marginBottom: '24px'
++    }}>
++      <label style={{ display: 'block', fontSize: '14px', fontWeight: '700', color: 'var(--text-tertiary)', marginBottom: '12px' }}>
++        Daily Budget (AED)
++      </label>
++      
++      <div style={{ display: 'flex', alignItems: 'center', marginBottom: '20px' }}>
++        <span style={{ fontSize: '24px', fontWeight: '700', color: 'var(--text-primary)', marginRight: '8px' }}>AED</span>
++        <input 
++          type="number" 
++          inputMode="decimal"
++          value={value}
++          onChange={onChange}
++          placeholder="100"
++          style={{
++            fontSize: '24px',
++            fontWeight: '700',
++            color: 'var(--primary-color)',
++            border: 'none',
++            background: 'transparent',
++            width: '100%',
++            outline: 'none'
++          }}
++        />
++      </div>
++
++      {/* Range Slider for quick adjustment */}
++      <input 
++        type="range" 
++        min="50" 
++        max="2000" 
++        step="50" 
++        value={budget || 50} 
++        onChange={onChange}
++        style={{ width: '100%', marginBottom: '24px', accentColor: 'var(--primary-color)' }}
++      />
++
++      {/* Estimates Grid */}
++      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
++        <div style={{ backgroundColor: 'var(--bg-primary)', padding: '12px', borderRadius: '12px', textAlign: 'center', border: '1px solid var(--border-color)' }}>
++          <span style={{ display: 'block', fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '4px' }}>Est. Clicks</span>
++          <span style={{ fontSize: '18px', fontWeight: '700', color: 'var(--text-primary)' }}>{estimatedClicks}</span>
++        </div>
++        <div style={{ backgroundColor: 'var(--bg-accent)', padding: '12px', borderRadius: '12px', textAlign: 'center' }}>
++          <span style={{ display: 'block', fontSize: '12px', color: 'var(--primary-color)', marginBottom: '4px', fontWeight: '600' }}>Est. Leads/Day</span>
++          <span style={{ fontSize: '18px', fontWeight: '700', color: 'var(--primary-color)' }}>{estimatedLeads}</span>
++        </div>
++      </div>
++      
++      <p style={{ fontSize: '11px', color: 'var(--text-secondary)', marginTop: '12px', textAlign: 'center' }}>
++        *Estimates based on {platform === 'googleAds' ? 'Google' : 'Meta'} market averages.
++      </p>
++    </div>
++  );
++};
++
++export default BudgetCalculator;
+\ No newline at end of file
+diff --git a/CompetitorAnalysis.jsx b/CompetitorAnalysis.jsx
+new file mode 100644
+index 0000000..1dfde19
+--- /dev/null
++++ b/CompetitorAnalysis.jsx
+@@ -0,0 +1,79 @@
++import React, { useState } from 'react';
++import './mobile-styles.css';
++
++const CompetitorAnalysis = ({ competitors = [], onUpdate }) => {
++  const [currentUrl, setCurrentUrl] = useState('');
++
++  const handleAdd = () => {
++    if (!currentUrl) return;
++    // Add to list
++    const newCompetitors = [...competitors, currentUrl];
++    onUpdate(newCompetitors);
++    setCurrentUrl('');
++  };
++
++  const handleRemove = (indexToRemove) => {
++    const newCompetitors = competitors.filter((_, index) => index !== indexToRemove);
++    onUpdate(newCompetitors);
++  };
++
++  return (
++    <div style={{ marginBottom: '24px' }}>
++      <label style={{ display: 'block', fontSize: '14px', fontWeight: '700', color: 'var(--text-tertiary)', marginBottom: '8px' }}>
++        Competitor Analysis
++      </label>
++      <p style={{ fontSize: '13px', color: 'var(--text-secondary)', marginBottom: '12px', lineHeight: '1.4' }}>
++        Add links to competitors you want to outperform.
++      </p>
++
++      <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
++        <input
++          type="url"
++          value={currentUrl}
++          onChange={(e) => setCurrentUrl(e.target.value)}
++          placeholder="https://competitor.com"
++          style={{
++            flex: 1,
++            padding: '16px',
++            fontSize: '16px',
++            borderRadius: '12px',
++            border: '1px solid var(--border-color)',
++            backgroundColor: 'var(--bg-secondary)',
++            color: 'var(--text-primary)',
++            outline: 'none'
++          }}
++        />
++        <button
++          onClick={handleAdd}
++          disabled={!currentUrl}
++          style={{
++            padding: '0 20px',
++            backgroundColor: 'var(--bg-accent)',
++            color: 'var(--primary-color)',
++            border: 'none',
++            borderRadius: '12px',
++            fontWeight: '600',
++            cursor: 'pointer',
++            opacity: !currentUrl ? 0.5 : 1
++          }}
++        >
++          Add
++        </button>
++      </div>
++
++      {/* List of Competitors */}
++      {competitors.length > 0 && (
++        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
++          {competitors.map((url, index) => (
++            <div key={index} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px', backgroundColor: 'var(--bg-secondary)', borderRadius: '8px', border: '1px solid var(--border-color)' }}>
++              <span style={{ fontSize: '14px', color: 'var(--text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '80%' }}>{url}</span>
++              <button onClick={() => handleRemove(index)} style={{ background: 'none', border: 'none', color: 'var(--danger)', fontSize: '18px', cursor: 'pointer', padding: '0 8px' }}>×</button>
++            </div>
++          ))}
++        </div>
++      )}
++    </div>
++  );
++};
++
++export default CompetitorAnalysis;
+\ No newline at end of file
+diff --git a/Confetti.jsx b/Confetti.jsx
+new file mode 100644
+index 0000000..0877a57
+--- /dev/null
++++ b/Confetti.jsx
+@@ -0,0 +1,42 @@
++import React, { useEffect, useState } from 'react';
++import './mobile-styles.css';
++
++const Confetti = () => {
++  const [particles, setParticles] = useState([]);
++
++  useEffect(() => {
++    const colors = ['#FFC700', '#FF0000', '#2E3192', '#41BBC7', '#10B981'];
++    const count = 50;
++    const newParticles = [];
++
++    for (let i = 0; i < count; i++) {
++      newParticles.push({
++        id: i,
++        left: Math.random() * 100, // Random horizontal position 0-100%
++        animationDelay: Math.random() * 2, // Random start time
++        backgroundColor: colors[Math.floor(Math.random() * colors.length)],
++        animationDuration: 2 + Math.random() * 2 // Random fall speed
++      });
++    }
++    setParticles(newParticles);
++  }, []);
++
++  return (
++    <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none', zIndex: 9999, overflow: 'hidden' }}>
++      {particles.map((p) => (
++        <div
++          key={p.id}
++          className="confetti"
++          style={{
++            left: `${p.left}%`,
++            backgroundColor: p.backgroundColor,
++            animation: `confetti-fall ${p.animationDuration}s linear forwards`,
++            animationDelay: `${p.animationDelay}s`
++          }}
++        />
++      ))}
++    </div>
++  );
++};
++
++export default Confetti;
+\ No newline at end of file
+diff --git a/DashboardStats.jsx b/DashboardStats.jsx
+new file mode 100644
+index 0000000..041a416
+--- /dev/null
++++ b/DashboardStats.jsx
+@@ -0,0 +1,19 @@
++import React from 'react';
++import './mobile-styles.css';
++
++const DashboardStats = ({ views, leads }) => {
++  return (
++    <div className="stats-grid">
++      <div className="stat-card">
++        <span className="stat-label">Total Views</span>
++        <span className="stat-value">{views.toLocaleString()}</span>
++      </div>
++      <div className="stat-card">
++        <span className="stat-label">Total Leads</span>
++        <span className="stat-value">{leads.toLocaleString()}</span>
++      </div>
++    </div>
++  );
++};
++
++export default DashboardStats;
+\ No newline at end of file
+diff --git a/DomainSearch.jsx b/DomainSearch.jsx
+new file mode 100644
+index 0000000..c081449
+--- /dev/null
++++ b/DomainSearch.jsx
+@@ -0,0 +1,102 @@
++import React, { useState } from 'react';
++import './mobile-styles.css';
++
++const DomainSearch = ({ onSelect }) => {
++  const [query, setQuery] = useState('');
++  const [result, setResult] = useState(null);
++  const [isSearching, setIsSearching] = useState(false);
++
++  const handleSearch = () => {
++    if (!query) return;
++    setIsSearching(true);
++    setResult(null);
++
++    // Simulate API call
++    setTimeout(() => {
++      const isAvailable = Math.random() > 0.3; // 70% chance available
++      const domainName = query.includes('.') ? query : `${query}.com`;
++      
++      setResult({
++        domain: domainName,
++        available: isAvailable,
++        price: isAvailable ? 'AED 50/yr' : null
++      });
++      
++      setIsSearching(false);
++      
++      if (isAvailable && onSelect) {
++        onSelect(domainName);
++      }
++    }, 1500);
++  };
++
++  return (
++    <div style={{ marginBottom: '24px' }}>
++      <label style={{ display: 'block', fontSize: '14px', fontWeight: '700', color: 'var(--text-tertiary)', marginBottom: '8px' }}>
++        Find your Domain
++      </label>
++      <div style={{ display: 'flex', gap: '8px' }}>
++        <input
++          type="text"
++          value={query}
++          onChange={(e) => setQuery(e.target.value)}
++          placeholder="e.g. myluxuryhomes"
++          style={{
++            flex: 1,
++            padding: '16px',
++            fontSize: '16px',
++            borderRadius: '12px',
++            border: '1px solid var(--border-color)',
++            backgroundColor: 'var(--bg-secondary)',
++            color: 'var(--text-primary)',
++            outline: 'none'
++          }}
++        />
++        <button
++          onClick={handleSearch}
++          disabled={isSearching}
++          style={{
++            padding: '0 20px',
++            backgroundColor: 'var(--primary-color)',
++            color: 'white',
++            border: 'none',
++            borderRadius: '12px',
++            fontWeight: '600',
++            cursor: 'pointer',
++            opacity: isSearching ? 0.7 : 1,
++            minWidth: '80px'
++          }}
++        >
++          {isSearching ? '...' : 'Search'}
++        </button>
++      </div>
++
++      {result && (
++        <div style={{ 
++          marginTop: '12px', 
++          padding: '12px', 
++          borderRadius: '12px', 
++          backgroundColor: result.available ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)',
++          border: `1px solid ${result.available ? '#10B981' : '#EF4444'}`,
++          display: 'flex',
++          justifyContent: 'space-between',
++          alignItems: 'center'
++        }}>
++          <div>
++            <span style={{ display: 'block', fontWeight: '700', color: result.available ? '#059669' : '#DC2626' }}>
++              {result.domain}
++            </span>
++            <span style={{ fontSize: '12px', color: result.available ? '#059669' : '#DC2626' }}>
++              {result.available ? 'Available' : 'Taken'}
++            </span>
++          </div>
++          {result.available && (
++            <span style={{ fontWeight: '700', color: '#059669', fontSize: '14px' }}>{result.price}</span>
++          )}
++        </div>
++      )}
++    </div>
++  );
++};
++
++export default DomainSearch;
+\ No newline at end of file
+diff --git a/EmptyState.jsx b/EmptyState.jsx
+new file mode 100644
+index 0000000..9ffd8fa
+--- /dev/null
++++ b/EmptyState.jsx
+@@ -0,0 +1,31 @@
++import React from 'react';
++import StickyFooter from './StickyFooter';
++
++const EmptyState = ({ title, message, onAction, actionLabel }) => {
++  return (
++    <div style={{ 
++      display: 'flex', 
++      flexDirection: 'column', 
++      alignItems: 'center', 
++      justifyContent: 'center', 
++      minHeight: '70vh', 
++      padding: '20px',
++      textAlign: 'center' 
++    }}>
++      {/* Friendly Illustration Placeholder */}
++      <div style={{ fontSize: '64px', marginBottom: '24px' }}>🏠</div>
++      
++      <h3 style={{ fontSize: '20px', fontWeight: 'bold', marginBottom: '12px', color: '#111827' }}>
++        {title}
++      </h3>
++      
++      <p style={{ color: '#6B7280', marginBottom: '40px', lineHeight: '1.5', maxWidth: '300px' }}>
++        {message}
++      </p>
++      
++      <StickyFooter label={actionLabel} onClick={onAction} />
++    </div>
++  );
++};
++
++export default EmptyState;
+\ No newline at end of file
+diff --git a/ForgivingInput.jsx b/ForgivingInput.jsx
+new file mode 100644
+index 0000000..e294eb1
+--- /dev/null
++++ b/ForgivingInput.jsx
+@@ -0,0 +1,90 @@
++import React, { useState } from 'react';
++
++const ForgivingInput = ({ label, type = "text", placeholder, helperText, value, onChange }) => {
++  const [isListening, setIsListening] = useState(false);
++  // Smart input mode: 'decimal' brings up the number pad on mobile immediately
++  const inputMode = type === 'number' ? 'decimal' : 'text';
++
++  const handleVoiceInput = () => {
++    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
++    
++    if (!SpeechRecognition) {
++      alert("Voice input is not supported in this browser.");
++      return;
++    }
++
++    const recognition = new SpeechRecognition();
++    recognition.lang = 'en-US';
++    recognition.interimResults = false;
++    recognition.maxAlternatives = 1;
++
++    recognition.onstart = () => setIsListening(true);
++    recognition.onend = () => setIsListening(false);
++
++    recognition.onresult = (event) => {
++      const transcript = event.results[0][0].transcript;
++      const currentValue = value || '';
++      // Append if there's existing text, otherwise just set it
++      const newValue = currentValue ? `${currentValue} ${transcript}` : transcript;
++      onChange({ target: { value: newValue } });
++    };
++
++    recognition.start();
++  };
++  
++  return (
++    <div className="input-group" style={{ marginBottom: '24px' }}>
++      <label style={{ display: 'block', fontSize: '14px', fontWeight: '700', color: 'var(--text-tertiary)', marginBottom: '8px' }}>
++        {label}
++      </label>
++      
++      <div style={{ position: 'relative' }}>
++        <input 
++          type={type === 'number' ? 'text' : type} // Using 'text' with inputMode prevents some browser validation quirks
++          inputMode={inputMode}
++          placeholder={placeholder} 
++          value={value}
++          onChange={onChange}
++          style={{
++            width: '100%',
++            padding: '16px',     /* Large touch target for thumbs */
++            paddingRight: '48px', /* Space for mic button */
++            fontSize: '16px',    /* CRITICAL: Prevents auto-zoom on iPhone */
++            borderRadius: '12px',
++            border: `1px solid ${isListening ? 'var(--primary-color)' : 'var(--border-color)'}`,
++            backgroundColor: 'var(--bg-secondary)',
++            color: 'var(--text-primary)',
++            outline: 'none',
++            transition: 'border-color 0.2s'
++          }}
++        />
++        <button
++          onClick={handleVoiceInput}
++          style={{
++            position: 'absolute',
++            right: '12px',
++            top: '50%',
++            transform: 'translateY(-50%)',
++            background: 'none',
++            border: 'none',
++            fontSize: '20px',
++            cursor: 'pointer',
++            padding: '4px',
++            opacity: isListening ? 1 : 0.6
++          }}
++          title="Dictate"
++        >
++          {isListening ? '🔴' : '🎙️'}
++        </button>
++      </div>
++      
++      {helperText && (
++        <span style={{ display: 'block', fontSize: '13px', color: 'var(--text-secondary)', marginTop: '6px', lineHeight: '1.4' }}>
++          💡 {helperText}
++        </span>
++      )}
++    </div>
++  );
++};
++
++export default ForgivingInput;
+\ No newline at end of file
+diff --git a/IntentSelectionScreen.jsx b/IntentSelectionScreen.jsx
+new file mode 100644
+index 0000000..f0d19ee
+--- /dev/null
++++ b/IntentSelectionScreen.jsx
+@@ -0,0 +1,56 @@
++import React from 'react';
++import './mobile-styles.css';
++
++const IntentSelectionScreen = ({ onSelect, onBack }) => {
++  const intents = [
++    { id: 'website', label: 'Build a Website', icon: '🌐', desc: 'Create your professional profile' },
++    { id: 'googleAds', label: 'Get Google Leads', icon: '🔍', desc: 'Be seen when buyers search' },
++    { id: 'metaLeadGen', label: 'Find Buyers on FB', icon: '∞', desc: 'Ads for Facebook & Instagram' },
++    { id: 'smsCampaign', label: 'Wake Up Old Leads', icon: '💬', desc: 'Send SMS to your contacts' },
++    { id: 'emailCampaign', label: 'Send Emails', icon: '✉️', desc: 'Automatic follow-up emails' },
++    { id: 'aiMarketExpert', label: 'Ask AI Expert', icon: '🤖', desc: 'Get help with pricing & data' },
++  ];
++
++  return (
++    <div className="screen-container" style={{ padding: '24px', paddingBottom: '40px' }}>
++      <div style={{ display: 'flex', alignItems: 'center', marginBottom: '24px' }}>
++        <button 
++          onClick={onBack}
++          style={{ background: 'none', border: 'none', fontSize: '24px', marginRight: '16px', cursor: 'pointer', padding: 0, color: 'var(--text-tertiary)' }}
++        >
++          ←
++        </button>
++        <h1 className="screen-title" style={{ marginBottom: 0 }}>Start Here</h1>
++      </div>
++      
++      <p style={{ color: 'var(--text-secondary)', marginBottom: '32px' }}>What do you want to achieve today?</p>
++
++      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
++        {intents.map((item) => (
++          <button
++            key={item.id}
++            onClick={() => onSelect(item.id)}
++            style={{
++              display: 'flex',
++              flexDirection: 'column',
++              alignItems: 'flex-start',
++              padding: '20px',
++              backgroundColor: 'var(--bg-secondary)',
++              border: '1px solid var(--border-color)',
++              borderRadius: '16px',
++              textAlign: 'left',
++              cursor: 'pointer',
++              transition: 'transform 0.1s'
++            }}
++          >
++            <span style={{ fontSize: '32px', marginBottom: '12px' }}>{item.icon}</span>
++            <span style={{ fontSize: '16px', fontWeight: '700', color: 'var(--text-primary)', marginBottom: '4px' }}>{item.label}</span>
++            <span style={{ fontSize: '12px', color: 'var(--text-secondary)', lineHeight: '1.4' }}>{item.desc}</span>
++          </button>
++        ))}
++      </div>
++    </div>
++  );
++};
++
++export default IntentSelectionScreen;
+\ No newline at end of file
+diff --git a/LeadDetailsModal.jsx b/LeadDetailsModal.jsx
+new file mode 100644
+index 0000000..826dceb
+--- /dev/null
++++ b/LeadDetailsModal.jsx
+@@ -0,0 +1,74 @@
++import React from 'react';
++import './mobile-styles.css';
++
++const LeadDetailsModal = ({ project, onClose }) => {
++const LeadDetailsModal = ({ project, onClose, onLeadSelect }) => {
++  if (!project) return null;
++
++  // Dummy leads generator if not present in project data
++  const leads = project.leadsList || [
++    { id: 1, name: "Sarah Miller", time: "2 mins ago", phone: "+971501234567" },
++    { id: 2, name: "Mohammed Ali", time: "1 hour ago", phone: "+971559876543" },
++    { id: 3, name: "John Smith", time: "3 hours ago", phone: "+971523334444" },
++    { id: 4, name: "Emma Wilson", time: "1 day ago", phone: "+971505556666" },
++    { id: 5, name: "David Chen", time: "2 days ago", phone: "+971567778888" },
++  ];
++
++  // If project has 0 leads, show empty list
++  const displayLeads = project.leads === 0 ? [] : leads;
++
++  return (
++    <div className="modal-overlay" onClick={onClose}>
++      <div className="modal-content" onClick={e => e.stopPropagation()} style={{ height: '80vh', display: 'flex', flexDirection: 'column' }}>
++        
++        {/* Header */}
++        <div style={{ padding: '20px', borderBottom: '1px solid #E5E7EB', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
++          <div>
++            <h3 style={{ margin: 0, fontSize: '18px', fontWeight: '700', color: '#111827' }}>{project.name}</h3>
++            <span style={{ fontSize: '12px', color: '#6B7280' }}>{project.leads} Leads Generated</span>
++          </div>
++          <button 
++            onClick={onClose} 
++            style={{ background: '#F3F4F6', border: 'none', borderRadius: '50%', width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px', cursor: 'pointer', color: '#4B5563' }}
++          >
++            ×
++          </button>
++        </div>
++
++        {/* Leads List */}
++        <div style={{ flex: 1, overflowY: 'auto', padding: '0 20px' }}>
++          {displayLeads.length === 0 ? (
++            <div style={{ textAlign: 'center', padding: '60px 0', color: '#9CA3AF' }}>
++              <div style={{ fontSize: '40px', marginBottom: '12px' }}>📭</div>
++              <p>No leads received yet.</p>
++            </div>
++          ) : (
++            displayLeads.map(lead => (
++              <div key={lead.id} className="lead-item">
++                <div className="lead-info">
++              <div key={lead.id} className="lead-item" onClick={() => onLeadSelect(lead)} style={{ cursor: 'pointer' }}>
++                <div className="lead-info" style={{ flex: 1 }}>
++                  <span className="lead-name">{lead.name}</span>
++                  <span className="lead-time">{lead.time}</span>
++                </div>
++                <a href={`tel:${lead.phone}`} className="lead-action">
++                  📞 Call
++                </a>
++              </div>
++            ))
++          )}
++        </div>
++
++        {/* Footer Action */}
++        <div style={{ padding: '20px', borderTop: '1px solid #E5E7EB' }}>
++          <button className="primary-button" style={{ height: '48px', fontSize: '16px' }}>
++            Download CSV
++          </button>
++        </div>
++
++      </div>
++    </div>
++  );
++};
++
++export default LeadDetailsModal;
+\ No newline at end of file
+diff --git a/LeadNurtureScreen.jsx b/LeadNurtureScreen.jsx
+new file mode 100644
+index 0000000..e69de29
+diff --git a/LoadingScreen.jsx b/LoadingScreen.jsx
+new file mode 100644
+index 0000000..c645e6d
+--- /dev/null
++++ b/LoadingScreen.jsx
+@@ -0,0 +1,54 @@
++import React, { useState, useEffect } from 'react';
++import './mobile-styles.css';
++
++const LoadingScreen = () => {
++  const steps = [
++    "Analyzing Market Data...",
++    "Identifying Target Audience...",
++    "Drafting High-Converting Copy...",
++    "Selecting Best Images...",
++    "Finalizing Your Blueprint..."
++  ];
++
++  const [currentStep, setCurrentStep] = useState(0);
++
++  useEffect(() => {
++    // Cycle through the "work" steps to keep the user engaged
++    const interval = setInterval(() => {
++      setCurrentStep((prev) => (prev < steps.length - 1 ? prev + 1 : prev));
++    }, 1500); // Change text every 1.5 seconds
++
++    return () => clearInterval(interval);
++  }, []);
++
++  return (
++    <div style={{
++      display: 'flex',
++      flexDirection: 'column',
++      alignItems: 'center',
++      justifyContent: 'center',
++      minHeight: '80vh',
++      padding: '24px',
++      textAlign: 'center'
++    }}>
++      {/* Spinner Circle (defined in mobile-styles.css) */}
++      <div className="spinner"></div>
++
++      <h2 style={{ 
++        fontSize: '20px', 
++        fontWeight: '700', 
++        marginTop: '32px', 
++        marginBottom: '12px',
++        color: '#111827'
++      }}>
++        {steps[currentStep]}
++      </h2>
++
++      <p style={{ color: '#6B7280', fontSize: '14px' }}>
++        This usually takes about 10 seconds.
++      </p>
++    </div>
++  );
++};
++
++export default LoadingScreen;
+\ No newline at end of file
+diff --git a/LoginScreen.jsx b/LoginScreen.jsx
+new file mode 100644
+index 0000000..541b361
+--- /dev/null
++++ b/LoginScreen.jsx
+@@ -0,0 +1,74 @@
++import React, { useState } from 'react';
++import ForgivingInput from './ForgivingInput';
++import StickyFooter from './StickyFooter';
++import './mobile-styles.css';
++
++const LoginScreen = ({ onLogin }) => {
++  const [isSignup, setIsSignup] = useState(false);
++  const [formData, setFormData] = useState({ name: '', email: '', password: '' });
++
++  const handleChange = (field, value) => {
++    setFormData(prev => ({ ...prev, [field]: value }));
++  };
++
++  const handleSubmit = () => {
++    // Simulate auth delay
++    onLogin(formData);
++  };
++
++  return (
++    <div className="screen-container" style={{ padding: '24px', paddingBottom: '100px', display: 'flex', flexDirection: 'column', justifyContent: 'center', minHeight: '80vh' }}>
++      <div style={{ textAlign: 'center', marginBottom: '40px' }}>
++        <div style={{ fontSize: '64px', marginBottom: '16px' }}>🚀</div>
++        <h1 className="screen-title" style={{ marginBottom: '8px' }}>
++          {isSignup ? 'Create Account' : 'Welcome Back'}
++        </h1>
++        <p style={{ color: 'var(--text-secondary)', fontSize: '16px' }}>
++          {isSignup ? 'Start building your real estate empire.' : 'Login to manage your campaigns.'}
++        </p>
++      </div>
++
++      {isSignup && (
++        <ForgivingInput 
++          label="Full Name" 
++          placeholder="e.g. John Doe" 
++          value={formData.name} 
++          onChange={(e) => handleChange('name', e.target.value)} 
++        />
++      )}
++
++      <ForgivingInput 
++        label="Email Address" 
++        type="email"
++        placeholder="name@agency.com" 
++        value={formData.email} 
++        onChange={(e) => handleChange('email', e.target.value)} 
++      />
++
++      <ForgivingInput 
++        label="Password" 
++        type="password"
++        placeholder="••••••••" 
++        value={formData.password} 
++        onChange={(e) => handleChange('password', e.target.value)} 
++      />
++
++      <div style={{ textAlign: 'center', marginTop: '16px' }}>
++        <button 
++          onClick={() => setIsSignup(!isSignup)}
++          style={{ background: 'none', border: 'none', color: 'var(--primary-color)', fontWeight: '600', fontSize: '14px', cursor: 'pointer' }}
++        >
++          {isSignup ? 'Already have an account? Login' : 'New here? Create Account'}
++        </button>
++      </div>
++
++      <StickyFooter 
++        label={isSignup ? 'Get Started' : 'Login'} 
++        onClick={handleSubmit} 
++        disabled={!formData.email || !formData.password}
++      />
++    </div>
++  );
++};
++
++export default LoginScreen;
+\ No newline at end of file
+diff --git a/MyProjectsScreen.jsx b/MyProjectsScreen.jsx
+new file mode 100644
+index 0000000..874e716
+--- /dev/null
++++ b/MyProjectsScreen.jsx
+@@ -0,0 +1,207 @@
++import React, { useState } from 'react';
++import EmptyState from './EmptyState';
++import StickyFooter from './StickyFooter';
++import DashboardStats from './DashboardStats';
++import LeadDetailsModal from './LeadDetailsModal';
++import './mobile-styles.css';
++
++const MyProjectsScreen = ({ onCreateNew, onSettings }) => {
++  // 1. This would normally come from your database or API
++  // We initialize it with data so you can see the stats and swipe action
++  const [projects, setProjects] = useState([
++    { id: 1, name: "Downtown Luxury Loft", status: "Live", views: 1240, leads: 45 },
++    { id: 2, name: "Palm Jumeirah Villa", status: "Draft", views: 0, leads: 0 },
++    { id: 3, name: "Marina 2-Bed", status: "Live", views: 850, leads: 12 }
++  ]); 
++
++  const [selectedProject, setSelectedProject] = useState(null);
++
++  // Pull to Refresh State
++  const [isRefreshing, setIsRefreshing] = useState(false);
++  const [pullHeight, setPullHeight] = useState(0);
++  const startY = React.useRef(0);
++
++  const handlePullStart = (e) => {
++    if (window.scrollY === 0) {
++      startY.current = e.touches[0].clientY;
++    }
++  };
++
++  const handlePullMove = (e) => {
++    if (window.scrollY === 0 && startY.current > 0 && !isRefreshing) {
++      const currentY = e.touches[0].clientY;
++      const diff = currentY - startY.current;
++      if (diff > 0) {
++        setPullHeight(Math.min(diff * 0.4, 100)); // Add resistance
++      }
++    }
++  };
++
++  const handlePullEnd = () => {
++    if (pullHeight > 60) {
++      setIsRefreshing(true);
++      setPullHeight(60); // Snap to loading height
++      // Simulate Refresh API Call
++      setTimeout(() => {
++        setProjects(prev => prev.map(p => ({
++          ...p,
++          views: p.views + Math.floor(Math.random() * 50),
++          leads: p.leads + (Math.random() > 0.8 ? 1 : 0)
++        })));
++        setIsRefreshing(false);
++        setPullHeight(0);
++      }, 1500);
++    } else {
++      setPullHeight(0);
++    }
++    startY.current = 0;
++  };
++
++  // Calculate total stats
++  const totalViews = projects.reduce((acc, p) => acc + (p.views || 0), 0);
++  const totalLeads = projects.reduce((acc, p) => acc + (p.leads || 0), 0);
++
++  const handleDelete = (id) => {
++    setProjects(projects.filter(p => p.id !== id));
++  };
++
++  // 2. The "Empty State" Logic
++  // If the agent has no work saved, we guide them immediately to the action.
++  if (projects.length === 0) {
++    return (
++      <EmptyState 
++        title="No Projects Yet"
++        message="You haven't started any campaigns. Tap the button below to create your first website or ad."
++        actionLabel="Start New Project"
++        onAction={onCreateNew}
++      />
++    );
++  }
++
++  // 3. The "List State" (If they have data)
++  return (
++    <div 
++      className="screen-container" 
++      style={{ padding: '24px', paddingBottom: '100px', minHeight: '80vh' }}
++      onTouchStart={handlePullStart}
++      onTouchMove={handlePullMove}
++      onTouchEnd={handlePullEnd}
++    >
++      {/* Refresh Indicator */}
++      <div style={{ 
++        height: `${pullHeight}px`, 
++        overflow: 'hidden', 
++        display: 'flex', 
++        alignItems: 'center', 
++        justifyContent: 'center',
++        transition: isRefreshing ? 'height 0.2s' : 'height 0.1s ease-out'
++      }}>
++        {isRefreshing ? (
++          <div className="spinner" style={{ width: '24px', height: '24px', borderWidth: '3px' }}></div>
++        ) : (
++          <span style={{ transform: `rotate(${pullHeight * 3}deg)`, fontSize: '20px', opacity: Math.min(pullHeight / 40, 1) }}>⬇️</span>
++        )}
++      </div>
++
++      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
++        <h1 className="screen-title" style={{ marginBottom: 0 }}>My Projects</h1>
++        <button 
++          onClick={onSettings}
++          style={{ 
++            background: '#F3F4F6', 
++            border: 'none', 
++            borderRadius: '50%', 
++            width: '40px', 
++            height: '40px', 
++            display: 'flex', 
++            alignItems: 'center', 
++            justifyContent: 'center', 
++            fontSize: '20px', 
++            cursor: 'pointer' 
++          }}
++        >
++          ⚙️
++        </button>
++      </div>
++      
++      <DashboardStats views={totalViews} leads={totalLeads} />
++      
++      <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
++        {projects.map((project) => (
++          <SwipeableProjectItem 
++            key={project.id} 
++            project={project} 
++            onDelete={handleDelete} 
++            onSelect={() => setSelectedProject(project)}
++          />
++        ))}
++      </div>
++
++      {selectedProject && <LeadDetailsModal project={selectedProject} onClose={() => setSelectedProject(null)} />}
++      <StickyFooter label="Start New Project" onClick={onCreateNew} />
++    </div>
++  );
++};
++
++// Sub-component for swipe logic
++const SwipeableProjectItem = ({ project, onDelete, onSelect }) => {
++  const [offset, setOffset] = useState(0);
++  const startX = React.useRef(0);
++
++  const handleTouchStart = (e) => {
++    startX.current = e.touches[0].clientX;
++  };
++
++  const handleTouchMove = (e) => {
++    const currentX = e.touches[0].clientX;
++    const diff = currentX - startX.current;
++    // Only allow swiping left (negative diff) up to -80px
++    if (diff < 0 && diff > -100) {
++      setOffset(diff);
++    }
++  };
++
++  const handleTouchEnd = () => {
++    if (offset < -40) {
++      setOffset(-80); // Snap open
++    } else {
++      setOffset(0); // Snap close
++    }
++  };
++
++  const handleClick = () => {
++    // Only trigger select if we aren't swiped open
++    if (offset === 0) onSelect();
++  };
++
++  return (
++    <div className="project-item-wrapper">
++       <div className="delete-action" onClick={() => onDelete(project.id)}>
++         🗑️
++       </div>
++       <div 
++         className="project-item-content"
++         style={{ 
++           transform: `translateX(${offset}px)`,
++           padding: '20px', borderRadius: '16px', backgroundColor: 'white', border: '1px solid #E5E7EB', position: 'relative', zIndex: 2, transition: 'transform 0.2s ease-out'
++         }}
++         onTouchStart={handleTouchStart}
++         onTouchMove={handleTouchMove}
++         onTouchEnd={handleTouchEnd}
++         onClick={handleClick}
++       >
++          <h3 style={{ fontSize: '18px', fontWeight: '700', margin: '0 0 8px 0' }}>{project.name}</h3>
++          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
++            <span style={{ fontSize: '14px', color: '#6B7280' }}>{project.status}</span>
++            {project.views > 0 && (
++              <span style={{ fontSize: '12px', fontWeight: '600', color: '#007AFF' }}>
++                {project.views} views
++              </span>
++            )}
++          </div>
++       </div>
++    </div>
++  );
++};
++
++export default MyProjectsScreen;
+\ No newline at end of file
+diff --git a/PaymentScreen.jsx b/PaymentScreen.jsx
+new file mode 100644
+index 0000000..136e132
+--- /dev/null
++++ b/PaymentScreen.jsx
+@@ -0,0 +1,81 @@
++import React, { useState } from 'react';
++import StickyFooter from './StickyFooter';
++import './mobile-styles.css';
++
++const PaymentScreen = ({ amount, onPaymentComplete, onBack }) => {
++  const [selectedMethod, setSelectedMethod] = useState('apple');
++  const displayAmount = amount || '199';
++
++  const handlePay = () => {
++    // Simulate payment processing delay
++    onPaymentComplete();
++  };
++
++  return (
++    <div className="screen-container" style={{ padding: '24px', paddingBottom: '100px' }}>
++      <div style={{ display: 'flex', alignItems: 'center', marginBottom: '24px' }}>
++        <button 
++          onClick={onBack}
++          style={{ background: 'none', border: 'none', fontSize: '24px', marginRight: '16px', cursor: 'pointer', padding: 0, color: 'var(--text-tertiary)' }}
++        >
++          ←
++        </button>
++        <h1 className="screen-title" style={{ marginBottom: 0 }}>Activate</h1>
++      </div>
++
++      <div style={{ textAlign: 'center', marginBottom: '32px' }}>
++        <span style={{ fontSize: '48px', fontWeight: '800', color: 'var(--text-primary)' }}>AED {displayAmount}</span>
++        <span style={{ display: 'block', color: 'var(--text-secondary)', fontSize: '14px' }}>Total Budget</span>
++      </div>
++
++      <h3 style={{ fontSize: '16px', fontWeight: '700', marginBottom: '16px', color: 'var(--text-primary)' }}>Pay with</h3>
++
++      <div 
++        className={`payment-method-card ${selectedMethod === 'apple' ? 'selected' : ''}`}
++        onClick={() => setSelectedMethod('apple')}
++      >
++        <div style={{ display: 'flex', alignItems: 'center' }}>
++          <span style={{ fontSize: '24px', marginRight: '12px' }}>🍎</span>
++          <span style={{ fontWeight: '600', color: 'var(--text-primary)' }}>Apple Pay</span>
++        </div>
++        <div className="radio-circle">
++          {selectedMethod === 'apple' && <div className="radio-dot" />}
++        </div>
++      </div>
++
++      <div 
++        className={`payment-method-card ${selectedMethod === 'google' ? 'selected' : ''}`}
++        onClick={() => setSelectedMethod('google')}
++      >
++        <div style={{ display: 'flex', alignItems: 'center' }}>
++          <span style={{ fontSize: '24px', marginRight: '12px' }}>🤖</span>
++          <span style={{ fontWeight: '600', color: 'var(--text-primary)' }}>Google Pay</span>
++        </div>
++        <div className="radio-circle">
++          {selectedMethod === 'google' && <div className="radio-dot" />}
++        </div>
++      </div>
++
++      <div 
++        className={`payment-method-card ${selectedMethod === 'card' ? 'selected' : ''}`}
++        onClick={() => setSelectedMethod('card')}
++      >
++        <div style={{ display: 'flex', alignItems: 'center' }}>
++          <span style={{ fontSize: '24px', marginRight: '12px' }}>💳</span>
++          <span style={{ fontWeight: '600', color: 'var(--text-primary)' }}>Credit Card</span>
++        </div>
++        <div className="radio-circle">
++          {selectedMethod === 'card' && <div className="radio-dot" />}
++        </div>
++      </div>
++
++      <p style={{ fontSize: '12px', color: 'var(--text-secondary)', textAlign: 'center', marginTop: '24px', lineHeight: '1.5' }}>
++        🔒 Secure payment processed by Stripe. No payment profile required.
++      </p>
++
++      <StickyFooter label={`Pay AED ${displayAmount}`} onClick={handlePay} />
++    </div>
++  );
++};
++
++export default PaymentScreen;
+\ No newline at end of file
+diff --git a/PersonaSelector.jsx b/PersonaSelector.jsx
+new file mode 100644
+index 0000000..70a7c56
+--- /dev/null
++++ b/PersonaSelector.jsx
+@@ -0,0 +1,45 @@
++import React from 'react';
++import './mobile-styles.css';
++
++const PersonaSelector = ({ selectedPersona, onSelect }) => {
++  const personas = [
++    { id: 'professional', label: 'Professional', icon: '👔', desc: 'Trustworthy & Formal' },
++    { id: 'friendly', label: 'Friendly', icon: '👋', desc: 'Warm & Approachable' },
++    { id: 'luxury', label: 'Luxury', icon: '✨', desc: 'Elegant & Exclusive' },
++    { id: 'urgent', label: 'Urgent', icon: '🔥', desc: 'High Energy & Direct' },
++  ];
++
++  return (
++    <div style={{ marginBottom: '24px' }}>
++      <label style={{ display: 'block', fontSize: '14px', fontWeight: '700', color: 'var(--text-tertiary)', marginBottom: '12px' }}>
++        AI Tone of Voice
++      </label>
++      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
++        {personas.map((p) => (
++          <button
++            key={p.id}
++            onClick={() => onSelect(p.id)}
++            style={{
++              display: 'flex',
++              flexDirection: 'column',
++              alignItems: 'center',
++              padding: '16px',
++              backgroundColor: selectedPersona === p.id ? 'var(--bg-accent)' : 'var(--bg-secondary)',
++              border: `1px solid ${selectedPersona === p.id ? 'var(--primary-color)' : 'var(--border-color)'}`,
++              borderRadius: '12px',
++              cursor: 'pointer',
++              transition: 'all 0.2s',
++              textAlign: 'center'
++            }}
++          >
++            <span style={{ fontSize: '24px', marginBottom: '8px' }}>{p.icon}</span>
++            <span style={{ fontSize: '14px', fontWeight: '600', color: 'var(--text-primary)', marginBottom: '4px' }}>{p.label}</span>
++            <span style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>{p.desc}</span>
++          </button>
++        ))}
++      </div>
++    </div>
++  );
++};
++
++export default PersonaSelector;
+\ No newline at end of file
+diff --git a/PreviewModal.jsx b/PreviewModal.jsx
+new file mode 100644
+index 0000000..cdcb875
+--- /dev/null
++++ b/PreviewModal.jsx
+@@ -0,0 +1,60 @@
++import React from 'react';
++import './mobile-styles.css';
++
++const PreviewModal = ({ template, onClose, onSelect }) => {
++  if (!template) return null;
++
++  return (
++    <div className="modal-overlay" onClick={onClose}>
++      <div className="modal-content" onClick={e => e.stopPropagation()}>
++        <div style={{ height: '300px', backgroundColor: '#F3F4F6', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
++           {template.image ? 
++             <img src={template.image} alt={template.title} style={{width:'100%', height:'100%', objectFit:'cover'}} /> 
++             : <span style={{fontSize: '40px'}}>📷</span>
++           }
++           <button 
++             onClick={onClose}
++             style={{
++               position: 'absolute',
++               top: '16px',
++               right: '16px',
++               background: 'rgba(0,0,0,0.5)',
++               color: 'white',
++               border: 'none',
++               borderRadius: '50%',
++               width: '32px',
++               height: '32px',
++               display: 'flex',
++               alignItems: 'center',
++               justifyContent: 'center',
++               fontSize: '18px',
++               cursor: 'pointer'
++             }}
++           >
++             ×
++           </button>
++        </div>
++        
++        <div style={{ padding: '24px' }}>
++          <span style={{ fontSize: '12px', color: '#007AFF', fontWeight: '700', textTransform: 'uppercase' }}>{template.category}</span>
++          <h2 style={{ fontSize: '24px', fontWeight: '700', margin: '8px 0 16px 0', color: '#111827' }}>{template.title}</h2>
++          <p style={{ color: '#6B7280', marginBottom: '24px', lineHeight: '1.5' }}>
++            This template is optimized for {template.category.toLowerCase()} looking to capture high-intent leads on mobile devices.
++          </p>
++          
++          <button 
++            className="primary-button" 
++            onClick={() => {
++              onSelect(template);
++              onClose();
++            }}
++          >
++            Use This Template
++          </button>
++        </div>
++      </div>
++    </div>
++  );
++};
++
++export default PreviewModal;
+\ No newline at end of file
+diff --git a/ProgressBar.jsx b/ProgressBar.jsx
+new file mode 100644
+index 0000000..9aced4a
+--- /dev/null
++++ b/ProgressBar.jsx
+@@ -0,0 +1,12 @@
++import React from 'react';
++import './mobile-styles.css';
++
++const ProgressBar = ({ progress }) => {
++  return (
++    <div className="progress-container">
++      <div className="progress-fill" style={{ width: `${progress}%` }}></div>
++    </div>
++  );
++};
++
++export default ProgressBar;
+\ No newline at end of file
+diff --git a/SettingsScreen.jsx b/SettingsScreen.jsx
+new file mode 100644
+index 0000000..9991845
+--- /dev/null
++++ b/SettingsScreen.jsx
+@@ -0,0 +1,89 @@
++import React, { useState } from 'react';
++import StickyFooter from './StickyFooter';
++import ForgivingInput from './ForgivingInput';
++import './mobile-styles.css';
++
++const SettingsScreen = ({ onBack, onSave, theme, onToggleTheme }) => {
++  const [profile, setProfile] = useState({
++    name: 'Agent Name',
++    email: 'agent@example.com',
++    phone: '+971 50 000 0000'
++  });
++
++  const [notifications, setNotifications] = useState({
++    email: true,
++    push: true,
++    sms: false
++  });
++
++  const handleToggle = (key) => {
++    setNotifications(prev => ({ ...prev, [key]: !prev[key] }));
++  };
++
++  return (
++    <div className="screen-container" style={{ padding: '24px', paddingBottom: '100px' }}>
++      {/* Header */}
++      <div style={{ display: 'flex', alignItems: 'center', marginBottom: '24px' }}>
++        <button 
++          onClick={onBack}
++          style={{ background: 'none', border: 'none', fontSize: '24px', marginRight: '16px', cursor: 'pointer', padding: 0, color: 'var(--text-tertiary)' }}
++        >
++          ←
++        </button>
++        <h1 className="screen-title" style={{ marginBottom: 0 }}>Settings</h1>
++      </div>
++
++      {/* Profile Section */}
++      <h3 style={{ fontSize: '18px', fontWeight: '700', marginBottom: '16px', color: 'var(--text-primary)' }}>Profile</h3>
++      <ForgivingInput 
++        label="Full Name" 
++        value={profile.name} 
++        onChange={(e) => setProfile({...profile, name: e.target.value})} 
++      />
++      <ForgivingInput 
++        label="Email Address" 
++        value={profile.email} 
++        onChange={(e) => setProfile({...profile, email: e.target.value})} 
++      />
++      <ForgivingInput 
++        label="Phone Number" 
++        type="tel"
++        value={profile.phone} 
++        onChange={(e) => setProfile({...profile, phone: e.target.value})} 
++      />
++
++      {/* Appearance Section */}
++      <h3 style={{ fontSize: '18px', fontWeight: '700', marginTop: '32px', marginBottom: '16px', color: 'var(--text-primary)' }}>Appearance</h3>
++      <ToggleRow label="Dark Mode" checked={theme === 'dark'} onToggle={onToggleTheme} />
++
++      {/* Notifications Section */}
++      <h3 style={{ fontSize: '18px', fontWeight: '700', marginTop: '32px', marginBottom: '16px', color: 'var(--text-primary)' }}>Notifications</h3>
++      
++      <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
++        <ToggleRow label="Email Notifications" checked={notifications.email} onToggle={() => handleToggle('email')} />
++        <ToggleRow label="Push Notifications" checked={notifications.push} onToggle={() => handleToggle('push')} />
++        <ToggleRow label="SMS Alerts" checked={notifications.sms} onToggle={() => handleToggle('sms')} />
++      </div>
++
++      <StickyFooter label="Save Changes" onClick={() => onSave({ profile, notifications })} />
++    </div>
++  );
++};
++
++const ToggleRow = ({ label, checked, onToggle }) => (
++  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 0', borderBottom: '1px solid var(--bg-tertiary)' }}>
++    <span style={{ fontSize: '16px', color: 'var(--text-tertiary)' }}>{label}</span>
++    <div 
++      onClick={onToggle}
++      style={{
++        width: '50px', height: '28px', backgroundColor: checked ? 'var(--primary-color)' : 'var(--border-color)', borderRadius: '14px', position: 'relative', cursor: 'pointer', transition: 'background-color 0.2s'
++      }}
++    >
++      <div style={{
++        width: '24px', height: '24px', backgroundColor: 'white', borderRadius: '50%', position: 'absolute', top: '2px', left: checked ? '24px' : '2px', transition: 'left 0.2s', boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
++      }} />
++    </div>
++  </div>
++);
++
++export default SettingsScreen;
+\ No newline at end of file
+diff --git a/ShareModal.jsx b/ShareModal.jsx
+new file mode 100644
+index 0000000..fa29feb
+--- /dev/null
++++ b/ShareModal.jsx
+@@ -0,0 +1,107 @@
++import React, { useState } from 'react';
++import './mobile-styles.css';
++
++const ShareModal = ({ url, onClose }) => {
++  const [copied, setCopied] = useState(false);
++
++  const handleCopy = () => {
++    navigator.clipboard.writeText(url);
++    setCopied(true);
++    setTimeout(() => setCopied(false), 2000);
++  };
++
++  const handleEmail = () => {
++    window.location.href = `mailto:?subject=Check out my new site&body=Here is the link: ${url}`;
++  };
++
++  const handleSMS = () => {
++    window.location.href = `sms:?body=Check out my new site: ${url}`;
++  };
++
++  const handleWhatsApp = () => {
++    window.open(`https://wa.me/?text=${encodeURIComponent("Check out my new site: " + url)}`, '_blank');
++  };
++
++  return (
++    <div className="modal-overlay" onClick={onClose}>
++      <div className="modal-content" onClick={e => e.stopPropagation()} style={{ padding: '24px' }}>
++        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
++          <h3 style={{ margin: 0, fontSize: '20px', fontWeight: '700', color: '#111827' }}>Share Project</h3>
++          <button 
++            onClick={onClose} 
++            style={{ 
++              background: '#F3F4F6', 
++              border: 'none', 
++              borderRadius: '50%',
++              width: '32px', 
++              height: '32px', 
++              display: 'flex',
++              alignItems: 'center',
++              justifyContent: 'center',
++              fontSize: '20px', 
++              cursor: 'pointer',
++              color: '#4B5563'
++            }}
++          >
++            ×
++          </button>
++        </div>
++
++        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
++          <ShareOption 
++            icon="📋" 
++            label={copied ? "Copied!" : "Copy Link"} 
++            onClick={handleCopy} 
++            color="#F3F4F6" 
++            textColor="#1F2937" 
++          />
++          <ShareOption 
++            icon="💬" 
++            label="WhatsApp" 
++            onClick={handleWhatsApp} 
++            color="#DCFCE7" 
++            textColor="#166534" 
++          />
++          <ShareOption 
++            icon="✉️" 
++            label="Email" 
++            onClick={handleEmail} 
++            color="#DBEAFE" 
++            textColor="#1E40AF" 
++          />
++          <ShareOption 
++            icon="📱" 
++            label="SMS" 
++            onClick={handleSMS} 
++            color="#FEF3C7" 
++            textColor="#92400E" 
++          />
++        </div>
++      </div>
++    </div>
++  );
++};
++
++const ShareOption = ({ icon, label, onClick, color, textColor }) => (
++  <button 
++    onClick={onClick}
++    style={{
++      display: 'flex',
++      flexDirection: 'column',
++      alignItems: 'center',
++      justifyContent: 'center',
++      padding: '20px',
++      backgroundColor: color,
++      borderRadius: '16px',
++      border: 'none',
++      cursor: 'pointer',
++      transition: 'transform 0.1s',
++      width: '100%'
++    }}
++  >
++    <span style={{ fontSize: '28px', marginBottom: '8px' }}>{icon}</span>
++    <span style={{ fontSize: '14px', fontWeight: '600', color: textColor }}>{label}</span>
++  </button>
++);
++
++export default ShareModal;
+\ No newline at end of file
+diff --git a/SmartAdPlanner.jsx b/SmartAdPlanner.jsx
+new file mode 100644
+index 0000000..18d582c
+--- /dev/null
++++ b/SmartAdPlanner.jsx
+@@ -0,0 +1,67 @@
++import React, { useState, useEffect } from 'react';
++import BudgetCalculator from './BudgetCalculator';
++import './mobile-styles.css';
++
++const SmartAdPlanner = ({ market, budget, onBudgetChange }) => {
++  const [analyzing, setAnalyzing] = useState(true);
++  
++  // Simulate the "Smart" analysis happening in real-time
++  useEffect(() => {
++    if (market && market.length > 2) {
++      setAnalyzing(true);
++      const timer = setTimeout(() => setAnalyzing(false), 1500);
++      return () => clearTimeout(timer);
++    }
++  }, [market]);
++
++  if (!market || market.length < 3) return null;
++
++  return (
++    <div>
++      {analyzing ? (
++        <div style={{ textAlign: 'center', padding: '20px', backgroundColor: 'var(--bg-secondary)', borderRadius: '16px', marginBottom: '24px' }}>
++          <div className="spinner" style={{ width: '24px', height: '24px', margin: '0 auto 12px auto', borderWidth: '3px' }}></div>
++          <p style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>Scanning Google Search Trends for <strong>{market}</strong>...</p>
++        </div>
++      ) : (
++        <div className="smart-planner-container">
++          {/* Insight Header */}
++          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '16px' }}>
++            <div>
++              <h3 style={{ fontSize: '16px', fontWeight: '700', margin: '0 0 4px 0', color: 'var(--text-primary)' }}>High Demand Detected</h3>
++              <p style={{ fontSize: '13px', color: 'var(--text-secondary)', margin: 0 }}>
++                We found <strong>1,240+ people</strong> searching for properties in {market} right now.
++              </p>
++            </div>
++            <span className="trend-badge">🔥 Hot Market</span>
++          </div>
++
++          {/* Auto-Generated Keywords */}
++          <div style={{ marginBottom: '20px' }}>
++            <label style={{ fontSize: '12px', fontWeight: '700', color: 'var(--text-tertiary)', textTransform: 'uppercase', display: 'block', marginBottom: '8px' }}>
++              Top Search Terms We Will Target:
++            </label>
++            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
++              <span className="keyword-tag">Buy Villa in {market}</span>
++              <span className="keyword-tag">Apartments for sale {market}</span>
++              <span className="keyword-tag">{market} Real Estate Agent</span>
++              <span className="keyword-tag" style={{ color: 'var(--primary-color)', borderColor: 'var(--primary-color)' }}>+ 45 more</span>
++            </div>
++          </div>
++
++          {/* No Account Needed Reassurance */}
++          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '12px', backgroundColor: 'rgba(255,255,255,0.5)', borderRadius: '8px', marginBottom: '8px' }}>
++            <span style={{ fontSize: '18px' }}>✅</span>
++            <span style={{ fontSize: '12px', color: 'var(--text-secondary)', lineHeight: '1.3' }}>
++              <strong>No Google Account needed.</strong> We run this through our verified agency partner account.
++            </span>
++          </div>
++        </div>
++      )}
++
++      <BudgetCalculator value={budget} onChange={onBudgetChange} platform="googleAds" />
++    </div>
++  );
++};
++
++export default SmartAdPlanner;
+\ No newline at end of file
+diff --git a/SmartReport.jsx b/SmartReport.jsx
+new file mode 100644
+index 0000000..2073b1a
+--- /dev/null
++++ b/SmartReport.jsx
+@@ -0,0 +1,120 @@
++import React from 'react';
++import './mobile-styles.css';
++
++const SmartReport = ({ data }) => {
++  // Default dummy data if none provided
++  const stats = data || {
++    clicks: 1240,
++    leads: 45,
++    cost: 450, // AED
++    ctr: '3.2%'
++  };
++
++  const cpl = (stats.cost / stats.leads).toFixed(2);
++
++  return (
++    <div className="smart-report-container">
++      <h3 style={{ fontSize: '18px', fontWeight: '700', marginBottom: '16px', color: 'var(--text-primary)' }}>
++        Performance Summary
++      </h3>
++      
++      <div className="report-grid">
++        <ReportCard 
++          label="Total Leads" 
++          value={stats.leads} 
++          trend="+12%" 
++          icon="👥" 
++          color="var(--primary-color)"
++          bgColor="var(--bg-accent)"
++        />
++        <ReportCard 
++          label="Cost Per Lead" 
++          value={`AED ${cpl}`} 
++          trend="-5%" 
++          trendGood={true} // Lower cost is good
++          icon="💰" 
++          color="#059669"
++          bgColor="#D1FAE5"
++        />
++        <ReportCard 
++          label="Ad Clicks" 
++          value={stats.clicks.toLocaleString()} 
++          trend="+8%" 
++          icon="👆" 
++          color="#D97706"
++          bgColor="#FEF3C7"
++        />
++        <ReportCard 
++          label="Total Spent" 
++          value={`AED ${stats.cost}`} 
++          icon="💳" 
++          color="#DC2626"
++          bgColor="#FEE2E2"
++        />
++      </div>
++
++      <div style={{ marginTop: '24px', padding: '16px', backgroundColor: 'var(--bg-secondary)', borderRadius: '12px', border: '1px solid var(--border-color)' }}>
++        <h4 style={{ fontSize: '14px', fontWeight: '700', margin: '0 0 8px 0', color: 'var(--text-primary)' }}>
++          💡 AI Insight
++        </h4>
++        <p style={{ fontSize: '13px', color: 'var(--text-secondary)', margin: 0, lineHeight: '1.5' }}>
++          Your cost per lead is <strong>5% lower</strong> than the market average for this area. We recommend increasing your budget by AED 50 to capture more volume.
++        </p>
++      </div>
++    </div>
++  );
++};
++
++const ReportCard = ({ label, value, trend, trendGood = true, icon, color, bgColor }) => (
++  <div style={{ 
++    backgroundColor: 'var(--bg-primary)', 
++    padding: '16px', 
++    borderRadius: '16px', 
++    border: '1px solid var(--border-color)',
++    display: 'flex',
++    flexDirection: 'column',
++    position: 'relative',
++    boxShadow: '0 2px 4px rgba(0,0,0,0.02)'
++  }}>
++    <div style={{ 
++      width: '32px', 
++      height: '32px', 
++      borderRadius: '8px', 
++      backgroundColor: bgColor, 
++      color: color,
++      display: 'flex', 
++      alignItems: 'center', 
++      justifyContent: 'center',
++      fontSize: '16px',
++      marginBottom: '12px'
++    }}>
++      {icon}
++    </div>
++    
++    <span style={{ fontSize: '12px', color: 'var(--text-secondary)', fontWeight: '600', textTransform: 'uppercase', marginBottom: '4px' }}>
++      {label}
++    </span>
++    
++    <span style={{ fontSize: '20px', fontWeight: '800', color: 'var(--text-primary)' }}>
++      {value}
++    </span>
++
++    {trend && (
++      <span style={{ 
++        position: 'absolute',
++        top: '16px',
++        right: '16px',
++        fontSize: '11px',
++        fontWeight: '700',
++        color: trendGood ? '#059669' : '#DC2626',
++        backgroundColor: trendGood ? '#D1FAE5' : '#FEE2E2',
++        padding: '2px 6px',
++        borderRadius: '4px'
++      }}>
++        {trend}
++      </span>
++    )}
++  </div>
++);
++
++export default SmartReport;
+\ No newline at end of file
+diff --git a/StickyFooter.jsx b/StickyFooter.jsx
+new file mode 100644
+index 0000000..04e9445
+--- /dev/null
++++ b/StickyFooter.jsx
+@@ -0,0 +1,19 @@
++import React from 'react';
++import '../mobile-styles.css';
++
++const StickyFooter = ({ label, onClick, disabled = false }) => {
++  return (
++    <div className="sticky-footer-action">
++      <button 
++        className="primary-button" 
++        onClick={onClick}
++        disabled={disabled}
++        style={{ opacity: disabled ? 0.6 : 1 }}
++      >
++        {label}
++      </button>
++    </div>
++  );
++};
++
++export default StickyFooter;
+\ No newline at end of file
+diff --git a/SuccessScreen.jsx b/SuccessScreen.jsx
+new file mode 100644
+index 0000000..f8c080a
+--- /dev/null
++++ b/SuccessScreen.jsx
+@@ -0,0 +1,126 @@
++import React, { useState, useEffect } from 'react';
++import StickyFooter from './StickyFooter';
++import Confetti from './Confetti';
++import ShareModal from './ShareModal';
++import './mobile-styles.css';
++
++const SuccessScreen = ({ publishedUrl, onDashboardClick, onNextStepClick }) => {
++  const [showShare, setShowShare] = useState(false);
++
++  useEffect(() => {
++    // Play success sound on mount
++    const audio = new Audio('/sounds/success.mp3'); // Ensure this file exists in your public folder
++    audio.volume = 0.6;
++    audio.play().catch(e => console.log("Audio play prevented:", e));
++  }, []);
++
++  return (
++    <div className="screen-container" style={{ padding: '24px', paddingBottom: '100px', textAlign: 'center' }}>
++      <Confetti />
++      {showShare && <ShareModal url={publishedUrl} onClose={() => setShowShare(false)} />}
++      
++      {/* Success Icon / Animation Placeholder */}
++      <div style={{ fontSize: '64px', marginBottom: '24px', marginTop: '40px' }}>🎉</div>
++
++      <h1 className="screen-title" style={{ color: '#10B981' }}>You're Live!</h1>
++      
++      <p style={{ color: '#6B7280', marginBottom: '32px', fontSize: '16px', lineHeight: '1.5' }}>
++        Your project has been successfully published and is ready for visitors.
++      </p>
++
++      {/* Published URL Card - Highlighting the win */}
++      {publishedUrl && (
++        <div style={{ 
++          padding: '20px', 
++          backgroundColor: '#F0FDF4', 
++          border: '1px solid #BBF7D0', 
++          borderRadius: '16px',
++          marginBottom: '32px'
++        }}>
++          <span style={{ display: 'block', fontSize: '12px', color: '#15803D', fontWeight: '700', marginBottom: '4px', textTransform: 'uppercase' }}>
++            Published URL
++          </span>
++          <a href={publishedUrl} target="_blank" rel="noopener noreferrer" style={{ fontSize: '18px', color: '#15803D', fontWeight: '600', textDecoration: 'underline', wordBreak: 'break-all' }}>
++            {publishedUrl}
++          </a>
++
++          {/* Share Button */}
++          <button 
++            onClick={() => setShowShare(true)}
++            style={{
++              marginTop: '16px',
++              width: '100%',
++              padding: '12px',
++              backgroundColor: '#111827',
++              color: 'white',
++              border: 'none',
++              borderRadius: '8px',
++              fontWeight: '600',
++              fontSize: '14px',
++              display: 'flex',
++              alignItems: 'center',
++              justifyContent: 'center',
++              gap: '8px',
++              cursor: 'pointer'
++            }}
++          >
++            <span>📤 Share Project</span>
++          </button>
++        </div>
++      )}
++
++      {/* Next Steps Section - Upsell the next feature immediately */}
++      <div style={{ textAlign: 'left' }}>
++        <h3 style={{ fontSize: '18px', fontWeight: '700', marginBottom: '16px', color: '#111827' }}>What's Next?</h3>
++        
++        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
++            <button 
++              onClick={() => onNextStepClick('meta')}
++              style={{ 
++                padding: '16px', 
++                borderRadius: '12px', 
++                border: '1px solid #E5E7EB', 
++                backgroundColor: 'white',
++                textAlign: 'left',
++                fontSize: '16px',
++                fontWeight: '500',
++                color: '#374151',
++                display: 'flex',
++                justifyContent: 'space-between',
++                alignItems: 'center',
++                boxShadow: '0 1px 2px rgba(0,0,0,0.05)'
++              }}
++            >
++              <span>🚀 Run Facebook Ads</span>
++              <span style={{ color: '#9CA3AF' }}>→</span>
++            </button>
++            
++            <button 
++              onClick={() => onNextStepClick('google')}
++              style={{ 
++                padding: '16px', 
++                borderRadius: '12px', 
++                border: '1px solid #E5E7EB', 
++                backgroundColor: 'white',
++                textAlign: 'left',
++                fontSize: '16px',
++                fontWeight: '500',
++                color: '#374151',
++                display: 'flex',
++                justifyContent: 'space-between',
++                alignItems: 'center',
++                boxShadow: '0 1px 2px rgba(0,0,0,0.05)'
++              }}
++            >
++              <span>🔍 Run Google Ads</span>
++              <span style={{ color: '#9CA3AF' }}>→</span>
++            </button>
++        </div>
++      </div>
++
++      <StickyFooter label="Go to Dashboard" onClick={onDashboardClick} />
++    </div>
++  );
++};
++
++export default SuccessScreen;
+\ No newline at end of file
+diff --git a/TemplateCard.jsx b/TemplateCard.jsx
+new file mode 100644
+index 0000000..e7656af
+--- /dev/null
++++ b/TemplateCard.jsx
+@@ -0,0 +1,66 @@
++import React, { useRef } from 'react';
++
++const TemplateCard = ({ title, category, image, onSelect, onLongPress }) => {
++  const timerRef = useRef(null);
++  const isLongPress = useRef(false);
++
++  const handleStart = () => {
++    isLongPress.current = false;
++    timerRef.current = setTimeout(() => {
++      isLongPress.current = true;
++      if (onLongPress) onLongPress();
++    }, 600); // 600ms threshold for long press
++  };
++
++  const handleEnd = () => {
++    if (timerRef.current) clearTimeout(timerRef.current);
++  };
++
++  const handleClick = (e) => {
++    if (isLongPress.current) return; // Ignore click if it was a long press
++    onSelect();
++  };
++
++  return (
++    <div 
++      onClick={handleClick}
++      onTouchStart={handleStart}
++      onTouchEnd={handleEnd}
++      onMouseDown={handleStart}
++      onMouseUp={handleEnd}
++      onMouseLeave={handleEnd}
++      style={{
++        borderRadius: '16px',
++        overflow: 'hidden',
++        border: '1px solid #E5E7EB',
++        backgroundColor: 'white',
++        marginBottom: '20px',
++        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)',
++        cursor: 'pointer',
++        userSelect: 'none', /* Prevents text selection during long press */
++        WebkitUserSelect: 'none'
++      }}
++    >
++      {/* Image Placeholder Area */}
++      <div style={{ 
++        height: '200px', 
++        backgroundColor: '#F3F4F6', 
++        display: 'flex', 
++        alignItems: 'center', 
++        justifyContent: 'center',
++        color: '#9CA3AF',
++        fontSize: '14px'
++      }}>
++        {image ? <img src={image} alt={title} style={{width:'100%', height:'100%', objectFit:'cover'}} /> : '📷 Template Preview'}
++      </div>
++
++      <div style={{ padding: '16px' }}>
++        <span style={{ fontSize: '12px', color: '#007AFF', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{category}</span>
++        <h3 style={{ fontSize: '18px', fontWeight: '700', color: '#111827', marginTop: '4px', marginBottom: '12px' }}>{title}</h3>
++        <button className="primary-button" style={{ height: '44px', fontSize: '16px' }}>Select Template</button>
++      </div>
++    </div>
++  );
++};
++
++export default TemplateCard;
+\ No newline at end of file
+diff --git a/TemplateLibraryScreen.jsx b/TemplateLibraryScreen.jsx
+new file mode 100644
+index 0000000..f65d089
+--- /dev/null
++++ b/TemplateLibraryScreen.jsx
+@@ -0,0 +1,110 @@
++import React, { useState } from 'react';
++import TemplateCard from './TemplateCard';
++import PreviewModal from './PreviewModal';
++import './mobile-styles.css';
++
++const TemplateLibraryScreen = ({ onSelect, onBack }) => {
++  const [activeFilter, setActiveFilter] = useState('All');
++  const [previewTemplate, setPreviewTemplate] = useState(null);
++
++  // Filters based on your flow-spec.json categories
++  const filters = ["All", "Broker", "Developer", "Individual", "Luxury", "Minimal"];
++
++  // Dummy Data for the demo
++  const templates = [
++    { id: 1, title: "Modern Brokerage", category: "Broker", image: null },
++    { id: 2, title: "Luxury Villa Showcase", category: "Luxury", image: null },
++    { id: 3, title: "Agent Personal Brand", category: "Individual", image: null },
++    { id: 4, title: "Off-Plan Launch", category: "Developer", image: null },
++    { id: 5, title: "Minimalist Portfolio", category: "Minimal", image: null },
++    { id: 6, title: "Corporate Agency", category: "Broker", image: null },
++  ];
++
++  const filteredTemplates = activeFilter === 'All' 
++    ? templates 
++    : templates.filter(t => t.category === activeFilter || (activeFilter === 'Luxury' && t.title.includes('Luxury')));
++
++  return (
++    <div className="screen-container" style={{ padding: '24px', paddingBottom: '40px' }}>
++      
++      {/* Header with Back Button */}
++      <div style={{ display: 'flex', alignItems: 'center', marginBottom: '24px' }}>
++        <button 
++          onClick={onBack}
++          style={{ 
++            background: 'none', 
++            border: 'none', 
++            fontSize: '24px', 
++            marginRight: '16px', 
++            cursor: 'pointer', 
++            padding: 0,
++            color: '#374151'
++          }}
++        >
++          ←
++        </button>
++        <h1 className="screen-title" style={{ marginBottom: 0 }}>Select Design</h1>
++      </div>
++
++      {/* Horizontal Filter Scroll - Mobile Optimized */}
++      <div style={{ 
++        display: 'flex', 
++        overflowX: 'auto', 
++        gap: '10px', 
++        marginBottom: '24px', 
++        paddingBottom: '4px',
++        scrollbarWidth: 'none', /* Firefox */
++        msOverflowStyle: 'none' /* IE/Edge */
++      }}>
++        {/* Hide scrollbar for Chrome/Safari */}
++        <style>{`div::-webkit-scrollbar { display: none; }`}</style>
++        
++        {filters.map(filter => (
++          <button
++            key={filter}
++            onClick={() => setActiveFilter(filter)}
++            style={{
++              padding: '8px 16px',
++              borderRadius: '20px',
++              border: activeFilter === filter ? 'none' : '1px solid #E5E7EB',
++              backgroundColor: activeFilter === filter ? '#111827' : '#F9FAFB',
++              color: activeFilter === filter ? 'white' : '#4B5563',
++              fontSize: '14px',
++              fontWeight: '600',
++              whiteSpace: 'nowrap',
++              flexShrink: 0,
++              transition: 'all 0.2s'
++            }}
++          >
++            {filter}
++          </button>
++        ))}
++      </div>
++
++      {/* Templates List */}
++      <div style={{ display: 'flex', flexDirection: 'column' }}>
++        {filteredTemplates.map(template => (
++          <TemplateCard 
++            key={template.id}
++            title={template.title}
++            category={template.category}
++            image={template.image}
++            onSelect={() => onSelect(template)}
++            onLongPress={() => setPreviewTemplate(template)}
++          />
++        ))}
++      </div>
++
++      {/* Preview Modal */}
++      {previewTemplate && (
++        <PreviewModal 
++          template={previewTemplate} 
++          onClose={() => setPreviewTemplate(null)} 
++          onSelect={onSelect}
++        />
++      )}
++    </div>
++  );
++};
++
++export default TemplateLibraryScreen;
+\ No newline at end of file
+diff --git a/ToastNotification.jsx b/ToastNotification.jsx
+new file mode 100644
+index 0000000..7d029b9
+--- /dev/null
++++ b/ToastNotification.jsx
+@@ -0,0 +1,22 @@
++import React, { useEffect } from 'react';
++import './mobile-styles.css';
++
++const ToastNotification = ({ message, onClose, duration = 3000 }) => {
++  useEffect(() => {
++    const timer = setTimeout(() => {
++      onClose();
++    }, duration);
++    return () => clearTimeout(timer);
++  }, [onClose, duration]);
++
++  return (
++    <div className="toast-container">
++      <div className="toast">
++        <span style={{ marginRight: '8px' }}>✅</span>
++        {message}
++      </div>
++    </div>
++  );
++};
++
++export default ToastNotification;
+\ No newline at end of file
+diff --git a/UniversalInputsScreen.jsx b/UniversalInputsScreen.jsx
+new file mode 100644
+index 0000000..b6145ef
+--- /dev/null
++++ b/UniversalInputsScreen.jsx
+@@ -0,0 +1,166 @@
++import React, { useState } from 'react';
++import ForgivingInput from './ForgivingInput';
++import StickyFooter from './StickyFooter';
++import BudgetCalculator from './BudgetCalculator';
++import SmartAdPlanner from './SmartAdPlanner';
++import DomainSearch from './DomainSearch';
++import CompetitorAnalysis from './CompetitorAnalysis';
++import PersonaSelector from './PersonaSelector';
++import '../mobile-styles.css';
++
++const UniversalInputsScreen = ({ onNext, onBack, serviceType }) => {
++  // State matches the questions in your flow-spec.json
++  const [formData, setFormData] = useState({
++    market: '',
++    audience: 'Home Buyers',
++    goal: 'Get Leads',
++    language: 'English',
++    budget: '',
++    siteName: '',
++    competitors: [],
++    persona: 'professional'
++  });
++
++  const handleChange = (key, value) => {
++    setFormData(prev => ({ ...prev, [key]: value }));
++  };
++
++  // Helper to render a styled select box that matches ForgivingInput
++  const renderSelect = (label, field, options) => (
++    <div style={{ marginBottom: '24px' }}>
++      <label style={{ display: 'block', fontSize: '14px', fontWeight: '700', color: 'var(--text-tertiary)', marginBottom: '8px' }}>
++        {label}
++      </label>
++      <div style={{ position: 'relative' }}>
++        <select
++          value={formData[field]}
++          onChange={(e) => handleChange(field, e.target.value)}
++          style={{
++            width: '100%',
++            padding: '16px',
++            fontSize: '16px', /* Prevents iOS zoom */
++            borderRadius: '12px',
++            border: '1px solid var(--border-color)',
++            backgroundColor: 'var(--bg-secondary)',
++            appearance: 'none', /* Removes default OS styling */
++            outline: 'none',
++            color: 'var(--text-primary)'
++          }}
++        >
++          {options.map(opt => (
++            <option key={opt} value={opt}>{opt}</option>
++          ))}
++        </select>
++        {/* Custom Arrow for better UI */}
++        <div style={{ position: 'absolute', right: '16px', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', color: 'var(--text-secondary)', fontSize: '12px' }}>
++          ▼
++        </div>
++      </div>
++    </div>
++  );
++
++  // Dynamic Title based on Service
++  const getTitle = () => {
++    switch(serviceType) {
++      case 'website': return 'Website Details';
++      case 'googleAds': return 'Google Ads Setup';
++      case 'metaLeadGen': return 'Meta Campaign';
++      case 'smsCampaign': return 'SMS Blast Config';
++      default: return 'Quick Details';
++    }
++  };
++
++  return (
++    <div className="screen-container" style={{ padding: '24px', paddingBottom: '100px' }}>
++      <div style={{ display: 'flex', alignItems: 'center', marginBottom: '12px' }}>
++        <button 
++          onClick={onBack}
++          style={{ 
++            background: 'none', 
++            border: 'none', 
++            fontSize: '24px', 
++            marginRight: '16px', 
++            cursor: 'pointer', 
++            padding: 0,
++            color: 'var(--text-tertiary)'
++          }}
++        >
++          ←
++        </button>
++        <h1 className="screen-title" style={{ marginBottom: 0 }}>{getTitle()}</h1>
++      </div>
++      <p style={{ color: 'var(--text-secondary)', marginBottom: '32px', fontSize: '16px', lineHeight: '1.5' }}>
++        Help us write your content.
++      </p>
++
++      {/* 1. Market Input (Text) */}
++      <ForgivingInput 
++        label="Target City/Area"
++        placeholder="e.g. Downtown Dubai"
++        helperText="Where is the property located?"
++        value={formData.market}
++        onChange={(e) => handleChange('market', e.target.value)}
++      />
++
++      {/* Conditional Fields based on Service Type */}
++      {serviceType === 'website' && (
++        <>
++          <ForgivingInput 
++            label="Website Name"
++            placeholder="e.g. Luxury Living Dubai"
++            value={formData.siteName}
++            onChange={(e) => handleChange('siteName', e.target.value)}
++          />
++          <DomainSearch onSelect={(domain) => handleChange('domain', domain)} />
++        </>
++      )}
++
++      {(serviceType === 'website' || serviceType === 'aiMarketExpert') && (
++        <CompetitorAnalysis 
++          competitors={formData.competitors}
++          onUpdate={(list) => handleChange('competitors', list)}
++        />
++      )}
++
++      {serviceType === 'googleAds' && (
++        <SmartAdPlanner 
++          market={formData.market}
++          budget={formData.budget}
++          onBudgetChange={(e) => handleChange('budget', e.target.value)}
++        />
++      )}
++
++      {serviceType === 'metaLeadGen' && (
++        <BudgetCalculator 
++          value={formData.budget}
++          onChange={(e) => handleChange('budget', e.target.value)}
++          platform="metaLeadGen"
++        />
++      )}
++
++      {/* 2. Audience (Select) */}
++      {renderSelect("Who are you targeting?", "audience", ["Home Buyers", "Investors/B2B"])}
++
++      {/* 3. Goal (Select) */}
++      {renderSelect("Main Goal", "goal", ["Get Leads", "Get Calls", "WhatsApp Chats", "Bookings", "File Downloads"])}
++
++      {/* 4. Language (Select) */}
++      {renderSelect("Language", "language", ["English", "Arabic", "Both"])}
++
++      {/* 5. Persona Selector */}
++      <PersonaSelector 
++        selectedPersona={formData.persona} 
++        onSelect={(p) => handleChange('persona', p)} 
++      />
++
++      {/* Sticky Footer - Only enabled if they typed a market */}
++      <StickyFooter 
++        label="Generate Blueprint" 
++        onClick={() => onNext(formData)}
++        disabled={!formData.market || formData.market.length < 2}
++      />
++    </div>
++  );
++};
++
++export default UniversalInputsScreen;
+\ No newline at end of file
+diff --git a/flow-spec.json b/flow-spec.json
+index 58025c4..1353752 100644
+--- a/flow-spec.json
++++ b/flow-spec.json
+@@ -4,33 +4,33 @@
+   "states": {
+     "intentSelection": {
+       "type": "CHOICE_SCREEN",
+-      "title": "What do you want to do?",
++      "title": "Start Here",
+       "options": [
+-        { "id": "website", "label": "Website", "nextState": "website_audienceGate" },
+-        { "id": "smsCampaign", "label": "SMS Campaign", "nextState": "universalPath_minimumInputs" },
+-        { "id": "aiMarketExpert", "label": "AI Market Expert", "nextState": "universalPath_minimumInputs" },
+-        { "id": "emailCampaign", "label": "Email Campaign", "nextState": "universalPath_minimumInputs" },
+-        { "id": "googleAds", "label": "Google Ads", "nextState": "googleAds_preCheck" },
+-        { "id": "metaLeadGen", "label": "Meta Lead Generation", "nextState": "metaLeadGen_preCheck" },
+-        { "id": "fullMarketData", "label": "Full Market Data", "nextState": "universalPath_minimumInputs" }
++        { "id": "website", "label": "Build a Website", "nextState": "website_audienceGate" },
++        { "id": "smsCampaign", "label": "Send SMS Blast", "nextState": "universalPath_minimumInputs" },
++        { "id": "aiMarketExpert", "label": "Ask AI Expert", "nextState": "universalPath_minimumInputs" },
++        { "id": "emailCampaign", "label": "Send Emails", "nextState": "universalPath_minimumInputs" },
++        { "id": "googleAds", "label": "Run Google Ads", "nextState": "googleAds_preCheck" },
++        { "id": "metaLeadGen", "label": "Get FB/Insta Leads", "nextState": "metaLeadGen_preCheck" },
++        { "id": "fullMarketData", "label": "Get Market Data", "nextState": "universalPath_minimumInputs" }
+       ]
+     },
+ 
+     "// ---------------- Website Path ---------------- //": {},
+     "website_audienceGate": {
+       "type": "CHOICE_SCREEN",
+-      "title": "Who is this website for?",
++      "title": "Your Audience",
+       "options": [
+-        { "id": "broker", "label": "Broker", "nextState": "website_showBlueprints", "context": { "audience": "broker" } },
+-        { "id": "developer", "label": "Developer", "nextState": "website_showBlueprints", "context": { "audience": "developer" } },
+-        { "id": "individual", "label": "Individual", "nextState": "website_showBlueprints", "context": { "audience": "individual" } },
++        { "id": "broker", "label": "Brokerage", "nextState": "website_showBlueprints", "context": { "audience": "broker" } },
++        { "id": "developer", "label": "Property Developer", "nextState": "website_showBlueprints", "context": { "audience": "developer" } },
++        { "id": "individual", "label": "Myself (Agent)", "nextState": "website_showBlueprints", "context": { "audience": "individual" } },
+         { "id": "marketing", "label": "Marketing Agency", "nextState": "website_showBlueprints", "context": { "audience": "marketing" } }
+       ]
+     },
+     "website_showBlueprints": {
+       "type": "BLUEPRINT_SELECTION_SCREEN",
+-      "title": "Choose a Blueprint",
+-      "description": "Select a pre-defined blueprint for your audience, or describe your own vision.",
++      "title": "Select Strategy",
++      "description": "Choose a structure that fits your business model.",
+       "getBlueprintPack": {
+         "fromContext": "audience" 
+       },
+@@ -45,8 +45,8 @@
+     },
+     "website_templateLibrary": {
+       "type": "TEMPLATE_LIBRARY_SCREEN",
+-      "title": "Template Library",
+-      "description": "Pick a template to open directly in the builder.",
++      "title": "Select Design",
++      "description": "Choose a design to start with.",
+       "filters": [
+         { "id": "audience", "label": "Audience", "options": ["Broker", "Developer", "Individual", "Marketing"] },
+         { "id": "goal", "label": "Goal", "options": ["Leads", "WhatsApp", "Booking", "Download"] },
+@@ -64,12 +64,12 @@
+       "type": "BUILDER_SCREEN",
+       "primaryCtaRule": true,
+       "sectionStore": {
+-        "hero": { "label": "Hero Blocks", "variants": ["Image BG", "Video BG", "Minimal"] },
+-        "proof": { "label": "Proof Blocks", "variants": ["Reviews", "Stats", "Logos"] },
+-        "offer": { "label": "Offer Blocks", "variants": ["Payment Plan", "Packages", "Features"] },
+-        "tools": { "label": "Tools Blocks", "variants": ["ROI Calculator", "Valuation Request"] },
+-        "contact": { "label": "Contact Blocks", "variants": ["WhatsApp", "Form", "Booking"] },
+-        "compliance": { "label": "Compliance Blocks", "autoInsertByMarket": true }
++        "hero": { "label": "Top Section", "variants": ["Image BG", "Video BG", "Minimal"] },
++        "proof": { "label": "Social Proof", "variants": ["Reviews", "Stats", "Logos"] },
++        "offer": { "label": "The Offer", "variants": ["Payment Plan", "Packages", "Features"] },
++        "tools": { "label": "Calculators", "variants": ["ROI Calculator", "Valuation Request"] },
++        "contact": { "label": "Contact Forms", "variants": ["WhatsApp", "Form", "Booking"] },
++        "compliance": { "label": "Legal/Footer", "autoInsertByMarket": true }
+       },
+       "aiActions": [
+         "Rewrite for luxury / direct / formal", "Shorten", "Add proof", "Make bilingual", "Add WhatsApp CTA", "Add SEO-friendly headings + schema"
+@@ -82,7 +82,7 @@
+     },
+     "website_finished": {
+         "type": "FINAL_OUTPUT_SCREEN",
+-        "title": "Your Website is Live!",
++        "title": "You're Live!",
+         "outputs": [
+             { "type": "URL", "label": "Published URL" },
+             { "type": "TRACKING_SETUP", "label": "Tracking Setup", "details": "Meta Pixel, GA4, and conversion events have been configured." }
+@@ -99,38 +99,147 @@
+     "// ---------------- Cross-Path Linking States ---------------- //": {},
+     "metaLeadGen_preCheck": {
+       "type": "CHOICE_SCREEN",
+-      "title": "Do you have a landing page for your Meta campaign?",
++--- /Users/mahmou
++--- /Users/mahmoudezz/entersite-main-2/flow-spec.json
+++++ /Users/mahmoudezz/entersite-main-2/flow-spec.json
++@@ -102,7 +102,7 @@
++     "metaLeadGen_preCheck": {
++--- /Users/mahmoudezz/entersite-main-2/flow-spec.json
+++++ /Users/mahmoudezz/entersite-main-2/flow-spec.json
++@@ -102,7 +102,7 @@
++     "metaLeadGen_preCheck": {
++       "type": "CHOICE_SCREEN",
++-      "title": "Do you have a website link for this ad?",
+++      "title": "Do you have a link?",
++       "options": [
++         { "id": "yes", "label": "Yes, I have
++--- /Users/mahmoudezz/entersite-main-2/flow-spec.json
+++++ /Users/mahmoudezz/entersite-main-2/flow-spec.json
++@@ -102,7 +102,7 @@
++     "metaLeadGen_preCheck": {
++       "type": "CHOICE_SCREEN",
++-      "title": "Do you have a website link for this ad?",
+++      "title": "Do you have a link?",
++       "options": [
++         { "id": "yes", "label": "Yes, I have a link", "nextState": "universalPath_minimumInputs" },
++@@ -111,7 +111,7 @@
++     "googleAds_preCheck": {
++       "type": "CHOICE_SCREEN",
++-      "title": "Do you have a website link
++--- /Users/mahmoudezz/entersite-main-2/flow-spec.json
+++++ /Users/mahmoudezz/entersite-main-2/flow-spec.json
++@@ -102,7 +102,7 @@
++     "metaLeadGen_preCheck": {
++       "type": "CHOICE_SCREEN",
++-      "title": "Do you have a website link for this ad?",
+++      "title": "Do you have a link?",
++       "options": [
++         { "id": "yes", "label": "Yes, I have a link", "nextState": "universalPath_minimumInputs" },
++@@ -111,7 +111,7 @@
++     "googleAds_preCheck": {
++       "type": "CHOICE_SCREEN",
++-      "title": "Do you have a website link for this ad?",
+++      "title": "Do you have a link?",
++       "options": [
++         { "id": "yes", "label": "Yes, I have a link", "nextState": "universalPath_minimumInputs" },
++@@ -124,7 +
++--- /Users/mahmoudezz/entersite-main-2/flow-spec.json
+++++ /Users/mahmoudezz/entersite-main-2/flow-spec.json
++@@ -102,7 +102,7 @@
++     "metaLeadGen_preCheck": {
++       "type": "CHOICE_SCREEN",
++-      "title": "Do you have a website link for this ad?",
+++      "title": "Do you have a link?",
++       "options": [
++         { "id": "yes", "label": "Yes, I have a link", "nextState": "universalPath_minimumInputs" },
++@@ -111,7 +111,7 @@
++     "googleAds_preCheck": {
++       "type": "CHOICE_SCREEN",
++-      "title": "Do you have a website link for this ad?",
+++      "title": "Do you have a link?",
++       "options": [
++         { "id": "yes", "label": "Yes, I have a link", "nextState": "universalPath_minimumInputs" },
++@@ -124,7 +124,6 @@
++       "description": "Help us write your content.",
++       "questions": [
++         { "id": "market", "label": "Target City/Area", "type": "text" },
++-        { "id": "industry", "label": "Industry
++--- /Users/mahmoudezz/entersite-main-2/flow-spec.json
+++++ /Users/mahmoudezz/entersite-main-2/flow-spec.json
++@@ -102,7 +102,7 @@
++     "metaLeadGen_preCheck": {
++       "type": "CHOICE_SCREEN",
++-      "title": "Do you have a website link for this ad?",
+++      "title": "Do you have a link?",
++       "options": [
++         { "id": "yes", "label": "Yes, I have a link", "nextState": "universalPath_minimumInputs" },
++@@ -111,7 +111,7 @@
++     "googleAds_preCheck": {
++       "type": "CHOICE_SCREEN",
++-      "title": "Do you have a website link for this ad?",
+++      "title": "Do you have a link?",
++       "options": [
++         { "id": "yes", "label": "Yes, I have a link", "nextState": "universalPath_minimumInputs" },
++@@ -124,7 +124,6 @@
++       "description": "Help us write your content.",
++       "questions": [
++         { "id": "market", "label": "Target City/Area", "type": "text" },
++-        { "id": "industry", "label": "Industry", "type": "text", "default": "Real Estate" },
++         { "id": "audience", "label": "Who are you targeting?", "type": "select", "options": ["Home Buyers", "Investors/B2B"] },
++         { "id": "goal", "
++--- /Users/mahmoudezz/entersite-main-2/flow-spec.json
+++++ /Users/mahmoudezz/entersite-main-2/flow-spec.json
++@@ -102,7 +102,7 @@
++     "metaLeadGen_preCheck": {
++       "type": "CHOICE_SCREEN",
++-      "title": "Do you have a website link for this ad?",
+++      "title": "Do you have a link?",
++       "options": [
++         { "id": "yes", "label": "Yes, I have a link", "nextState": "universalPath_minimumInputs" },
++@@ -111,7 +111,7 @@
++     "googleAds_preCheck": {
++       "type": "CHOICE_SCREEN",
++-      "title": "Do you have a website link for this ad?",
+++      "title": "Do you have a link?",
++       "options": [
++         { "id": "yes", "label": "Yes, I have a link", "nextState": "universalPath_minimumInputs" },
++@@ -124,7 +124,6 @@
++       "description": "Help us write your content.",
++       "questions": [
++         { "id": "market", "label": "Target City/Area", "type": "text" },
++         { "id": "audience", "label": "Who are you targeting?", "type": "select", "options": ["Home Buyers", "Investors/B2B"] },
++         { "id": "goal", "label": "Main Goal", "type": "select", "options": ["Get Leads", "Get Calls", "WhatsApp Chats", "Bookings", "File Downloads"] },
++      "title": "Do you have a link?",
+       "options": [
+-        { "id": "yes", "label": "Yes, I have a URL", "nextState": "universalPath_minimumInputs" },
+-        { "id": "no", "label": "No, I need to build one", "nextState": "website_audienceGate" }
++        { "id": "yes", "label": "Yes, I have a link", "nextState": "universalPath_minimumInputs" },
++        { "id": "no", "label": "No, let's build one", "nextState": "website_audienceGate" }
+       ]
+     },
+     "googleAds_preCheck": {
+       "type": "CHOICE_SCREEN",
+-      "title": "Do you have a landing page for your Google Ads?",
++      "title": "Do you have a link?",
+       "options": [
+-        { "id": "yes", "label": "Yes, I have a URL", "nextState": "universalPath_minimumInputs" },
+-        { "id": "no", "label": "No, I need to build one", "nextState": "website_audienceGate" }
++        { "id": "yes", "label": "Yes, I have a link", "nextState": "universalPath_minimumInputs" },
++        { "id": "no", "label": "No, let's build one", "nextState": "website_audienceGate" }
+       ]
+     },
+ 
+     "// ---------------- Universal Path Engine ---------------- //": {},
+     "universalPath_minimumInputs": {
+       "type": "INPUT_SCREEN",
+-      "title": "Minimum Inputs",
+-      "description": "Answer a few questions to generate your blueprint.",
++      "title": "Quick Details",
++      "description": "Help us write your content.",
+       "questions": [
+-        { "id": "market", "label": "Market / Location", "type": "text" },
+-        { "id": "industry", "label": "Industry", "type": "text", "default": "Real Estate" },
+-        { "id": "audience", "label": "Audience", "type": "select", "options": ["B2C", "B2B"] },
+-        { "id": "goal", "label": "Goal", "type": "select", "options": ["Leads", "Calls", "WhatsApp", "Bookings", "Downloads"] },
+-        { "id": "language", "label": "Language", "type": "select", "options": ["EN", "AR", "Both"] }
++        { "id": "market", "label": "Target City/Area", "type": "text" },
++        { "id": "audience", "label": "Who are you targeting?", "type": "select", "options": ["Home Buyers", "Investors/B2B"] },
++        { "id": "goal", "label": "Main Goal", "type": "select", "options": ["Get Leads", "Get Calls", "WhatsApp Chats", "Bookings", "File Downloads"] },
++        { "id": "language", "label": "Language", "type": "select", "options": ["English", "Arabic", "Both"] }
+       ],
+       "nextState": "universalPath_generateOutput"
+     },
+     "universalPath_generateOutput": {
+       "type": "GENERATION_SCREEN",
+-      "title": "Generating Your Blueprint...",
++      "title": "Working on it...",
+       "outputs": [
+         "Blueprint (steps + copy + assets + targeting)",
+         "Execution checklist",
+@@ -141,11 +250,11 @@
+     },
+     "universalPath_launchExport": {
+       "type": "LAUNCH_EXPORT_SCREEN",
+-      "title": "Launch or Export",
++      "title": "Ready!",
+       "options": [
+-        { "id": "export", "label": "Export Files", "details": "copy / creatives / CSV / audiences" },
+-        { "id": "pushLive", "label": "Push Live", "details": "if connected" },
+-        { "id": "startTracking", "label": "Start Tracking", "details": "view dashboard" }
++        { "id": "export", "label": "Download Files", "details": "Get your copy & images" },
++        { "id": "pushLive", "label": "Go Live Now", "details": "Publish immediately" },
++        { "id": "startTracking", "label": "View Results", "details": "Go to dashboard" }
+       ]
+     }
+   },
+diff --git a/mobile-styles.css b/mobile-styles.css
+new file mode 100644
+index 0000000..d5c0112
+--- /dev/null
++++ b/mobile-styles.css
+@@ -0,0 +1,354 @@
++/* Color Variables & Dark Mode */
++:root {
++  --bg-primary: #ffffff;
++  --bg-secondary: #F9FAFB;
++  --bg-tertiary: #F3F4F6;
++  --bg-accent: #EFF6FF;
++  --text-primary: #111827;
++  --text-secondary: #6B7280;
++  --text-tertiary: #374151;
++  --border-color: #E5E7EB;
++  --primary-color: #007AFF;
++  --white: #ffffff;
++  --danger: #EF4444;
++}
++
++[data-theme='dark'] {
++  --bg-primary: #111827;
++  --bg-secondary: #1F2937;
++  --bg-tertiary: #374151;
++  --bg-accent: #374151;
++  --text-primary: #F9FAFB;
++  --text-secondary: #9CA3AF;
++  --text-tertiary: #D1D5DB;
++  --border-color: #374151;
++  --primary-color: #3B82F6;
++}
++
++/* Make the primary action unmissable and reachable */
++.sticky-footer-action {
++  position: fixed;
++  bottom: 0;
++  left: 0;
++  width: 100%;
++  padding: 16px 24px; /* Large touch area */
++  background-color: var(--bg-primary);
++  box-shadow: 0 -4px 12px rgba(0,0,0,0.05);
++  z-index: 1000;
++  display: flex;
++  justify-content: center;
++}
++
++.primary-button {
++  width: 100%;
++  height: 56px; /* Minimum 44px for mobile, 56px is better */
++  border-radius: 12px; /* Modern, friendly look */
++  background-color: var(--primary-color); /* Your Brand Color */
++  color: var(--white);
++  font-size: 18px;
++  font-weight: 600;
++  border: none;
++  /* Remove delay on tap for mobile */
++  touch-action: manipulation; 
++}
++
++/* Fix "Huge" titles - Mobile Typography */
++.screen-title {
++  font-size: 24px !important; /* Reduced from default */
++  font-weight: 700;
++  margin-bottom: 12px;
++  line-height: 1.3;
++}
++
++/* Simple Spinner Animation */
++.spinner {
++  width: 50px;
++  height: 50px;
++  border: 5px solid var(--border-color); /* Light grey background */
++  border-top: 5px solid var(--primary-color); /* Blue foreground */
++  border-radius: 50%;
++  animation: spin 1s linear infinite;
++}
++
++@keyframes spin {
++  0% { transform: rotate(0deg); }
++  100% { transform: rotate(360deg); }
++}
++
++/* Modal Styles */
++.modal-overlay {
++  position: fixed;
++  top: 0;
++  left: 0;
++  width: 100%;
++  height: 100%;
++  background-color: rgba(0, 0, 0, 0.6);
++  z-index: 2000;
++  display: flex;
++  align-items: center;
++  justify-content: center;
++  padding: 20px;
++  backdrop-filter: blur(4px);
++}
++
++.modal-content {
++  background-color: var(--bg-primary);
++  width: 100%;
++  max-width: 400px;
++  border-radius: 20px;
++  overflow: hidden;
++  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
++  animation: slideUp 0.3s ease-out;
++}
++
++@keyframes slideUp {
++  from { transform: translateY(20px); opacity: 0; }
++  to { transform: translateY(0); opacity: 1; }
++}
++
++/* Toast Notification */
++.toast-container {
++  position: fixed;
++  top: 20px;
++  left: 50%;
++  transform: translateX(-50%);
++  z-index: 3000;
++  width: 90%;
++  max-width: 400px;
++  animation: slideDown 0.4s ease-out;
++}
++
++.toast {
++  background-color: #1F2937; /* Dark Grey */
++  color: white;
++  padding: 12px 20px;
++  border-radius: 50px;
++  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
++  display: flex;
++  align-items: center;
++  justify-content: center;
++  font-size: 14px;
++  font-weight: 500;
++}
++
++@keyframes slideDown {
++  from { transform: translate(-50%, -100%); opacity: 0; }
++  to { transform: translate(-50%, 0); opacity: 1; }
++}
++
++/* Progress Bar */
++.progress-container {
++  width: 100%;
++  height: 4px;
++  background-color: var(--bg-tertiary);
++  position: sticky;
++  top: 0;
++  z-index: 900;
++}
++
++.progress-fill {
++  height: 100%;
++  background-color: var(--primary-color);
++  transition: width 0.5s ease-in-out;
++}
++
++/* Confetti Animation */
++.confetti {
++  position: fixed;
++  width: 8px;
++  height: 16px;
++  top: -20px;
++  z-index: 2000;
++}
++
++@keyframes confetti-fall {
++  0% { transform: translateY(0) rotate(0deg); opacity: 1; }
++  100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
++}
++
++/* Dashboard Stats */
++.stats-grid {
++  display: grid;
++  grid-template-columns: 1fr 1fr;
++  gap: 16px;
++  margin-bottom: 24px;
++}
++
++.stat-card {
++  background-color: var(--bg-secondary);
++  border: 1px solid var(--border-color);
++  border-radius: 16px;
++  padding: 16px;
++  display: flex;
++  flex-direction: column;
++  align-items: center;
++  text-align: center;
++}
++
++.stat-label {
++  font-size: 12px;
++  color: var(--text-secondary);
++  text-transform: uppercase;
++  font-weight: 700;
++  margin-bottom: 4px;
++}
++
++.stat-value {
++  font-size: 24px;
++  font-weight: 800;
++  color: var(--text-primary);
++}
++
++/* Swipe to Delete */
++.project-item-wrapper {
++  position: relative;
++  overflow: hidden;
++  border-radius: 16px;
++}
++
++.delete-action {
++  position: absolute;
++  top: 0;
++  right: 0;
++  bottom: 0;
++  width: 80px;
++  background-color: var(--danger);
++  display: flex;
++  align-items: center;
++  justify-content: center;
++  color: var(--white);
++  font-size: 24px;
++  z-index: 1;
++  border-top-right-radius: 16px;
++  border-bottom-right-radius: 16px;
++  cursor: pointer;
++}
++
++/* Lead List Items */
++.lead-item {
++  padding: 16px 0;
++  border-bottom: 1px solid var(--bg-tertiary);
++  display: flex;
++  justify-content: space-between;
++  align-items: center;
++}
++
++.lead-info {
++  display: flex;
++  flex-direction: column;
++}
++
++.lead-name {
++  font-weight: 600;
++  font-size: 15px;
++  color: var(--text-primary);
++  margin-bottom: 4px;
++}
++
++.lead-time {
++  font-size: 12px;
++  color: var(--text-secondary);
++}
++
++.lead-action {
++  background-color: var(--bg-accent);
++  color: var(--primary-color);
++  padding: 8px 16px;
++  border-radius: 20px;
++  font-size: 13px;
++  font-weight: 600;
++  text-decoration: none;
++}
++
++/* Confetti Animation */
++.confetti {
++  position: fixed;
++  width: 8px;
++  height: 16px;
++  top: -20px;
++  z-index: 2000;
++}
++
++@keyframes confetti-fall {
++  0% { transform: translateY(0) rotate(0deg); opacity: 1; }
++  100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
++}
++
++/* Smart Ad Planner */
++.smart-planner-container {
++  background-color: var(--bg-accent);
++  border: 1px solid var(--primary-color);
++  border-radius: 16px;
++  padding: 20px;
++  margin-bottom: 24px;
++  animation: slideUp 0.4s ease-out;
++}
++
++.trend-badge {
++  display: inline-flex;
++  align-items: center;
++  background-color: #DCFCE7;
++  color: #166534;
++  padding: 4px 12px;
++  border-radius: 20px;
++  font-size: 12px;
++  font-weight: 700;
++  margin-bottom: 12px;
++}
++
++.keyword-tag {
++  background-color: var(--white);
++  border: 1px solid var(--border-color);
++  padding: 6px 12px;
++  border-radius: 8px;
++  font-size: 13px;
++  color: var(--text-primary);
++}
++
++/* Smart Report */
++.smart-report-container {
++  margin-bottom: 24px;
++}
++
++.report-grid {
++  display: grid;
++  grid-template-columns: 1fr 1fr;
++  gap: 12px;
++}
++
++/* Payment Options */
++.payment-method-card {
++  display: flex;
++  align-items: center;
++  justify-content: space-between;
++  padding: 20px;
++  border: 1px solid var(--border-color);
++  border-radius: 16px;
++  margin-bottom: 12px;
++  background-color: var(--bg-secondary);
++  cursor: pointer;
++  transition: all 0.2s;
++}
++
++.payment-method-card.selected {
++  border-color: var(--primary-color);
++  background-color: var(--bg-accent);
++  box-shadow: 0 0 0 1px var(--primary-color);
++}
++
++.radio-circle {
++  width: 20px; 
++  height: 20px; 
++  border-radius: 50%; 
++  border: 2px solid var(--border-color); 
++  display: flex; 
++  align-items: center; 
++  justify-content: center;
++}
++
++.radio-dot {
++  width: 10px; 
++  height: 10px; 
++  border-radius: 50%; 
++  background-color: var(--primary-color);
++}
+\ No newline at end of file
+diff --git a/next-env.d.ts b/next-env.d.ts
+index 9edff1c..c4b7818 100644
+--- a/next-env.d.ts
++++ b/next-env.d.ts
+@@ -1,6 +1,6 @@
+ /// <reference types="next" />
+ /// <reference types="next/image-types/global" />
+-import "./.next/types/routes.d.ts";
++import "./.next/dev/types/routes.d.ts";
+ 
+ // NOTE: This file should not be edited
+ // see https://nextjs.org/docs/app/api-reference/config/typescript for more information.

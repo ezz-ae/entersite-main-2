@@ -1,5 +1,5 @@
 import React from 'react';
-import './mobile-styles.css';
+
 
 const BudgetCalculator = ({ value, onChange, platform }) => {
   const budget = parseFloat(value) || 0;

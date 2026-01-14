@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import StickyFooter from './StickyFooter';
 import Confetti from './Confetti';
 import ShareModal from './ShareModal';
-import './mobile-styles.css';
+
 
 const SuccessScreen = ({ publishedUrl, onDashboardClick, onNextStepClick }) => {
   const [showShare, setShowShare] = useState(false);
