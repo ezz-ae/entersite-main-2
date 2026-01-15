@@ -15,10 +15,19 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onBack, onSave, theme, 
   const { user, logout } = useAuth();
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showChangePassword, setShowChangePassword] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [profile, setProfile] = useState({
     name: user?.name || 'Agent Name',
     email: user?.email || 'agent@example.com',
     phone: user?.phone || '+971 50 000 0000'
+  });
+
+  const [errors, setErrors] = useState({
+    email: '',
+    phone: ''
   });
 
   const [notifications, setNotifications] = useState<Record<string, boolean>>({
@@ -47,6 +56,50 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onBack, onSave, theme, 
   const confirmDeleteAccount = () => {
     logout();
     setShowDeleteConfirm(false);
+  };
+
+  const handleChangePassword = () => {
+    if (newPassword !== confirmPassword) {
+      alert("New passwords do not match!");
+      return;
+    }
+    // Simulate password change logic here
+    alert("Password changed successfully!");
+    setShowChangePassword(false);
+    // Reset fields
+    setCurrentPassword(''); setNewPassword(''); setConfirmPassword('');
+  };
+
+  const validateEmail = (email: string) => {
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return re.test(email);
+  };
+
+  const validatePhone = (phone: string) => {
+    // Basic phone validation: allows +, spaces, dashes, and digits, min length 7
+    const re = /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/;
+    return re.test(phone);
+  };
+
+  const handleSave = () => {
+    let valid = true;
+    const newErrors = { email: '', phone: '' };
+
+    if (!validateEmail(profile.email)) {
+      newErrors.email = 'Please enter a valid email address.';
+      valid = false;
+    }
+
+    if (!validatePhone(profile.phone)) {
+      newErrors.phone = 'Please enter a valid phone number.';
+      valid = false;
+    }
+
+    setErrors(newErrors);
+
+    if (valid) {
+      onSave({ profile, notifications });
+    }
   };
 
   return (
@@ -88,13 +141,18 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onBack, onSave, theme, 
         label="Email Address" 
         value={profile.email} 
         onChange={(e) => setProfile({...profile, email: e.target.value})} 
+        style={errors.email ? { borderColor: 'var(--danger)' } : {}}
       />
+      {errors.email && <div style={{ color: 'var(--danger)', fontSize: '12px', marginTop: '-12px', marginBottom: '12px' }}>{errors.email}</div>}
+      
       <ForgivingInput 
         label="Phone Number" 
         type="tel"
         value={profile.phone} 
         onChange={(e) => setProfile({...profile, phone: e.target.value})} 
+        style={errors.phone ? { borderColor: 'var(--danger)' } : {}}
       />
+      {errors.phone && <div style={{ color: 'var(--danger)', fontSize: '12px', marginTop: '-12px', marginBottom: '12px' }}>{errors.phone}</div>}
       </div>
 
       {/* Appearance Section */}
@@ -106,6 +164,21 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onBack, onSave, theme, 
         <ToggleRow label="Email Notifications" checked={notifications.email} onToggle={() => handleToggle('email')} />
         <ToggleRow label="Push Notifications" checked={notifications.push} onToggle={() => handleToggle('push')} />
         <ToggleRow label="SMS Alerts" checked={notifications.sms} onToggle={() => handleToggle('sms')} />
+      </div>
+
+      {/* Security Section */}
+      <div className="settings-section-title">Security</div>
+      <div style={{ backgroundColor: 'var(--bg-primary)', padding: '0 16px', borderRadius: '12px', border: '1px solid var(--border-color)' }}>
+        <div 
+          onClick={() => setShowChangePassword(true)}
+          style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 0', cursor: 'pointer' }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+            <div className="settings-icon-container">🔒</div>
+            <span style={{ fontSize: '16px', fontWeight: '500', color: 'var(--text-primary)' }}>Change Password</span>
+          </div>
+          <span style={{ color: 'var(--text-tertiary)' }}>›</span>
+        </div>
       </div>
 
       {/* Account Actions */}
@@ -183,7 +256,49 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onBack, onSave, theme, 
         </div>
       )}
 
-      <StickyFooter label="Save Changes" onClick={() => onSave({ profile, notifications })} />
+      {showChangePassword && (
+        <div className="modal-overlay" onClick={() => setShowChangePassword(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{ padding: '24px' }}>
+            <h3 style={{ margin: '0 0 16px 0', fontSize: '18px', color: 'var(--text-primary)' }}>Change Password</h3>
+            
+            <ForgivingInput 
+              label="Current Password" 
+              type="password"
+              value={currentPassword} 
+              onChange={(e) => setCurrentPassword(e.target.value)} 
+            />
+            
+            <ForgivingInput 
+              label="New Password" 
+              type="password"
+              value={newPassword} 
+              onChange={(e) => setNewPassword(e.target.value)} 
+            />
+
+            <ForgivingInput 
+              label="Confirm New Password" 
+              type="password"
+              value={confirmPassword} 
+              onChange={(e) => setConfirmPassword(e.target.value)} 
+            />
+
+            <div style={{ display: 'flex', gap: '12px', marginTop: '8px' }}>
+              <button onClick={() => setShowChangePassword(false)} style={{ flex: 1, padding: '12px', borderRadius: '12px', border: '1px solid var(--border-color)', backgroundColor: 'var(--bg-primary)', color: 'var(--text-primary)', fontWeight: 600, cursor: 'pointer' }}>
+                Cancel
+              </button>
+              <button 
+                onClick={handleChangePassword} 
+                style={{ flex: 1, padding: '12px', borderRadius: '12px', border: 'none', backgroundColor: 'var(--primary-color)', color: '#fff', fontWeight: 600, cursor: 'pointer', opacity: (!currentPassword || !newPassword || !confirmPassword) ? 0.5 : 1 }}
+                disabled={!currentPassword || !newPassword || !confirmPassword}
+              >
+                Update
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <StickyFooter label="Save Changes" onClick={handleSave} />
     </div>
   );
 };

@@ -31,6 +31,7 @@ import MortgageCalculatorScreen from './MortgageCalculatorScreen';
 import CommissionCalculatorScreen from './CommissionCalculatorScreen';
 import MarketTrendsScreen from './MarketTrendsScreen';
 import CampaignBuilderScreen from './CampaignBuilderScreen';
+import CreateCampaignWizard from './CreateCampaignWizard';
 import ConversationViewScreen from './ConversationViewScreen';
 
 const AppContent: React.FC = () =>
@@ -166,7 +167,13 @@ const AppContent: React.FC = () =>
         );
 
       case 'googleAdsDashboard':
-        return <GoogleAdsDashboard onBack={() => navigateTo('dashboard')} />;
+        return <GoogleAdsDashboard onBack={() => navigateTo('dashboard')} onCreate={() => navigateTo('createCampaignWizard')} />;
+
+      case 'createCampaignWizard':
+        return <CreateCampaignWizard onBack={() => navigateTo('googleAdsDashboard')} onLaunch={(data) => {
+          console.log('Launching campaign:', data);
+          navigateTo('success');
+        }} />;
 
       case 'chatAgentDashboard':
         return (

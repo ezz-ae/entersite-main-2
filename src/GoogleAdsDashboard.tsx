@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import StickyFooter from './StickyFooter';
 import './mobile-styles.css';
 
 interface Stat {
@@ -13,24 +14,30 @@ interface Campaign {
   clicks: number;
   ctr: string;
   cost: string;
+  conversions: number;
+  cpa: string;
   status: 'Active' | 'Paused';
 }
 
 interface GoogleAdsDashboardProps {
   onBack: () => void;
+  onCreate?: () => void;
 }
 
-const GoogleAdsDashboard: React.FC<GoogleAdsDashboardProps> = ({ onBack }) => {
+const GoogleAdsDashboard: React.FC<GoogleAdsDashboardProps> = ({ onBack, onCreate }) => {
   const [stats] = useState<Stat[]>([
     { label: 'Impressions', value: '12.5K', trend: 'up' },
     { label: 'Clicks', value: '843', trend: 'up' },
     { label: 'Avg CPC', value: '$1.42', trend: 'down' },
+    { label: 'Conversions', value: '42', trend: 'up' },
+    { label: 'Cost / Conv.', value: '$28.50', trend: 'down' },
+    { label: 'Total Cost', value: '$1,240', trend: 'up' },
   ]);
 
   const [campaigns] = useState<Campaign[]>([
-    { id: 1, name: 'Summer Sale Promo', clicks: 450, ctr: '4.2%', cost: '$320', status: 'Active' },
-    { id: 2, name: 'Retargeting - Cart', clicks: 210, ctr: '6.8%', cost: '$180', status: 'Active' },
-    { id: 3, name: 'Brand Awareness', clicks: 183, ctr: '1.5%', cost: '$110', status: 'Paused' },
+    { id: 1, name: 'Summer Sale Promo', clicks: 450, ctr: '4.2%', cost: '$320', conversions: 15, cpa: '$21.33', status: 'Active' },
+    { id: 2, name: 'Retargeting - Cart', clicks: 210, ctr: '6.8%', cost: '$180', conversions: 22, cpa: '$8.18', status: 'Active' },
+    { id: 3, name: 'Brand Awareness', clicks: 183, ctr: '1.5%', cost: '$110', conversions: 5, cpa: '$22.00', status: 'Paused' },
   ]);
 
   return (
@@ -95,6 +102,9 @@ const GoogleAdsDashboard: React.FC<GoogleAdsDashboardProps> = ({ onBack }) => {
                 <div style={styles.campaignMeta}>
                   {campaign.clicks} Clicks • CTR {campaign.ctr}
                 </div>
+                <div style={styles.campaignMeta}>
+                  {campaign.conversions} Conv. • CPA {campaign.cpa}
+                </div>
               </div>
               <div style={{ textAlign: 'right' }}>
                 <div style={styles.cost}>{campaign.cost}</div>
@@ -114,6 +124,8 @@ const GoogleAdsDashboard: React.FC<GoogleAdsDashboardProps> = ({ onBack }) => {
           ))}
         </div>
       </div>
+
+      {onCreate && <StickyFooter label="Create New Campaign" onClick={onCreate} />}
     </div>
   );
 };
