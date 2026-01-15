@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import StickyFooter from './StickyFooter';
 import ForgivingInput from './ForgivingInput';
+import { useAuth } from './AuthContext';
 
 interface SettingsScreenProps {
   onBack: () => void;
@@ -11,10 +12,13 @@ interface SettingsScreenProps {
 }
 
 const SettingsScreen: React.FC<SettingsScreenProps> = ({ onBack, onSave, theme, onToggleTheme, onNavigateTo }) => {
+  const { user, logout } = useAuth();
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [profile, setProfile] = useState({
-    name: 'Agent Name',
-    email: 'agent@example.com',
-    phone: '+971 50 000 0000'
+    name: user?.name || 'Agent Name',
+    email: user?.email || 'agent@example.com',
+    phone: user?.phone || '+971 50 000 0000'
   });
 
   const [notifications, setNotifications] = useState<Record<string, boolean>>({
@@ -25,6 +29,24 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onBack, onSave, theme, 
 
   const handleToggle = (key: string) => {
     setNotifications(prev => ({ ...prev, [key]: !prev[key] }));
+  };
+
+  const handleLogout = () => {
+    setShowLogoutConfirm(true);
+  };
+
+  const confirmLogout = () => {
+    logout();
+    setShowLogoutConfirm(false);
+  };
+
+  const handleDeleteAccount = () => {
+    setShowDeleteConfirm(true);
+  };
+
+  const confirmDeleteAccount = () => {
+    logout();
+    setShowDeleteConfirm(false);
   };
 
   return (
@@ -85,6 +107,81 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onBack, onSave, theme, 
         <ToggleRow label="Push Notifications" checked={notifications.push} onToggle={() => handleToggle('push')} />
         <ToggleRow label="SMS Alerts" checked={notifications.sms} onToggle={() => handleToggle('sms')} />
       </div>
+
+      {/* Account Actions */}
+      <div style={{ marginTop: '32px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+        <button 
+          onClick={handleLogout}
+          style={{
+            width: '100%',
+            padding: '16px',
+            borderRadius: '12px',
+            border: '1px solid var(--border-color)',
+            backgroundColor: 'var(--bg-primary)',
+            color: 'var(--text-primary)',
+            fontWeight: 600,
+            fontSize: '16px',
+            cursor: 'pointer'
+          }}
+        >
+          Logout
+        </button>
+
+        <button 
+          onClick={handleDeleteAccount}
+          style={{
+            width: '100%',
+            padding: '16px',
+            borderRadius: '12px',
+            border: '1px solid var(--danger)',
+            backgroundColor: 'rgba(239, 68, 68, 0.05)',
+            color: 'var(--danger)',
+            fontWeight: 600,
+            fontSize: '16px',
+            cursor: 'pointer'
+          }}
+        >
+          Delete Account
+        </button>
+      </div>
+
+      {showLogoutConfirm && (
+        <div className="modal-overlay" onClick={() => setShowLogoutConfirm(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{ padding: '24px' }}>
+            <h3 style={{ margin: '0 0 12px 0', fontSize: '18px', color: 'var(--text-primary)' }}>Logout?</h3>
+            <p style={{ margin: '0 0 24px 0', color: 'var(--text-secondary)', fontSize: '14px', lineHeight: '1.5' }}>
+              Are you sure you want to log out?
+            </p>
+            <div style={{ display: 'flex', gap: '12px' }}>
+              <button onClick={() => setShowLogoutConfirm(false)} style={{ flex: 1, padding: '12px', borderRadius: '12px', border: '1px solid var(--border-color)', backgroundColor: 'var(--bg-primary)', color: 'var(--text-primary)', fontWeight: 600, cursor: 'pointer' }}>
+                Cancel
+              </button>
+              <button onClick={confirmLogout} style={{ flex: 1, padding: '12px', borderRadius: '12px', border: 'none', backgroundColor: 'var(--danger)', color: '#fff', fontWeight: 600, cursor: 'pointer' }}>
+                Logout
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showDeleteConfirm && (
+        <div className="modal-overlay" onClick={() => setShowDeleteConfirm(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{ padding: '24px' }}>
+            <h3 style={{ margin: '0 0 12px 0', fontSize: '18px', color: 'var(--text-primary)' }}>Delete Account?</h3>
+            <p style={{ margin: '0 0 24px 0', color: 'var(--text-secondary)', fontSize: '14px', lineHeight: '1.5' }}>
+              Are you sure you want to delete your account? This action is permanent and cannot be undone.
+            </p>
+            <div style={{ display: 'flex', gap: '12px' }}>
+              <button onClick={() => setShowDeleteConfirm(false)} style={{ flex: 1, padding: '12px', borderRadius: '12px', border: '1px solid var(--border-color)', backgroundColor: 'var(--bg-primary)', color: 'var(--text-primary)', fontWeight: 600, cursor: 'pointer' }}>
+                Cancel
+              </button>
+              <button onClick={confirmDeleteAccount} style={{ flex: 1, padding: '12px', borderRadius: '12px', border: 'none', backgroundColor: 'var(--danger)', color: '#fff', fontWeight: 600, cursor: 'pointer' }}>
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <StickyFooter label="Save Changes" onClick={() => onSave({ profile, notifications })} />
     </div>
