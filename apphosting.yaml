@@ -1,0 +1,14 @@
+# We recommend that you leave this file in its default state.
+# If you need to customize your build process, we recommend that you use a custom build tool and customize your build script in package.json.
+# For more information, see https://firebase.google.com/docs/hosting/frameworks/configure.
+run:
+  npm ci && npm run build
+
+# We recommend that you leave this file in its default state.
+# If you need to customize your build process, we recommend that you use a custom build tool and customize your build script in package.json.
+# For more information, see https://firebase.google.com/docs/hosting/frameworks/configure.
+
+# The "run" field defines the command that will be executed to build your web app.
+# We've detected that you're using npm, so we've set this to "npm ci && npm run build".
+run:
+  npm ci && npm run build

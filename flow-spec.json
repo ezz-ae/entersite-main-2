@@ -1,0 +1,292 @@
+
+{
+  "startState": "intentSelection",
+  "states": {
+    "intentSelection": {
+      "type": "CHOICE_SCREEN",
+      "title": "Start Here",
+      "options": [
+        { "id": "website", "label": "Build a Website", "nextState": "website_audienceGate" },
+        { "id": "smsCampaign", "label": "Send SMS Blast", "nextState": "universalPath_minimumInputs" },
+        { "id": "aiMarketExpert", "label": "Ask AI Expert", "nextState": "universalPath_minimumInputs" },
+        { "id": "emailCampaign", "label": "Send Emails", "nextState": "universalPath_minimumInputs" },
+        { "id": "googleAds", "label": "Run Google Ads", "nextState": "googleAds_preCheck" },
+        { "id": "metaLeadGen", "label": "Get FB/Insta Leads", "nextState": "metaLeadGen_preCheck" },
+        { "id": "fullMarketData", "label": "Get Market Data", "nextState": "universalPath_minimumInputs" }
+      ]
+    },
+
+    "// ---------------- Website Path ---------------- //": {},
+    "website_audienceGate": {
+      "type": "CHOICE_SCREEN",
+      "title": "Your Audience",
+      "options": [
+        { "id": "broker", "label": "Brokerage", "nextState": "website_showBlueprints", "context": { "audience": "broker" } },
+        { "id": "developer", "label": "Property Developer", "nextState": "website_showBlueprints", "context": { "audience": "developer" } },
+        { "id": "individual", "label": "Myself (Agent)", "nextState": "website_showBlueprints", "context": { "audience": "individual" } },
+        { "id": "marketing", "label": "Marketing Agency", "nextState": "website_showBlueprints", "context": { "audience": "marketing" } }
+      ]
+    },
+    "website_showBlueprints": {
+      "type": "BLUEPRINT_SELECTION_SCREEN",
+      "title": "Select Strategy",
+      "description": "Choose a structure that fits your business model.",
+      "getBlueprintPack": {
+        "fromContext": "audience" 
+      },
+      "actions": {
+        "onSelectBlueprint": {
+          "runEngine": "universalPath_minimumInputs"
+        },
+        "onUseTemplate": {
+          "goToState": "website_templateLibrary"
+        }
+      }
+    },
+    "website_templateLibrary": {
+      "type": "TEMPLATE_LIBRARY_SCREEN",
+      "title": "Select Design",
+      "description": "Choose a design to start with.",
+      "filters": [
+        { "id": "audience", "label": "Audience", "options": ["Broker", "Developer", "Individual", "Marketing"] },
+        { "id": "goal", "label": "Goal", "options": ["Leads", "WhatsApp", "Booking", "Download"] },
+        { "id": "style", "label": "Style", "options": ["Minimal", "Luxury", "Corporate", "Bold"] },
+        { "id": "language", "label": "Language", "options": ["EN", "AR", "Bilingual"] },
+        { "id": "pageType", "label": "Page Type", "options": ["Landing", "Hub", "Profile", "Toolkit", "Resources"] }
+      ],
+      "actions": {
+        "onSelectTemplate": {
+          "loadBuilder": true
+        }
+      }
+    },
+    "website_builder": {
+      "type": "BUILDER_SCREEN",
+      "primaryCtaRule": true,
+      "sectionStore": {
+        "hero": { "label": "Top Section", "variants": ["Image BG", "Video BG", "Minimal"] },
+        "proof": { "label": "Social Proof", "variants": ["Reviews", "Stats", "Logos"] },
+        "offer": { "label": "The Offer", "variants": ["Payment Plan", "Packages", "Features"] },
+        "tools": { "label": "Calculators", "variants": ["ROI Calculator", "Valuation Request"] },
+        "contact": { "label": "Contact Forms", "variants": ["WhatsApp", "Form", "Booking"] },
+        "compliance": { "label": "Legal/Footer", "autoInsertByMarket": true }
+      },
+      "aiActions": [
+        "Rewrite for luxury / direct / formal", "Shorten", "Add proof", "Make bilingual", "Add WhatsApp CTA", "Add SEO-friendly headings + schema"
+      ],
+      "actions": {
+        "onPublish": {
+          "goToState": "website_finished"
+        }
+      }
+    },
+    "website_finished": {
+        "type": "FINAL_OUTPUT_SCREEN",
+        "title": "You're Live!",
+        "outputs": [
+            { "type": "URL", "label": "Published URL" },
+            { "type": "TRACKING_SETUP", "label": "Tracking Setup", "details": "Meta Pixel, GA4, and conversion events have been configured." }
+        ],
+        "nextSteps": [
+            { "label": "Run Meta leads", "action": "goToState", "target": "metaLeadGen_preCheck" },
+            { "label": "Run Google ads", "action": "goToState", "target": "googleAds_preCheck" },
+            { "label": "Start email flow", "action": "goToState", "target": "universalPath_minimumInputs" },
+            { "label": "Launch SMS reactivation", "action": "goToState", "target": "universalPath_minimumInputs" },
+            { "label": "Pull market data insights", "action": "goToState", "target": "universalPath_minimumInputs" }
+        ]
+    },
+    
+    "// ---------------- Cross-Path Linking States ---------------- //": {},
+    "metaLeadGen_preCheck": {
+      "type": "CHOICE_SCREEN",
+--- /Users/mahmou
+--- /Users/mahmoudezz/entersite-main-2/flow-spec.json
++++ /Users/mahmoudezz/entersite-main-2/flow-spec.json
+@@ -102,7 +102,7 @@
+     "metaLeadGen_preCheck": {
+--- /Users/mahmoudezz/entersite-main-2/flow-spec.json
++++ /Users/mahmoudezz/entersite-main-2/flow-spec.json
+@@ -102,7 +102,7 @@
+     "metaLeadGen_preCheck": {
+       "type": "CHOICE_SCREEN",
+-      "title": "Do you have a website link for this ad?",
++      "title": "Do you have a link?",
+       "options": [
+         { "id": "yes", "label": "Yes, I have
+--- /Users/mahmoudezz/entersite-main-2/flow-spec.json
++++ /Users/mahmoudezz/entersite-main-2/flow-spec.json
+@@ -102,7 +102,7 @@
+     "metaLeadGen_preCheck": {
+       "type": "CHOICE_SCREEN",
+-      "title": "Do you have a website link for this ad?",
++      "title": "Do you have a link?",
+       "options": [
+         { "id": "yes", "label": "Yes, I have a link", "nextState": "universalPath_minimumInputs" },
+@@ -111,7 +111,7 @@
+     "googleAds_preCheck": {
+       "type": "CHOICE_SCREEN",
+-      "title": "Do you have a website link
+--- /Users/mahmoudezz/entersite-main-2/flow-spec.json
++++ /Users/mahmoudezz/entersite-main-2/flow-spec.json
+@@ -102,7 +102,7 @@
+     "metaLeadGen_preCheck": {
+       "type": "CHOICE_SCREEN",
+-      "title": "Do you have a website link for this ad?",
++      "title": "Do you have a link?",
+       "options": [
+         { "id": "yes", "label": "Yes, I have a link", "nextState": "universalPath_minimumInputs" },
+@@ -111,7 +111,7 @@
+     "googleAds_preCheck": {
+       "type": "CHOICE_SCREEN",
+-      "title": "Do you have a website link for this ad?",
++      "title": "Do you have a link?",
+       "options": [
+         { "id": "yes", "label": "Yes, I have a link", "nextState": "universalPath_minimumInputs" },
+@@ -124,7 +
+--- /Users/mahmoudezz/entersite-main-2/flow-spec.json
++++ /Users/mahmoudezz/entersite-main-2/flow-spec.json
+@@ -102,7 +102,7 @@
+     "metaLeadGen_preCheck": {
+       "type": "CHOICE_SCREEN",
+-      "title": "Do you have a website link for this ad?",
++      "title": "Do you have a link?",
+       "options": [
+         { "id": "yes", "label": "Yes, I have a link", "nextState": "universalPath_minimumInputs" },
+@@ -111,7 +111,7 @@
+     "googleAds_preCheck": {
+       "type": "CHOICE_SCREEN",
+-      "title": "Do you have a website link for this ad?",
++      "title": "Do you have a link?",
+       "options": [
+         { "id": "yes", "label": "Yes, I have a link", "nextState": "universalPath_minimumInputs" },
+@@ -124,7 +124,6 @@
+       "description": "Help us write your content.",
+       "questions": [
+         { "id": "market", "label": "Target City/Area", "type": "text" },
+-        { "id": "industry", "label": "Industry
+--- /Users/mahmoudezz/entersite-main-2/flow-spec.json
++++ /Users/mahmoudezz/entersite-main-2/flow-spec.json
+@@ -102,7 +102,7 @@
+     "metaLeadGen_preCheck": {
+       "type": "CHOICE_SCREEN",
+-      "title": "Do you have a website link for this ad?",
++      "title": "Do you have a link?",
+       "options": [
+         { "id": "yes", "label": "Yes, I have a link", "nextState": "universalPath_minimumInputs" },
+@@ -111,7 +111,7 @@
+     "googleAds_preCheck": {
+       "type": "CHOICE_SCREEN",
+-      "title": "Do you have a website link for this ad?",
++      "title": "Do you have a link?",
+       "options": [
+         { "id": "yes", "label": "Yes, I have a link", "nextState": "universalPath_minimumInputs" },
+@@ -124,7 +124,6 @@
+       "description": "Help us write your content.",
+       "questions": [
+         { "id": "market", "label": "Target City/Area", "type": "text" },
+-        { "id": "industry", "label": "Industry", "type": "text", "default": "Real Estate" },
+         { "id": "audience", "label": "Who are you targeting?", "type": "select", "options": ["Home Buyers", "Investors/B2B"] },
+         { "id": "goal", "
+--- /Users/mahmoudezz/entersite-main-2/flow-spec.json
++++ /Users/mahmoudezz/entersite-main-2/flow-spec.json
+@@ -102,7 +102,7 @@
+     "metaLeadGen_preCheck": {
+       "type": "CHOICE_SCREEN",
+-      "title": "Do you have a website link for this ad?",
++      "title": "Do you have a link?",
+       "options": [
+         { "id": "yes", "label": "Yes, I have a link", "nextState": "universalPath_minimumInputs" },
+@@ -111,7 +111,7 @@
+     "googleAds_preCheck": {
+       "type": "CHOICE_SCREEN",
+-      "title": "Do you have a website link for this ad?",
++      "title": "Do you have a link?",
+       "options": [
+         { "id": "yes", "label": "Yes, I have a link", "nextState": "universalPath_minimumInputs" },
+@@ -124,7 +124,6 @@
+       "description": "Help us write your content.",
+       "questions": [
+         { "id": "market", "label": "Target City/Area", "type": "text" },
+         { "id": "audience", "label": "Who are you targeting?", "type": "select", "options": ["Home Buyers", "Investors/B2B"] },
+         { "id": "goal", "label": "Main Goal", "type": "select", "options": ["Get Leads", "Get Calls", "WhatsApp Chats", "Bookings", "File Downloads"] },
+      "title": "Do you have a link?",
+      "options": [
+        { "id": "yes", "label": "Yes, I have a link", "nextState": "universalPath_minimumInputs" },
+        { "id": "no", "label": "No, let's build one", "nextState": "website_audienceGate" }
+      ]
+    },
+    "googleAds_preCheck": {
+      "type": "CHOICE_SCREEN",
+      "title": "Do you have a link?",
+      "options": [
+        { "id": "yes", "label": "Yes, I have a link", "nextState": "universalPath_minimumInputs" },
+        { "id": "no", "label": "No, let's build one", "nextState": "website_audienceGate" }
+      ]
+    },
+
+    "// ---------------- Universal Path Engine ---------------- //": {},
+    "universalPath_minimumInputs": {
+      "type": "INPUT_SCREEN",
+      "title": "Quick Details",
+      "description": "Help us write your content.",
+      "questions": [
+        { "id": "market", "label": "Target City/Area", "type": "text" },
+        { "id": "audience", "label": "Who are you targeting?", "type": "select", "options": ["Home Buyers", "Investors/B2B"] },
+        { "id": "goal", "label": "Main Goal", "type": "select", "options": ["Get Leads", "Get Calls", "WhatsApp Chats", "Bookings", "File Downloads"] },
+        { "id": "language", "label": "Language", "type": "select", "options": ["English", "Arabic", "Both"] }
+      ],
+      "nextState": "universalPath_generateOutput"
+    },
+    "universalPath_generateOutput": {
+      "type": "GENERATION_SCREEN",
+      "title": "Working on it...",
+      "outputs": [
+        "Blueprint (steps + copy + assets + targeting)",
+        "Execution checklist",
+        "Templates (if relevant)",
+        "Tracking plan (events + KPIs)"
+      ],
+      "nextState": "universalPath_launchExport"
+    },
+    "universalPath_launchExport": {
+      "type": "LAUNCH_EXPORT_SCREEN",
+      "title": "Ready!",
+      "options": [
+        { "id": "export", "label": "Download Files", "details": "Get your copy & images" },
+        { "id": "pushLive", "label": "Go Live Now", "details": "Publish immediately" },
+        { "id": "startTracking", "label": "View Results", "details": "Go to dashboard" }
+      ]
+    }
+  },
+
+  "// ---------------- Data Definitions ---------------- //": {},
+  "blueprintPacks": {
+    "broker": {
+      "sitemap": "Broker sitemap blueprint",
+      "leadFunnel": "Lead funnel logic (WhatsApp / Call / Form)",
+      "areaPages": "Area pages plan",
+      "listings": "Listings strategy",
+      "agentMicroSites": "Agent micro-site structure"
+    },
+    "developer": {
+      "projectLaunch": "Project launch blueprint",
+      "paymentLogic": "Payment plan + floorplans logic",
+      "investorNarrative": "Investor narrative + credibility blocks",
+      "leadCapture": "Lead capture + brochure flow",
+      "partnerKit": "Partner kit structure (optional)"
+    },
+    "individual": {
+      "journey": "Simple journey (Buy / Invest / Sell)",
+      "tools": "Tools (ROI, affordability, valuation request)",
+      "copyStyle": "Trust-first copy style",
+      "pages": "Minimal pages but high conversion"
+    },
+    "marketing": {
+      "servicePackaging": "Service packaging blueprint",
+      "caseStudies": "Case study structure",
+      "auditFunnel": "Audit funnel",
+      "retainerTiers": "Retainer tier blocks",
+      "bookingSystem": "Booking + proof system"
+    }
+  }
+}

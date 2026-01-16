@@ -1,0 +1,134 @@
+'use client';
+
+import { useMemo, useState, useEffect } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
+import { Globe, Smartphone, Mail, Target, MessageSquare, ArrowRight } from 'lucide-react';
+
+const START_OPTIONS = [
+  {
+    id: 'website',
+    label: 'Website',
+    description: 'Create a project page with your branding.',
+    href: '/builder?start=1',
+    icon: Globe,
+  },
+  {
+    id: 'chat-agent',
+    label: 'Chat Agent',
+    description: 'Launch a conversational assistant for your listings.',
+    href: '/dashboard/chat-agent',
+    icon: MessageSquare,
+  },
+  {
+    id: 'sms',
+    label: 'SMS Campaign',
+    description: 'Send SMS updates for new listings.',
+    href: '/start/sms',
+    icon: Smartphone,
+  },
+  {
+    id: 'email',
+    label: 'Email Campaign',
+    description: 'Send a simple email follow-up.',
+    href: '/start/email',
+    icon: Mail,
+  },
+  {
+    id: 'ads',
+    label: 'Ads Launch',
+    description: 'Launch Google Ads in a few clicks.',
+    href: '/dashboard/google-ads',
+    icon: Target,
+  },
+];
+
+export function OnboardingFlow() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const [selected, setSelected] = useState<string | null>(null);
+
+  useEffect(() => {
+    const intent = searchParams.get('intent');
+    if (intent && START_OPTIONS.some((option) => option.id === intent)) {
+      setSelected(intent);
+    }
+  }, [searchParams]);
+
+  const selectedOption = useMemo(
+    () => START_OPTIONS.find((option) => option.id === selected) ?? null,
+    [selected]
+  );
+
+  const handleContinue = () => {
+    if (!selectedOption) return;
+    router.push(selectedOption.href);
+  };
+
+  return (
+    <div className="bg-zinc-950 border border-white/5 rounded-[2rem] sm:rounded-[3rem] overflow-hidden shadow-2xl">
+      <div className="p-6 sm:p-8 border-b border-white/5 flex flex-col gap-4">
+        <p className="text-[10px] font-bold uppercase tracking-[0.4em] text-zinc-500">Get Started</p>
+        <h1 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight text-white">
+          Start your first launch.
+        </h1>
+        <p className="text-zinc-500 max-w-3xl">
+          Choose the service you want to launch first. We will guide the rest.
+        </p>
+        <div className="flex flex-col sm:flex-row sm:items-center gap-2 text-[10px] font-bold uppercase tracking-[0.3em] text-zinc-600">
+          <div className="flex items-center gap-2">
+            <span className="h-2 w-2 rounded-full bg-blue-500" />
+            Step 1: Choose
+          </div>
+          <div className="hidden sm:block h-4 w-px bg-white/10" />
+          <div className="flex items-center gap-2">
+            <span className="h-2 w-2 rounded-full bg-white/10" />
+            Step 2: Confirm
+          </div>
+          <div className="hidden sm:block h-4 w-px bg-white/10" />
+          <div className="flex items-center gap-2">
+            <span className="h-2 w-2 rounded-full bg-white/10" />
+            Step 3: Launch
+          </div>
+        </div>
+      </div>
+
+      <div className="p-6 sm:p-8 space-y-8 sm:space-y-10">
+        <div className="grid sm:grid-cols-2 gap-4 sm:gap-6">
+          {START_OPTIONS.map((option) => (
+            <button
+              key={option.id}
+              onClick={() => setSelected(option.id)}
+              className={cn(
+                'p-5 sm:p-6 rounded-2xl border text-left transition-all',
+                selected === option.id
+                  ? 'border-blue-500/60 bg-blue-600/10'
+                  : 'border-white/10 bg-white/5 hover:border-blue-500/30'
+              )}
+            >
+              <div className="flex items-center gap-4 mb-4">
+                <option.icon className="h-6 w-6 sm:h-8 sm:w-8 text-blue-500" />
+                <h3 className="text-xl sm:text-2xl font-bold">{option.label}</h3>
+              </div>
+              <p className="text-sm sm:text-base text-zinc-400">{option.description}</p>
+            </button>
+          ))}
+        </div>
+
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-white/10 pt-6">
+          <p className="text-sm text-zinc-500">
+            {selectedOption ? `Selected: ${selectedOption.label}` : 'Select a card to continue.'}
+          </p>
+          <Button
+            onClick={handleContinue}
+            disabled={!selectedOption}
+            className="h-11 sm:h-12 px-6 rounded-full bg-white text-black font-bold disabled:opacity-40"
+          >
+            Start your first launch <ArrowRight className="ml-2 h-4 w-4" />
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+}

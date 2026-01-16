@@ -1,0 +1,89 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { generateText } from 'ai';
+import { z } from 'zod';
+import { getGoogleModel } from '@/lib/ai/google';
+import { formatProjectContext, getRelevantProjects } from '@/server/inventory';
+import { enforceRateLimit, getRequestIp } from '@/lib/server/rateLimit';
+
+const requestSchema = z.object({
+  message: z.string().min(1),
+  history: z
+    .array(
+      z.object({
+        role: z.enum(['user', 'agent']),
+        text: z.string(),
+      })
+    )
+    .optional(),
+  context: z.string().optional(),
+});
+
+export async function POST(req: NextRequest) {
+  // Public marketing preview: no auth, no persistence, strict rate limiting.
+  let payload: z.infer<typeof requestSchema> | null = null;
+  try {
+    const ip = getRequestIp(req);
+    if (!(await enforceRateLimit(`bot:preview:${ip}`, 20, 60_000))) {
+      return NextResponse.json({ reply: 'Rate limit exceeded' }, { status: 429 });
+    }
+    const body = await req.json();
+    payload = requestSchema.parse(body);
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return NextResponse.json({ reply: 'Invalid request payload.', error: error.errors }, { status: 400 });
+    }
+    return NextResponse.json({ reply: 'Invalid request payload.' }, { status: 400 });
+  }
+
+  const historyText = (payload.history || [])
+    .map((entry) => `${entry.role === 'user' ? 'Investor' : 'Agent'}: ${entry.text}`)
+    .join('\n');
+
+  let relevantProjects: Awaited<ReturnType<typeof getRelevantProjects>> = [];
+  try {
+    relevantProjects = await getRelevantProjects(payload.message, payload.context, 8);
+  } catch (error) {
+    console.error('[bot/preview/chat] inventory context failed', error);
+  }
+
+  const projectContext = relevantProjects.length
+    ? `\nRelevant listings:\n${relevantProjects.map(formatProjectContext).join('\n')}`
+    : '';
+
+  const prompt = `
+Role & Context:
+${payload.context || 'Entrestate chat assistant for UAE real estate teams.'}
+
+You are a UAE real estate advisor who explains things clearly and avoids technical jargon.
+Use the listing context below when available and keep answers concise.
+If asked about Dubai/UAE investment topics (fees, visas, payment plans, ROI, financing), give high-level guidance and say details should be confirmed with the broker.
+If you mention pricing or returns, note they are estimates.
+If you are unsure, say so and offer a next step (brochure, viewing, or a call).
+Ask one question at a time. If the buyer shows interest and contact details are missing, ask for name and WhatsApp or email.
+${projectContext}
+
+Conversation History:
+${historyText}
+
+Investor: ${payload.message}
+Agent:
+`;
+
+  try {
+    const { text } = await generateText({
+      model: getGoogleModel('gemini-2.5-flash'),
+      system:
+        'You are the Entrestate real estate assistant. Use a friendly, professional tone. Never sound robotic.',
+      prompt,
+    });
+
+    return NextResponse.json({ reply: text });
+  } catch (error) {
+    console.error('[bot/preview/chat] error', error);
+    const fallbackList = relevantProjects.slice(0, 3).map(formatProjectContext).join('\n');
+    const fallbackReply = fallbackList
+      ? `Here are a few options I can share right now:\n${fallbackList}\nTell me your budget and preferred area, and I will narrow it down.`
+      : "I can help with UAE projects, pricing ranges, and next steps. What area and budget should I focus on?";
+    return NextResponse.json({ reply: fallbackReply });
+  }
+}

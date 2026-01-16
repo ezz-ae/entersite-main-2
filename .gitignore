@@ -1,0 +1,55 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# Dependencies
+/node_modules
+/.pnp
+.pnp.js
+
+# Testing
+/coverage
+
+# Next.js build output
+/.next/
+/out/
+
+# Production build files
+/build
+
+# Static files
+/public
+
+# Miscellaneous
+.DS_Store
+*.pem
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+firebase-debug.log
+
+# Local .env file
+.env.local
+.env
+.env.vercel*
+
+# IDEs
+.vscode
+.idea
+
+# Vercel
+.vercel
+
+# Secrets
+service-account-key.json
+*-firebase-adminsdk-*.json
+
+# secrets
+src/config/service-account.json
+*.pem
+*.key
+
+# secrets
+src/config/service-account.json
+src/config/service-account.json
+.env*.local
