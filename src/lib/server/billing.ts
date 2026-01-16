@@ -37,6 +37,8 @@ export type TrialState = {
 export type SubscriptionRecord = {
   plan: PlanId;
   status: SubscriptionStatus;
+  creditBalance: number; // New field for prepaid credits in AED
+  monthlySpendCap?: number | null; // Optional spend cap
   currentPeriodStart?: string | null;
   currentPeriodEnd?: string | null;
   cancelAtPeriodEnd?: boolean | null;
@@ -50,9 +52,24 @@ export type BillingSku =
   | 'addon_leads_500'
   | 'addon_domain_1'
   | 'addon_sms_bundle'
-  | 'inventory_download_226';
+  | 'inventory_download_226'
+  | 'top_up_50'
+  | 'top_up_100'
+  | 'top_up_250';
 
 type MetricPeriod = 'monthly' | 'total';
+
+// Cost per unit of each usage metric in AED.
+// This is the foundation for the prepaid model.
+export const USAGE_COSTS: Partial<Record<UsageMetric, number>> = {
+  ai_conversations: 0.1, // 10 fils per conversation
+  email_sends: 0.01,   // 1 fil per email
+  sms_sends: 0.2,      // 20 fils per SMS
+  leads: 0.05,         // 5 fils per lead stored
+  domains: 39,         // 39 AED per domain (one-time, but enforced via usage)
+  landing_pages: 5,    // 5 AED per page created
+  ai_agents: 10,       // 10 AED per agent created
+};
 
 const TRIAL_DAYS = 7;
 const TRIAL_CONVERSATION_LIMIT = 25;
@@ -92,11 +109,12 @@ export const PLAN_PRICES_AED: Record<PlanId, number> = {
 export const BILLING_SKUS: Record<
   BillingSku,
   {
-    type: 'plan' | 'addon';
+    type: 'plan' | 'addon' | 'top_up';
     priceAed: number;
     label: string;
     plan?: PlanId;
     addOns?: BillingAddOns;
+    creditAed?: number;
   }
 > = {
   agent_pro: {
@@ -148,7 +166,26 @@ export const BILLING_SKUS: Record<
     label: 'Inventory download (one-time)',
     addOns: { inventory_downloads: 1 },
   },
+  top_up_50: {
+    type: 'top_up',
+    priceAed: 50,
+    label: '50 AED Credit',
+    creditAed: 50,
+  },
+  top_up_100: {
+    type: 'top_up',
+    priceAed: 100,
+    label: '100 AED Credit',
+    creditAed: 100,
+  },
+  top_up_250: {
+    type: 'top_up',
+    priceAed: 250,
+    label: '250 AED Credit',
+    creditAed: 250,
+  },
 };
+
 
 export const PLAN_LIMITS: Record<PlanId, Record<UsageMetric, number | null>> = {
   agent_pro: {
@@ -204,29 +241,23 @@ const PLAN_UPGRADE_MAP: Record<PlanId, PlanId | null> = {
   agency_os: null,
 };
 
-export class PlanLimitError extends Error {
-  metric: UsageMetric;
-  limit: number | null;
-  currentUsage: number;
-  plan: PlanId;
-  status: SubscriptionStatus;
-  suggestedUpgrade: PlanId | null;
-  constructor(options: {
-    metric: UsageMetric;
-    limit: number | null;
-    currentUsage: number;
-    plan: PlanId;
-    status: SubscriptionStatus;
-    suggestedUpgrade: PlanId | null;
-  }) {
-    super(`Plan limit reached for ${options.metric}`);
-    this.name = 'PlanLimitError';
-    this.metric = options.metric;
-    this.limit = options.limit;
-    this.currentUsage = options.currentUsage;
-    this.plan = options.plan;
-    this.status = options.status;
-    this.suggestedUpgrade = options.suggestedUpgrade;
+export class InsufficientCreditError extends Error {
+  cost: number;
+  balance: number;
+  constructor(cost: number, balance: number) {
+    super(`Insufficient credit. Cost: ${cost}, Balance: ${balance}`);
+    this.name = 'InsufficientCreditError';
+    this.cost = cost;
+    this.balance = balance;
+  }
+}
+
+export class SpendCapExceededError extends Error {
+  cap: number;
+  constructor(cap: number) {
+    super(`Monthly spend cap of ${cap} exceeded.`);
+    this.name = 'SpendCapExceededError';
+    this.cap = cap;
   }
 }
 
@@ -334,6 +365,8 @@ function normalizeSubscription(
   return {
     plan,
     status,
+    creditBalance: Number(data?.creditBalance || 0),
+    monthlySpendCap: data?.monthlySpendCap ? Number(data.monthlySpendCap) : null,
     currentPeriodStart: data?.currentPeriodStart ? String(data.currentPeriodStart) : null,
     currentPeriodEnd: data?.currentPeriodEnd ? String(data.currentPeriodEnd) : null,
     cancelAtPeriodEnd:
@@ -461,6 +494,8 @@ export async function ensureSubscription(db: Firestore, tenantId: string): Promi
     plan: DEFAULT_PLAN,
     status: 'trial',
     trial: createTrialState(now),
+    creditBalance: 0, // Initialize with zero credit
+    monthlySpendCap: null,
     currentPeriodStart: null,
     currentPeriodEnd: null,
     cancelAtPeriodEnd: false,
@@ -488,10 +523,13 @@ export async function ensureSubscription(db: Firestore, tenantId: string): Promi
 export async function getSubscription(db: Firestore, tenantId: string): Promise<SubscriptionRecord> {
   const doc = await db.collection('subscriptions').doc(tenantId).get();
   if (!doc.exists) {
+    // Return a default object for a non-existent subscription
     return {
       plan: DEFAULT_PLAN,
       status: 'trial',
       trial: createTrialState(new Date()),
+      creditBalance: 0,
+      monthlySpendCap: null,
       currentPeriodStart: null,
       currentPeriodEnd: null,
       cancelAtPeriodEnd: false,
@@ -522,115 +560,39 @@ export async function enforceUsageLimits(
 ) {
   const subscriptionRef = db.collection('subscriptions').doc(tenantId);
   const now = new Date();
-  let trialEndedReason: string | null = null;
+
+  // 1. Calculate total cost of this usage request
+  const totalCost = updates.reduce((sum, update) => {
+    const costPerUnit = USAGE_COSTS[update.metric] || 0;
+    return sum + (costPerUnit * update.increment);
+  }, 0);
 
   try {
     await db.runTransaction(async (tx) => {
       const subscriptionSnap = await tx.get(subscriptionRef);
-      const subscription = subscriptionSnap.exists
-        ? normalizeSubscription(subscriptionSnap.data(), now)
-        : {
-            plan: DEFAULT_PLAN,
-            status: 'trial' as SubscriptionStatus,
-            trial: createTrialState(now),
-            currentPeriodStart: null,
-            currentPeriodEnd: null,
-            cancelAtPeriodEnd: false,
-            addOns: {},
-          };
+      const subscription = normalizeSubscription(subscriptionSnap.data(), now);
 
-      const trialState = getTrialStateStatus(subscription.trial || null, now);
-      const subscriptionUpdates: Partial<SubscriptionRecord> = {};
-
-      if (!subscriptionSnap.exists) {
-        subscriptionUpdates.plan = subscription.plan;
-        subscriptionUpdates.status = subscription.status;
-        subscriptionUpdates.trial = subscription.trial;
-        subscriptionUpdates.currentPeriodStart = subscription.currentPeriodStart || null;
-        subscriptionUpdates.currentPeriodEnd = subscription.currentPeriodEnd || null;
-        subscriptionUpdates.cancelAtPeriodEnd = false;
-        subscriptionUpdates.addOns = subscription.addOns || {};
+      // 2. Check for sufficient credit balance
+      if (subscription.creditBalance < totalCost) {
+        throw new InsufficientCreditError(totalCost, subscription.creditBalance);
       }
 
-      if (subscription.status === 'trial' && trialState.isExpired) {
-        subscriptionUpdates.status = 'past_due';
-        if (subscription.trial) {
-          subscriptionUpdates.trial = {
-            ...subscription.trial,
-            endedAt: subscription.trial.endedAt || now.toISOString(),
-            endedReason: subscription.trial.endedReason || trialState.reason,
-          };
-        }
-      }
-
-      if (
-        subscription.status === 'active' &&
-        subscription.cancelAtPeriodEnd &&
-        subscription.currentPeriodEnd &&
-        new Date(subscription.currentPeriodEnd).getTime() <= now.getTime()
-      ) {
-        subscriptionUpdates.status = 'canceled';
-      }
-
-      const effectiveStatus = (subscriptionUpdates.status || subscription.status) as SubscriptionStatus;
+      const effectiveStatus = subscription.status;
       if (!isUsageAllowed(effectiveStatus)) {
-        throw new PlanLimitError({
-          metric: updates[0]?.metric || 'campaigns',
-          limit: 0,
-          currentUsage: 0,
-          plan: subscription.plan,
-          status: effectiveStatus,
-          suggestedUpgrade: getSuggestedUpgrade(subscription.plan),
-        });
+        // Still useful to prevent usage on e.g. canceled accounts.
+        throw new Error(`Usage not allowed for status: ${effectiveStatus}`);
       }
-
-      const usageDocIds = new Map<string, DocumentReference>();
-      const usageDocs = new Map<string, DocumentSnapshot>();
-
+      
+      // 3. Decrement credit balance
+      tx.set(subscriptionRef, {
+        creditBalance: FieldValue.increment(-totalCost),
+        updatedAt: FieldValue.serverTimestamp(),
+      }, { merge: true });
+      
+      // 4. Increment usage counters (still useful for analytics and spend caps)
       updates.forEach((update) => {
         const docId = getUsageDocId(update.metric, now);
-        if (!usageDocIds.has(docId)) {
-          usageDocIds.set(
-            docId,
-            db.collection('tenants').doc(tenantId).collection('usage').doc(docId),
-          );
-        }
-      });
-
-      await Promise.all(
-        Array.from(usageDocIds.entries()).map(async ([docId, ref]) => {
-          const snap = await tx.get(ref);
-          usageDocs.set(docId, snap);
-        }),
-      );
-
-      const usageDataByDoc = new Map<string, Record<string, number>>();
-      usageDocs.forEach((snap, docId) => {
-        const data = snap.exists ? (snap.data() as Record<string, number>) : {};
-        usageDataByDoc.set(docId, data || {});
-      });
-
-      updates.forEach((update) => {
-        const docId = getUsageDocId(update.metric, now);
-        const usageData = usageDataByDoc.get(docId) || {};
-        const current = Number(usageData[update.metric] || 0);
-        const limit = getEffectiveLimit(subscription.plan, update.metric, subscription.addOns);
-        if (limit !== null && current + update.increment > limit) {
-          throw new PlanLimitError({
-            metric: update.metric,
-            limit,
-            currentUsage: current,
-            plan: subscription.plan,
-            status: effectiveStatus,
-            suggestedUpgrade: getSuggestedUpgrade(subscription.plan),
-          });
-        }
-      });
-
-      updates.forEach((update) => {
-        const docId = getUsageDocId(update.metric, now);
-        const usageRef = usageDocIds.get(docId);
-        if (!usageRef) return;
+        const usageRef = db.collection('tenants').doc(tenantId).collection('usage').doc(docId);
         tx.set(
           usageRef,
           {
@@ -641,74 +603,50 @@ export async function enforceUsageLimits(
           { merge: true },
         );
       });
-
-      if (subscription.status === 'trial' && subscription.trial) {
-        let updatedTrial = { ...subscription.trial };
-        const hasLeadUpdate = updates.some((update) => update.metric === 'leads');
-        const conversationUpdate = updates.find((update) => update.metric === 'ai_conversations');
-
-        if (hasLeadUpdate) {
-          updatedTrial.leadCaptured = true;
-        }
-
-        if (conversationUpdate) {
-          const docId = getUsageDocId('ai_conversations', now);
-          const usageData = usageDataByDoc.get(docId) || {};
-          const current = Number(usageData.ai_conversations || 0);
-          updatedTrial.aiConversationCount = current + conversationUpdate.increment;
-        }
-
-        const reachedConversationLimit =
-          (updatedTrial.aiConversationCount || 0) >= TRIAL_CONVERSATION_LIMIT;
-        const milestoneReached =
-          (updatedTrial.publishedLandingPage && updatedTrial.leadCaptured) ||
-          reachedConversationLimit;
-
-        if (milestoneReached) {
-          updatedTrial = {
-            ...updatedTrial,
-            endedAt: updatedTrial.endedAt || now.toISOString(),
-            endedReason:
-              updatedTrial.endedReason ||
-              (reachedConversationLimit ? 'trial_ai_conversation_limit' : 'trial_milestone_reached'),
-          };
-          subscriptionUpdates.status = 'past_due';
-          trialEndedReason = updatedTrial.endedReason || 'trial_milestone_reached';
-        }
-
-        subscriptionUpdates.trial = updatedTrial;
-      }
-
-      if (Object.keys(subscriptionUpdates).length) {
-        tx.set(
-          subscriptionRef,
-          {
-            ...subscriptionUpdates,
-            updatedAt: FieldValue.serverTimestamp(),
-          },
-          { merge: true },
-        );
-      }
     });
+
+    await logBillingEvent(db, tenantId, {
+      type: 'usage_billed',
+      cost: totalCost,
+      metrics: updates.map(u => u.metric).join(','),
+    });
+
   } catch (error) {
-    if (error instanceof PlanLimitError) {
+    if (error instanceof InsufficientCreditError) {
       await logBillingEvent(db, tenantId, {
-        type: 'limit_blocked',
-        metric: error.metric,
-        limit: error.limit,
-        currentUsage: error.currentUsage,
-        plan: error.plan,
-        status: error.status,
+        type: 'insufficient_credit',
+        cost: error.cost,
+        balance: error.balance,
       });
     }
     throw error;
   }
+}
 
-  if (trialEndedReason) {
-    await logBillingEvent(db, tenantId, {
-      type: 'trial_ended',
-      reason: trialEndedReason,
-    });
+
+export class PlanLimitError extends Error {
+  metric: UsageMetric;
+  limit: number | null;
+  currentUsage: number;
+  plan: PlanId;
+  status: SubscriptionStatus;
+  suggestedUpgrade: PlanId | null;
+  constructor(options: {
+    metric: UsageMetric;
+    limit: number | null;
+    currentUsage: number;
+    plan: PlanId;
+    status: SubscriptionStatus;
+    suggestedUpgrade: PlanId | null;
+  }) {
+    super(`Plan limit reached for ${options.metric}`);
+    this.name = 'PlanLimitError';
+    this.metric = options.metric;
+    this.limit = options.limit;
+    this.currentUsage = options.currentUsage;
+    this.plan = options.plan;
+    this.status = options.status;
+    this.suggestedUpgrade = options.suggestedUpgrade;
   }
 }
 
@@ -716,47 +654,29 @@ export async function checkUsageLimit(
   db: Firestore,
   tenantId: string,
   metric: UsageMetric,
+  increment = 1,
 ) {
   const now = new Date();
-  const subscriptionRef = db.collection('subscriptions').doc(tenantId);
-  const subscriptionSnap = await subscriptionRef.get();
-  const subscription = subscriptionSnap.exists
-    ? normalizeSubscription(subscriptionSnap.data(), now)
-    : await ensureSubscription(db, tenantId);
+  const subscription = await ensureSubscription(db, tenantId);
 
-  const trialState = getTrialStateStatus(subscription.trial || null, now);
-  let effectiveStatus = subscription.status;
-  if (subscription.status === 'trial' && trialState.isExpired) {
-    effectiveStatus = 'past_due';
-    await subscriptionRef.set(
-      {
-        status: 'past_due',
-        trial: subscription.trial
-          ? {
-              ...subscription.trial,
-              endedAt: subscription.trial.endedAt || now.toISOString(),
-              endedReason: subscription.trial.endedReason || trialState.reason,
-            }
-          : null,
-        updatedAt: FieldValue.serverTimestamp(),
-      },
-      { merge: true },
-    );
+  if (!isUsageAllowed(subscription.status)) {
+    throw new Error(`Usage not allowed for status: ${subscription.status}`);
   }
 
-  if (!isUsageAllowed(effectiveStatus)) {
-    throw new PlanLimitError({
-      metric,
-      limit: 0,
-      currentUsage: 0,
-      plan: subscription.plan,
-      status: effectiveStatus,
-      suggestedUpgrade: getSuggestedUpgrade(subscription.plan),
-    });
+  // For metrics billed by usage, check credit balance.
+  if (metric in USAGE_COSTS) {
+    const cost = (USAGE_COSTS[metric] || 0) * increment;
+    if (subscription.creditBalance < cost) {
+      throw new InsufficientCreditError(cost, subscription.creditBalance);
+    }
+    return { balance: subscription.creditBalance, cost };
   }
 
+  // For metrics with hard limits (like seats), check plan limits.
   const limit = getEffectiveLimit(subscription.plan, metric, subscription.addOns);
-  if (limit === null) return { current: 0, limit };
+  if (limit === null) {
+    return { current: 0, limit }; // No limit
+  }
 
   const docId = getUsageDocId(metric, now);
   const usageSnap = await db
@@ -773,13 +693,14 @@ export async function checkUsageLimit(
       limit,
       currentUsage: current,
       plan: subscription.plan,
-      status: effectiveStatus,
+      status: subscription.status,
       suggestedUpgrade: getSuggestedUpgrade(subscription.plan),
     });
   }
 
   return { current, limit };
 }
+
 
 export async function recordTrialEvent(
   db: Firestore,

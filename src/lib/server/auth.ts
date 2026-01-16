@@ -127,17 +127,14 @@ async function resolveTenantAndRoles(claims: DecodedIdToken) {
   const claimTenant = getClaimsTenant(claims);
   const claimRoles = getClaimsRoles(claims);
 
-  let tenantId = claimTenant;
+  const tenantId = claimTenant;
   let roles = claimRoles;
   let memberProfile: Record<string, unknown> | null = null;
 
   if (!tenantId) {
-    const profile = await loadUserProfile(claims.uid);
-    const profileTenant = typeof profile?.tenantId === 'string' ? profile.tenantId : null;
-    tenantId = profileTenant || claims.uid;
-    if (!roles.length && profile?.role) {
-      roles = normalizeRoles(profile.role);
-    }
+    // Force tenant to be resolved from claims, not from user profile.
+    // This is a critical security measure to enforce strict tenant isolation.
+    throw new UnauthorizedError('Tenant ID not found in token claims.');
   }
 
   if (tenantId && !roles.length) {
@@ -154,7 +151,7 @@ async function resolveTenantAndRoles(claims: DecodedIdToken) {
     roles = tenantId === claims.uid ? ['agency_admin'] : ['agent'];
   }
 
-  return { tenantId: tenantId || claims.uid, roles };
+  return { tenantId, roles };
 }
 
 export async function requireAuth(req: NextRequest | Request): Promise<AuthContext> {

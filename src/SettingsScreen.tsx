@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import StickyFooter from './StickyFooter';
 import ForgivingInput from './ForgivingInput';
 import { useAuth } from './AuthContext';
@@ -12,19 +12,25 @@ interface SettingsScreenProps {
 }
 
 const SettingsScreen: React.FC<SettingsScreenProps> = ({ onBack, onSave, theme, onToggleTheme, onNavigateTo }) => {
-  const { user, logout } = useAuth();
+  const { user, token, logout } = useAuth();
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showChangePassword, setShowChangePassword] = useState(false);
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+
   const [profile, setProfile] = useState({
     name: user?.name || 'Agent Name',
     email: user?.email || 'agent@example.com',
     phone: user?.phone || '+971 50 000 0000'
   });
 
+  const [workspaceProfile, setWorkspaceProfile] = useState({
+    companyName: '',
+    vatId: ''
+  });
+  
   const [errors, setErrors] = useState({
     email: '',
     phone: ''
@@ -35,6 +41,27 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onBack, onSave, theme, 
     push: true,
     sms: false
   });
+
+  useEffect(() => {
+    async function fetchTenantProfile() {
+      if (!token) return;
+      try {
+        const response = await fetch('/api/tenant/profile', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (response.ok) {
+          const data = await response.json();
+          if (data.profile) {
+            setWorkspaceProfile(data.profile);
+          }
+        }
+      } catch (error) {
+        console.error("Failed to fetch tenant profile", error);
+      }
+    }
+    fetchTenantProfile();
+  }, [token]);
+
 
   const handleToggle = (key: string) => {
     setNotifications(prev => ({ ...prev, [key]: !prev[key] }));
@@ -81,7 +108,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onBack, onSave, theme, 
     return re.test(phone);
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     let valid = true;
     const newErrors = { email: '', phone: '' };
 
@@ -98,7 +125,26 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onBack, onSave, theme, 
     setErrors(newErrors);
 
     if (valid) {
+      // Prop-based save for personal profile and notifications
       onSave({ profile, notifications });
+
+      // API-based save for workspace profile
+      if (token) {
+        try {
+          await fetch('/api/tenant/profile', {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(workspaceProfile),
+          });
+          alert('Settings saved!');
+        } catch (error) {
+          console.error("Failed to save workspace profile", error);
+          alert('Failed to save company settings.');
+        }
+      }
     }
   };
 
@@ -117,17 +163,26 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onBack, onSave, theme, 
 
       {/* Workspace Section */}
       <div className="settings-section-title">Workspace</div>
-      <div style={{ borderRadius: '12px', overflow: 'hidden', border: '1px solid var(--border-color)' }}>
+      <div style={{ borderRadius: '12px', overflow: 'hidden', border: '1px solid var(--border-color)', marginBottom: '24px' }}>
+        <SettingsMenuItem icon="🏢" label="Company Profile" onClick={() => { /* Can navigate to a dedicated screen in future */ }} isSection />
+        <div style={{ backgroundColor: 'var(--bg-primary)', padding: '0 16px 16px 16px' }}>
+          <ForgivingInput 
+            label="Company Name" 
+            value={workspaceProfile.companyName} 
+            onChange={(e) => setWorkspaceProfile({...workspaceProfile, companyName: e.target.value})} 
+          />
+          <ForgivingInput 
+            label="VAT ID (Optional)" 
+            value={workspaceProfile.vatId} 
+            onChange={(e) => setWorkspaceProfile({...workspaceProfile, vatId: e.target.value})} 
+          />
+        </div>
         <SettingsMenuItem icon="👥" label="Team Management" onClick={() => onNavigateTo('teamManagement')} />
         <SettingsMenuItem icon="📅" label="Meeting Availability" onClick={() => onNavigateTo('meetingScheduler')} />
-        <SettingsMenuItem icon="📊" label="CRM Pipeline" onClick={() => onNavigateTo('crmPipeline')} />
-        <SettingsMenuItem icon="🎯" label="Lead Scoring" onClick={() => onNavigateTo('leadScoring')} />
-        <SettingsMenuItem icon="🔌" label="Integrations & API" onClick={() => onNavigateTo('integrations')} />
         <SettingsMenuItem icon="💳" label="Billing & Invoices" onClick={() => onNavigateTo('billing')} />
-        <SettingsMenuItem icon="📦" label="My Services & Reports" onClick={() => onNavigateTo('services')} />
-        <SettingsMenuItem icon="🎁" label="Refer & Earn" onClick={() => onNavigateTo('referral')} />
-        <SettingsMenuItem icon="❓" label="Help & Support" onClick={() => onNavigateTo('support')} />
+        <SettingsMenuItem icon="🔌" label="Integrations & API" onClick={() => onNavigateTo('integrations')} />
       </div>
+
 
       {/* Profile Section */}
       <div className="settings-section-title">Personal Profile</div>
@@ -303,13 +358,13 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onBack, onSave, theme, 
   );
 };
 
-const SettingsMenuItem: React.FC<{ icon: string; label: string; onClick: () => void }> = ({ icon, label, onClick }) => (
-  <div className="settings-menu-item" onClick={onClick}>
+const SettingsMenuItem: React.FC<{ icon: string; label: string; onClick: () => void; isSection?: boolean }> = ({ icon, label, onClick, isSection }) => (
+  <div className="settings-menu-item" onClick={onClick} style={isSection ? { cursor: 'default' } : {}}>
     <div style={{ display: 'flex', alignItems: 'center' }}>
       <div className="settings-icon-container">{icon}</div>
       <span style={{ fontSize: '16px', fontWeight: '500', color: 'var(--text-primary)' }}>{label}</span>
     </div>
-    <span style={{ color: 'var(--text-tertiary)' }}>›</span>
+    {!isSection && <span style={{ color: 'var(--text-tertiary)' }}>›</span>}
   </div>
 );
 

@@ -1,24 +1,94 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import './mobile-styles.css';
+import { useAuth } from '@/AuthContext'; // Assuming AuthContext provides the token
 
-interface Invoice {
+interface BillingEvent {
   id: string;
-  date: string;
-  amount: string;
-  status: string;
-  service: string;
+  createdAt: string;
+  amount: number;
+  currency?: string;
+  type: string;
+  [key: string]: any;
 }
 
 interface BillingScreenProps {
   onBack: () => void;
 }
 
+function formatEvent(event: BillingEvent) {
+  const date = new Date(event.createdAt).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+  });
+  
+  let amount = 'N/A';
+  if (event.amount) {
+    const currency = event.currency || 'AED';
+    amount = new Intl.NumberFormat('en-US', { style: 'currency', currency }).format(event.amount);
+  } else if (event.priceAed) {
+     amount = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'AED' }).format(event.priceAed);
+  }
+
+  let service = 'Account Activity';
+  switch (event.type) {
+    case 'subscription_created':
+      service = `Subscribed to ${event.plan || 'a plan'}`;
+      break;
+    case 'subscription_updated':
+      service = `Plan updated to ${event.plan || ''}`;
+      break;
+    case 'add_on_applied':
+      service = `Purchased: ${event.sku || 'Add-on'}`;
+      break;
+    case 'limit_blocked':
+      service = `Usage limit reached for ${event.metric}`;
+      amount = 'Usage Blocked';
+      break;
+    case 'trial_ended':
+      service = 'Trial Ended';
+      amount = 'N/A';
+      break;
+    default:
+      service = event.type.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+  }
+
+  return { ...event, date, amount, service };
+}
+
 const BillingScreen: React.FC<BillingScreenProps> = ({ onBack }) => {
-  const invoices: Invoice[] = [
-    { id: 'INV-001', date: 'Oct 24, 2023', amount: 'AED 450.00', status: 'Paid', service: 'Google Ads Budget' },
-    { id: 'INV-002', date: 'Oct 10, 2023', amount: 'AED 199.00', status: 'Paid', service: 'Website Hosting' },
-    { id: 'INV-003', date: 'Sep 24, 2023', amount: 'AED 450.00', status: 'Paid', service: 'Google Ads Budget' },
-  ];
+  const [invoices, setInvoices] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const { token } = useAuth();
+
+  useEffect(() => {
+    async function fetchBillingHistory() {
+      if (!token) {
+        setLoading(false);
+        setError("Authentication required.");
+        return;
+      }
+      try {
+        const response = await fetch('/api/billing/history', {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+        });
+        if (!response.ok) {
+          throw new Error('Failed to fetch billing history.');
+        }
+        const data = await response.json();
+        setInvoices(data.history.map(formatEvent));
+      } catch (e: any) {
+        setError(e.message || 'An error occurred.');
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchBillingHistory();
+  }, [token]);
 
   return (
     <div className="screen-container" style={{ padding: '24px', paddingBottom: '40px' }}>
@@ -43,6 +113,9 @@ const BillingScreen: React.FC<BillingScreenProps> = ({ onBack }) => {
       {/* Invoices */}
       <h3 style={{ fontSize: '16px', fontWeight: '700', marginBottom: '12px', color: 'var(--text-primary)' }}>Invoice History</h3>
       <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+        {loading && <div style={{ color: 'var(--text-secondary)'}}>Loading history...</div>}
+        {error && <div style={{ color: 'var(--danger-color)'}}>{error}</div>}
+        {!loading && !error && invoices.length === 0 && <div style={{ color: 'var(--text-secondary)'}}>No billing history found.</div>}
         {invoices.map(inv => (
           <div key={inv.id} style={{ 
             backgroundColor: 'var(--bg-primary)', 
@@ -55,11 +128,11 @@ const BillingScreen: React.FC<BillingScreenProps> = ({ onBack }) => {
           }}>
             <div>
               <div style={{ fontWeight: '600', color: 'var(--text-primary)', fontSize: '14px' }}>{inv.service}</div>
-              <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>{inv.date} • {inv.id}</div>
+              <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>{inv.date} • {inv.id.substring(0, 7)}</div>
             </div>
             <div style={{ textAlign: 'right' }}>
               <div style={{ fontWeight: '700', color: 'var(--text-primary)' }}>{inv.amount}</div>
-              <div style={{ fontSize: '11px', color: '#059669', fontWeight: '600' }}>{inv.status}</div>
+              {inv.status && <div style={{ fontSize: '11px', color: '#059669', fontWeight: '600' }}>{inv.status}</div>}
             </div>
             <button style={{ background: 'none', border: 'none', fontSize: '18px', cursor: 'pointer', color: 'var(--primary-color)', marginLeft: '8px' }}>
               ⬇️

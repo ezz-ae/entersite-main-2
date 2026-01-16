@@ -7,7 +7,7 @@ service cloud.firestore {
     }
 
     function tenantFromToken() {
-      return request.auth.token.tenantId != null ? request.auth.token.tenantId : request.auth.uid;
+      return request.auth.token.tenantId;
     }
 
     function hasRole(allowedRoles) {
@@ -100,46 +100,40 @@ service cloud.firestore {
       allow write: if isTenantAdmin(tenantId);
     }
 
-    // Sites owned by a tenant or legacy ownerUid-only entries
+    // Sites are tenant-owned
     match /sites/{siteId} {
-      allow create: if false;
-
-      allow read, update, delete: if isSignedIn() && (
-        (resource.data.tenantId == tenantFromToken()) ||
-        (resource.data.tenantId == null && resource.data.ownerUid == request.auth.uid)
-      );
+      allow create: if false; // Created via API
+      allow read, update, delete: if isTenantMember(resource.data.tenantId);
     }
 
     // Contacts are tenant-owned
     match /contacts/{contactId} {
       allow create: if isSignedIn() && request.resource.data.tenantId == tenantFromToken();
-      allow read, update, delete: if isSignedIn() && resource.data.tenantId == tenantFromToken();
+      allow read, update, delete: if isTenantMember(resource.data.tenantId);
     }
 
     // Bot event logs are tenant-owned
     match /bot_events/{eventId} {
       allow create: if isSignedIn() && request.resource.data.tenantId == tenantFromToken();
-      allow read, update, delete: if isSignedIn() && resource.data.tenantId == tenantFromToken();
+      allow read, update, delete: if isTenantMember(resource.data.tenantId);
     }
 
-    // Legacy projects (owner-only)
+    // Projects are tenant-owned
     match /projects/{projectId} {
-      allow read, update, delete: if isSignedIn() && request.auth.uid == resource.data.ownerUid;
-      allow create: if isSignedIn() && request.resource.data.ownerUid == request.auth.uid;
+      allow read, update, delete: if isTenantMember(resource.data.tenantId);
+      allow create: if isSignedIn() && isTenantMember(request.resource.data.tenantId);
       match /pages/{pageId} {
-        allow read, create, update, delete: if isSignedIn()
-          && get(/databases/$(database)/documents/projects/$(projectId)).data.ownerUid == request.auth.uid;
+        allow read, create, update, delete: if isTenantMember(get(/databases/$(database)/documents/projects/$(projectId)).data.tenantId);
       }
       match /audiences/{audId} {
-        allow read, create, update, delete: if isSignedIn()
-          && get(/databases/$(database)/documents/projects/$(projectId)).data.ownerUid == request.auth.uid;
+        allow read, create, update, delete: if isTenantMember(get(/databases/$(database)/documents/projects/$(projectId)).data.tenantId);
       }
     }
 
-    // Jobs are owner-scoped
+    // Jobs are tenant-owned
     match /jobs/{jobId} {
-      allow create: if isSignedIn() && request.resource.data.ownerUid == request.auth.uid;
-      allow read, update, delete: if isSignedIn() && resource.data.ownerUid == request.auth.uid;
+      allow create: if isSignedIn() && isTenantMember(request.resource.data.tenantId);
+      allow read, update, delete: if isTenantMember(resource.data.tenantId);
     }
 
     // Content posts are admin-only (server can still write)
