@@ -50,7 +50,7 @@ export default function InstagramAssistantPage() {
                 asChild
                 className="h-12 sm:h-14 md:h-16 w-full sm:w-auto rounded-full bg-white text-black font-black text-base sm:text-lg hover:scale-105 transition-all shadow-2xl shadow-white/10"
               >
-                <Link href="/dashboard/chat-agent">
+                <Link href="/chat-agent">
                   Get Your Assistant <ArrowRight className="ml-2 h-5 w-5" />
                 </Link>
               </Button>
@@ -166,7 +166,7 @@ export default function InstagramAssistantPage() {
               asChild
               className="h-12 w-full sm:w-auto rounded-full bg-white text-black font-black text-base hover:scale-105 transition-all shadow-2xl shadow-white/10"
             >
-              <Link href="/dashboard/chat-agent">
+              <Link href="/chat-agent">
                 Connect Instagram <ArrowRight className="ml-2 h-5 w-5" />
               </Link>
             </Button>

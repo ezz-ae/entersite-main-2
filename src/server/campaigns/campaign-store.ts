@@ -3,7 +3,6 @@ import type { Campaign, CampaignLanding, CampaignObjective } from './campaign-ty
 
 export async function createCampaign(params: {
   tenantId: string;
-  ownerUid: string;
   name: string;
   objective: CampaignObjective;
 }) {
@@ -14,7 +13,6 @@ export async function createCampaign(params: {
   const doc: Campaign = {
     id: ref.id,
     tenantId: params.tenantId,
-    ownerUid: params.ownerUid,
     name: params.name,
     objective: params.objective,
     status: 'draft',
@@ -40,10 +38,9 @@ export async function getCampaign(params: { campaignId: string }) {
   return snap.data() as Campaign;
 }
 
-export async function listCampaigns(params: { tenantId: string; ownerUid?: string }) {
+export async function listCampaigns(params: { tenantId: string }) {
   const db = getAdminDb();
-  let q: FirebaseFirestore.Query = db.collection('campaigns').where('tenantId', '==', params.tenantId);
-  if (params.ownerUid) q = q.where('ownerUid', '==', params.ownerUid);
+  const q: FirebaseFirestore.Query = db.collection('campaigns').where('tenantId', '==', params.tenantId);
 
   const snap = await q.orderBy('updatedAt', 'desc').limit(50).get();
   return snap.docs.map((d) => d.data() as Campaign);

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from "react";
+import Link from 'next/link';
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -17,7 +18,6 @@ import { Badge } from "@/components/ui/badge";
 import { X } from "lucide-react";
 import type { SitePage } from "@/lib/types";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { GoogleAdsManager } from "@/components/ads/google-ads-manager";
 
 interface SeoSettingsDialogProps {
   open: boolean;
@@ -31,6 +31,14 @@ export function SeoSettingsDialog({ open, onOpenChange, page, onSave }: SeoSetti
   const [description, setDescription] = useState(page.seo.description);
   const [keywords, setKeywords] = useState<string[]>(page.seo.keywords || []);
   const [currentKeyword, setCurrentKeyword] = useState("");
+  const adsParams = new URLSearchParams({ origin: 'builder' });
+  if (page.publishedUrl) {
+    adsParams.set('landing', page.publishedUrl);
+  } else if (page.customDomain) {
+    adsParams.set('landing', `https://${page.customDomain}`);
+  }
+  if (page.title) adsParams.set('title', page.title);
+  if (page.seo.description) adsParams.set('description', page.seo.description);
 
   // Reset state when page changes
   useEffect(() => {
@@ -153,7 +161,20 @@ export function SeoSettingsDialog({ open, onOpenChange, page, onSave }: SeoSetti
                 </TabsContent>
 
                 <TabsContent value="ads" className="h-full">
-                    <GoogleAdsManager pageTitle={title} pageDescription={description} />
+                    <div className="rounded-xl border border-border bg-muted/40 p-6">
+                        <div className="space-y-2">
+                            <h3 className="text-lg font-semibold">Run Google Ads from the Campaign System</h3>
+                            <p className="text-sm text-muted-foreground">
+                                Ads are now managed in the Google Ads module to keep campaigns, landing surfaces, and
+                                reporting aligned. Use the full workflow there to launch a campaign tied to this page.
+                            </p>
+                        </div>
+                        <div className="mt-4">
+                            <Button asChild>
+                                <Link href={`/google-ads/start?${adsParams.toString()}`}>Open Google Ads</Link>
+                            </Button>
+                        </div>
+                    </div>
                 </TabsContent>
             </Tabs>
         </div>

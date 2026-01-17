@@ -4,6 +4,7 @@ import { generateSiteStructure } from '@/lib/ai/vertex-service';
 import { getAdminDb } from '@/server/firebase-admin';
 import { requireRole, UnauthorizedError, ForbiddenError } from '@/server/auth';
 import { ALL_ROLES } from '@/lib/server/roles';
+import { enforceSameOrigin } from '@/lib/server/security';
 import {
   enforceUsageLimit,
   PlanLimitError,
@@ -13,7 +14,8 @@ import { SitePage, Block } from '@/lib/types';
 
 export async function POST(req: NextRequest) {
     try {
-        const { tenantId, uid } = await requireRole(req, ALL_ROLES);
+        enforceSameOrigin(req);
+        const { tenantId } = await requireRole(req, ALL_ROLES);
         const { projectId, extractedText, language } = await req.json();
 
         if (!projectId || !extractedText) {
@@ -35,7 +37,6 @@ export async function POST(req: NextRequest) {
             seo: siteData.seo,
             canonicalListings: [],
             brochureUrl: '',
-            ownerUid: uid,
             tenantId,
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString(),

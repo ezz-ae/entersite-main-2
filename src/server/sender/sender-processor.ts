@@ -13,9 +13,11 @@ import {
   listDueSenderRunsForTenant,
   updateSenderRun,
 } from './sender-store';
+import { writeSenderEvent } from './sender-events';
 import { writeAudienceEvent } from '@/server/audience/write-event';
 import type { AudienceProfile } from '@/server/audience/profile-types';
 import { writeAudienceAction } from '@/server/audience/write-action';
+import type { LeadDirection } from '@/lib/lead-direction';
 
 function renderTemplate(text: string, vars: Record<string, string>) {
   let out = text || '';
@@ -153,7 +155,9 @@ async function loadCampaignAndLead(params: {
   const [campSnap, leadSnap] = await Promise.all([campRef.get(), leadRef.get()]);
   if (!campSnap.exists) throw new Error('Campaign not found');
   if (!leadSnap.exists) throw new Error('Lead not found');
-  return { campaign: { id: campSnap.id, ...campSnap.data() }, lead: { id: leadSnap.id, ...leadSnap.data() } };
+  const campaignData = (campSnap.data() || {}) as Record<string, any>;
+  const leadData = (leadSnap.data() || {}) as Record<string, any>;
+  return { campaign: { id: campSnap.id, ...campaignData }, lead: { id: leadSnap.id, ...leadData } };
 }
 
 function resolveDraft(campaign: any): { enabled: boolean; draft: SmartSequenceDraft; delays: SenderDelays } {
@@ -168,11 +172,23 @@ function resolveDraft(campaign: any): { enabled: boolean; draft: SmartSequenceDr
 }
 
 async function processOneRun(run: SenderRun) {
-  const { campaign, lead } = await loadCampaignAndLead({
+  const loaded = await loadCampaignAndLead({
     tenantId: run.tenantId,
     campaignId: run.campaignId,
     leadId: run.leadId,
   });
+  const campaign = loaded.campaign as Record<string, any>;
+  const lead = loaded.lead as Record<string, any>;
+  const leadDirection = (lead?.direction as LeadDirection | null) ?? null;
+  const leadHotScore = typeof lead?.hotScore === 'number' ? lead.hotScore : null;
+  const baseEvent = {
+    tenantId: run.tenantId,
+    campaignId: run.campaignId,
+    leadId: run.leadId,
+    runId: run.id,
+    direction: leadDirection,
+    hotScore: leadHotScore,
+  };
 
   // Audience action hook: if a lead is already HOT, suppress further automation.
   // This prevents spamming high-intent leads while keeping the pipe deterministic.
@@ -192,11 +208,26 @@ async function processOneRun(run: SenderRun) {
         tenantId: run.tenantId,
         runId: run.id,
         patch: {
-          status: 'stopped',
+          status: 'suppressed',
           lastError: 'Suppressed: lead is hot',
-          history: [...(run.history || []), { at: Date.now(), channel: 'skip', ok: true, message: 'Suppressed (hot lead)' }],
+          history: [
+            ...(run.history || []),
+            { at: Date.now(), channel: 'skip', ok: true, message: 'Suppressed (hot lead)' },
+          ],
         },
       });
+      try {
+        await writeSenderEvent({
+          ...baseEvent,
+          type: 'sender.suppressed_hot',
+          stepIndex: run.stepIndex,
+          channel: 'none',
+          reason: 'Suppressed: lead is hot',
+          hotScore: profile?.totalWeight ?? leadHotScore,
+        });
+      } catch {
+        // never block
+      }
       try {
         await writeAudienceAction({
           tenantId: run.tenantId,
@@ -205,7 +236,12 @@ async function processOneRun(run: SenderRun) {
           type: 'sender.suppressed_hot',
           fromTier: tier,
           toTier: tier,
-          payload: { runId: run.id, stepIndex: run.stepIndex },
+          payload: {
+            runId: run.id,
+            stepIndex: run.stepIndex,
+            leadId: run.leadId,
+            hotScore: profile?.totalWeight ?? null,
+          },
         });
       } catch {
         // never block
@@ -248,15 +284,63 @@ async function processOneRun(run: SenderRun) {
   // Step resolution with skipping if channel not available
   if (run.stepIndex === 0) {
     if (!draft.email || !emailTo) {
-      history.push({ at: now, channel: 'skip', ok: true, message: 'Skip email (missing draft or lead email)' });
+      const reason = 'Skip email (missing draft or lead email)';
+      history.push({ at: now, channel: 'skip', ok: true, message: reason });
+      try {
+        await writeSenderEvent({
+          ...baseEvent,
+          type: 'sender.step.skipped',
+          stepIndex: 0,
+          channel: 'email',
+          reason,
+        });
+      } catch {
+        // never block
+      }
       await updateSenderRun({ tenantId: run.tenantId, runId: run.id, patch: { stepIndex: 1, nextAt: now } });
       return { ok: true, action: 'skipped_email' };
     }
 
     const subject = renderTemplate(draft.email.subject, vars);
     const body = renderTemplate(draft.email.body, vars).replaceAll('\n', '<br/>');
-    await sendEmail({ tenantId: run.tenantId, to: emailTo, subject, bodyHtml: body });
-    history.push({ at: now, channel: 'email', ok: true });
+    try {
+      await sendEmail({ tenantId: run.tenantId, to: emailTo, subject, bodyHtml: body });
+      history.push({ at: now, channel: 'email', ok: true });
+      try {
+        await writeSenderEvent({
+          ...baseEvent,
+          type: 'sender.step.sent',
+          stepIndex: 0,
+          channel: 'email',
+        });
+      } catch {
+        // never block
+      }
+    } catch (err: any) {
+      const message = err?.message || 'Email failed';
+      history.push({ at: now, channel: 'email', ok: false, message });
+      try {
+        await writeSenderEvent({
+          ...baseEvent,
+          type: 'sender.step.failed',
+          stepIndex: 0,
+          channel: 'email',
+          reason: message,
+        });
+      } catch {
+        // never block
+      }
+      await updateSenderRun({
+        tenantId: run.tenantId,
+        runId: run.id,
+        patch: {
+          status: 'failed',
+          lastError: message,
+          history,
+        },
+      });
+      return { ok: false, reason: 'email_failed' };
+    }
 
     try {
       await writeAudienceEvent({
@@ -285,14 +369,62 @@ async function processOneRun(run: SenderRun) {
 
   if (run.stepIndex === 1) {
     if (!draft.sms || !phoneTo) {
-      history.push({ at: now, channel: 'skip', ok: true, message: 'Skip SMS (missing draft or lead phone)' });
+      const reason = 'Skip SMS (missing draft or lead phone)';
+      history.push({ at: now, channel: 'skip', ok: true, message: reason });
+      try {
+        await writeSenderEvent({
+          ...baseEvent,
+          type: 'sender.step.skipped',
+          stepIndex: 1,
+          channel: 'sms',
+          reason,
+        });
+      } catch {
+        // never block
+      }
       await updateSenderRun({ tenantId: run.tenantId, runId: run.id, patch: { stepIndex: 2, nextAt: now } });
       return { ok: true, action: 'skipped_sms' };
     }
 
     const msg = renderTemplate(draft.sms.message, vars);
-    await sendSms({ tenantId: run.tenantId, to: phoneTo, message: msg });
-    history.push({ at: now, channel: 'sms', ok: true });
+    try {
+      await sendSms({ tenantId: run.tenantId, to: phoneTo, message: msg });
+      history.push({ at: now, channel: 'sms', ok: true });
+      try {
+        await writeSenderEvent({
+          ...baseEvent,
+          type: 'sender.step.sent',
+          stepIndex: 1,
+          channel: 'sms',
+        });
+      } catch {
+        // never block
+      }
+    } catch (err: any) {
+      const message = err?.message || 'SMS failed';
+      history.push({ at: now, channel: 'sms', ok: false, message });
+      try {
+        await writeSenderEvent({
+          ...baseEvent,
+          type: 'sender.step.failed',
+          stepIndex: 1,
+          channel: 'sms',
+          reason: message,
+        });
+      } catch {
+        // never block
+      }
+      await updateSenderRun({
+        tenantId: run.tenantId,
+        runId: run.id,
+        patch: {
+          status: 'failed',
+          lastError: message,
+          history,
+        },
+      });
+      return { ok: false, reason: 'sms_failed' };
+    }
 
     try {
       await writeAudienceEvent({
@@ -321,14 +453,62 @@ async function processOneRun(run: SenderRun) {
 
   if (run.stepIndex === 2) {
     if (!draft.whatsapp || !phoneTo) {
-      history.push({ at: now, channel: 'skip', ok: true, message: 'Skip WhatsApp (missing draft or lead phone)' });
+      const reason = 'Skip WhatsApp (missing draft or lead phone)';
+      history.push({ at: now, channel: 'skip', ok: true, message: reason });
+      try {
+        await writeSenderEvent({
+          ...baseEvent,
+          type: 'sender.step.skipped',
+          stepIndex: 2,
+          channel: 'whatsapp',
+          reason,
+        });
+      } catch {
+        // never block
+      }
       await updateSenderRun({ tenantId: run.tenantId, runId: run.id, patch: { stepIndex: 3, nextAt: now } });
       return { ok: true, action: 'skipped_whatsapp' };
     }
 
     const msg = renderTemplate(draft.whatsapp.message, vars);
-    await sendWhatsapp({ tenantId: run.tenantId, to: phoneTo, message: msg });
-    history.push({ at: now, channel: 'whatsapp', ok: true });
+    try {
+      await sendWhatsapp({ tenantId: run.tenantId, to: phoneTo, message: msg });
+      history.push({ at: now, channel: 'whatsapp', ok: true });
+      try {
+        await writeSenderEvent({
+          ...baseEvent,
+          type: 'sender.step.sent',
+          stepIndex: 2,
+          channel: 'whatsapp',
+        });
+      } catch {
+        // never block
+      }
+    } catch (err: any) {
+      const message = err?.message || 'WhatsApp failed';
+      history.push({ at: now, channel: 'whatsapp', ok: false, message });
+      try {
+        await writeSenderEvent({
+          ...baseEvent,
+          type: 'sender.step.failed',
+          stepIndex: 2,
+          channel: 'whatsapp',
+          reason: message,
+        });
+      } catch {
+        // never block
+      }
+      await updateSenderRun({
+        tenantId: run.tenantId,
+        runId: run.id,
+        patch: {
+          status: 'failed',
+          lastError: message,
+          history,
+        },
+      });
+      return { ok: false, reason: 'whatsapp_failed' };
+    }
 
     try {
       await writeAudienceEvent({

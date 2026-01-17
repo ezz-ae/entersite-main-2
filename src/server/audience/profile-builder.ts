@@ -28,8 +28,9 @@ export async function buildAudienceProfiles(params: {
   const cutoff = Date.now() - withinDays * 24 * 60 * 60 * 1000;
 
   let q: FirebaseFirestore.Query = db
+    .collection('tenants')
+    .doc(params.tenantId)
     .collection('events')
-    .where('tenantId', '==', params.tenantId)
     .where('ts', '>=', cutoff);
   if (params.campaignId) q = q.where('campaignId', '==', params.campaignId);
 

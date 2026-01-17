@@ -6,8 +6,8 @@ import { AuthProvider } from '@/hooks/useAuth';
 import { SiteHeader } from '@/components/site-header';
 import { SiteFooter } from '@/components/site-footer';
 
-const HIDDEN_PREFIXES = ['/dashboard', '/builder', '/admin', '/api'];
-const HIDDEN_ROUTES = new Set(['/init', '/profile']);
+const HIDDEN_PREFIXES = ['/builder', '/admin', '/api'];
+const HIDDEN_ROUTES = new Set(['/init', '/profile', '/login']);
 
 function shouldShowPublicChrome(pathname: string) {
   if (HIDDEN_ROUTES.has(pathname)) {

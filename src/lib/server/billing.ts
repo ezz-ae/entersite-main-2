@@ -39,6 +39,11 @@ export type SubscriptionRecord = {
   status: SubscriptionStatus;
   creditBalance: number; // New field for prepaid credits in AED
   monthlySpendCap?: number | null; // Optional spend cap
+  monthlySpendUsed?: number;
+  pauseWhenCapReached?: boolean;
+  isPausedDueToSpendCap?: boolean;
+  vatNumber?: string | null;
+  paymentModel?: 'prepaid' | 'postpaid';
   currentPeriodStart?: string | null;
   currentPeriodEnd?: string | null;
   cancelAtPeriodEnd?: boolean | null;
@@ -366,7 +371,16 @@ function normalizeSubscription(
     plan,
     status,
     creditBalance: Number(data?.creditBalance || 0),
-    monthlySpendCap: data?.monthlySpendCap ? Number(data.monthlySpendCap) : null,
+    monthlySpendCap:
+      data?.monthlySpendCap === null || data?.monthlySpendCap === undefined
+        ? null
+        : Number(data.monthlySpendCap),
+    monthlySpendUsed: Number(data?.monthlySpendUsed || 0),
+    pauseWhenCapReached: typeof data?.pauseWhenCapReached === 'boolean' ? data.pauseWhenCapReached : false,
+    isPausedDueToSpendCap:
+      typeof data?.isPausedDueToSpendCap === 'boolean' ? data.isPausedDueToSpendCap : false,
+    vatNumber: typeof data?.vatNumber === 'string' ? data.vatNumber : null,
+    paymentModel: data?.paymentModel === 'postpaid' ? 'postpaid' : 'prepaid',
     currentPeriodStart: data?.currentPeriodStart ? String(data.currentPeriodStart) : null,
     currentPeriodEnd: data?.currentPeriodEnd ? String(data.currentPeriodEnd) : null,
     cancelAtPeriodEnd:
@@ -496,6 +510,11 @@ export async function ensureSubscription(db: Firestore, tenantId: string): Promi
     trial: createTrialState(now),
     creditBalance: 0, // Initialize with zero credit
     monthlySpendCap: null,
+    monthlySpendUsed: 0,
+    pauseWhenCapReached: false,
+    isPausedDueToSpendCap: false,
+    vatNumber: null,
+    paymentModel: 'prepaid',
     currentPeriodStart: null,
     currentPeriodEnd: null,
     cancelAtPeriodEnd: false,
@@ -583,9 +602,33 @@ export async function enforceUsageLimits(
         throw new Error(`Usage not allowed for status: ${effectiveStatus}`);
       }
       
+      if (subscription.isPausedDueToSpendCap) {
+        throw new SpendCapExceededError(subscription.monthlySpendCap ?? 0);
+      }
+
+      const cap = subscription.monthlySpendCap;
+      if (cap !== null && cap !== undefined) {
+        const currentSpend = Number(subscription.monthlySpendUsed || 0);
+        if (currentSpend + totalCost > cap) {
+          if (subscription.pauseWhenCapReached) {
+            tx.set(
+              subscriptionRef,
+              {
+                isPausedDueToSpendCap: true,
+                updatedAt: FieldValue.serverTimestamp(),
+              },
+              { merge: true },
+            );
+          }
+          throw new SpendCapExceededError(cap);
+        }
+      }
+      
       // 3. Decrement credit balance
       tx.set(subscriptionRef, {
         creditBalance: FieldValue.increment(-totalCost),
+        monthlySpendUsed: FieldValue.increment(totalCost),
+        isPausedDueToSpendCap: false,
         updatedAt: FieldValue.serverTimestamp(),
       }, { merge: true });
       
@@ -617,6 +660,12 @@ export async function enforceUsageLimits(
         type: 'insufficient_credit',
         cost: error.cost,
         balance: error.balance,
+      });
+    }
+    if (error instanceof SpendCapExceededError) {
+      await logBillingEvent(db, tenantId, {
+        type: 'spend_cap_exceeded',
+        cap: error.cap,
       });
     }
     throw error;

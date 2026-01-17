@@ -8,6 +8,7 @@ import { createApiLogger } from '@/lib/logger';
 import { CAP } from '@/lib/capabilities';
 import { resend, fromEmail } from '@/lib/resend';
 import { ADMIN_ROLES } from '@/lib/server/roles';
+import { enforceSameOrigin } from '@/lib/server/security';
 import {
   checkUsageLimit,
   enforceUsageLimit,
@@ -28,6 +29,7 @@ const payloadSchema = z.object({
 export async function POST(req: NextRequest) {
   const logger = createApiLogger(req, { route: 'POST /api/email/send' });
   try {
+    enforceSameOrigin(req);
     const { tenantId, uid } = await requireRole(req, ADMIN_ROLES);
     if (!CAP.resend || !resend) {
       logger.logError('Resend not configured', 500);

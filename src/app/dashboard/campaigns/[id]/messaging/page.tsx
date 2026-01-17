@@ -10,6 +10,7 @@ import { Switch } from '@/components/ui/switch';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Loader2, Send, Save } from 'lucide-react';
+import { authorizedFetch } from '@/lib/auth-fetch';
 
 type SmartSequenceDraft = {
   email: { subject: string; body: string };
@@ -64,7 +65,7 @@ export default function CampaignMessagingPage() {
     let mounted = true;
     (async () => {
       try {
-        const res = await fetch(`/api/campaigns/${id}`);
+        const res = await authorizedFetch(`/api/campaigns/${id}`);
         const data = await res.json();
         if (!mounted) return;
         setCampaign(data?.campaign);
@@ -94,9 +95,8 @@ export default function CampaignMessagingPage() {
     setSuccess(null);
     setSaving(true);
     try {
-      const res = await fetch(`/api/campaigns/${id}/bindings`, {
+      const res = await authorizedFetch(`/api/campaigns/${id}/bindings`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           bindings: {
             sender: {
@@ -136,9 +136,8 @@ export default function CampaignMessagingPage() {
     try {
       // Email first
       if (testEmail) {
-        const emailRes = await fetch('/api/email/send', {
+        const emailRes = await authorizedFetch('/api/email/send', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             to: testEmail,
             subject: renderTemplate(draft.email.subject),
@@ -151,9 +150,8 @@ export default function CampaignMessagingPage() {
 
       // Then SMS
       if (testPhone) {
-        const smsRes = await fetch('/api/sms/send', {
+        const smsRes = await authorizedFetch('/api/sms/send', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             to: testPhone,
             message: renderTemplate(draft.sms.message),
@@ -165,9 +163,8 @@ export default function CampaignMessagingPage() {
 
       // Optional WhatsApp (best-effort)
       if (testPhone) {
-        const waRes = await fetch('/api/whatsapp/send', {
+        const waRes = await authorizedFetch('/api/whatsapp/send', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             to: testPhone,
             message: renderTemplate(draft.whatsapp.message),
@@ -202,9 +199,8 @@ export default function CampaignMessagingPage() {
 
     setRunning(true);
     try {
-      const res = await fetch(`/api/campaigns/${id}/sender/run`, {
+      const res = await authorizedFetch(`/api/campaigns/${id}/sender/run`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ mode, limit: 25 }),
       });
       const data = await res.json();
@@ -230,7 +226,7 @@ export default function CampaignMessagingPage() {
 
     setProcessing(true);
     try {
-      const res = await fetch(`/api/campaigns/${id}/sender/process?limit=25`, { method: 'POST' });
+      const res = await authorizedFetch(`/api/campaigns/${id}/sender/process?limit=25`, { method: 'POST' });
       const data = await res.json();
       if (!res.ok) throw new Error(data?.error || 'Failed to process queue');
       setRunReport(data);
@@ -263,7 +259,7 @@ export default function CampaignMessagingPage() {
           </div>
         </div>
         <div className="flex gap-2">
-          <Link href={`/dashboard/campaigns/${id}`}>
+          <Link href={`/google-ads/campaigns/${id}`}>
             <Button variant="outline">Back</Button>
           </Link>
           <Button onClick={save} disabled={saving}>
@@ -306,7 +302,7 @@ export default function CampaignMessagingPage() {
               onChange={(e) => setDraft({ ...draft, email: { ...draft.email, body: e.target.value } })}
               rows={8}
             />
-            <div className="text-xs opacity-70">Use <code>{{'{{landing_url}}'}}</code> in templates.</div>
+            <div className="text-xs opacity-70">Use <code>{'{{landing_url}}'}</code> in templates.</div>
           </CardContent>
         </Card>
 

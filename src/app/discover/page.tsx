@@ -16,21 +16,23 @@ import {
     Cpu,
     Building
 } from "lucide-react";
-import type { ProjectData } from '@/lib/types';
+import type { ProjectData, InventoryCta } from '@/lib/types';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { ENTRESTATE_INVENTORY } from '@/data/entrestate-inventory';
 
-const PROJECTS_PER_PAGE = 12;
+const PROJECTS_PER_PAGE = 25;
 
 export default function DiscoverPage() {
   const router = useRouter();
-  const [projects, setProjects] = useState<ProjectData[]>([]);
+  const [projects, setProjects] = useState<Array<ProjectData | InventoryCta>>([]);
   const [loading, setLoading] = useState(true);
   const [searchInput, setSearchInput] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCity, setSelectedCity] = useState("all");
+  const searchParams = useSearchParams();
+  const initialCity = searchParams.get('city') || 'all';
+  const [selectedCity, setSelectedCity] = useState(initialCity);
   const [page, setPage] = useState(1);
   const [totalProjects, setTotalProjects] = useState(0);
   const [showingSample, setShowingSample] = useState(false);
@@ -87,7 +89,7 @@ export default function DiscoverPage() {
   }, [fetchProjects]);
 
   const handleProjectClick = (projectId: string) => {
-    router.push(`/discover/${encodeURIComponent(projectId)}`);
+    router.push(`/inventory/project/${encodeURIComponent(projectId)}`);
   };
 
   const handleLoadSample = () => {
@@ -103,11 +105,11 @@ export default function DiscoverPage() {
   };
 
   const totalPages = Math.max(1, Math.ceil(totalProjects / PROJECTS_PER_PAGE));
-  const showingCount = projects.length;
+  const showingCount = projects.filter((item) => !isInventoryCta(item)).length;
   const canLoadMore = showingSample
-    ? projects.length < ENTRESTATE_INVENTORY.length
-    : projects.length < totalProjects;
-  const launchPackHref = '/start?intent=website';
+    ? showingCount < ENTRESTATE_INVENTORY.length
+    : showingCount < totalProjects;
+  const launchPackHref = '/login?returnTo=/builder?start=1';
 
   return (
     <main className="min-h-screen bg-black text-white flex flex-col font-sans selection:bg-blue-500/30">
@@ -238,11 +240,15 @@ export default function DiscoverPage() {
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 sm:gap-8">
                     {projects.map((project) => (
-                        <ProjectCard 
-                            key={project.id} 
-                            project={project} 
-                            onClick={() => handleProjectClick(project.id)} 
-                        />
+                        isInventoryCta(project) ? (
+                          <InventoryCtaCard key={project.id} cta={project} />
+                        ) : (
+                          <ProjectCard 
+                              key={project.id} 
+                              project={project} 
+                              onClick={() => handleProjectClick(project.id)} 
+                          />
+                        )
                     ))}
                 </div>
             )}
@@ -255,7 +261,7 @@ export default function DiscoverPage() {
                         onClick={() => fetchProjects(page + 1, { append: true })}
                     >
                         {loading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : null}
-                        Load 12 More
+                        Load {PROJECTS_PER_PAGE} More
                     </Button>
                     <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">
                       Page {page} of {totalPages}
@@ -311,6 +317,33 @@ export default function DiscoverPage() {
 interface ProjectCardProps {
   project: ProjectData;
   onClick: () => void;
+}
+
+function isInventoryCta(item: ProjectData | InventoryCta): item is InventoryCta {
+  return (item as InventoryCta).type === 'inventory-cta';
+}
+
+function InventoryCtaCard({ cta }: { cta: InventoryCta }) {
+  return (
+    <Card className="relative overflow-hidden rounded-[2rem] sm:rounded-[2.5rem] border border-white/10 bg-gradient-to-br from-blue-600/20 via-blue-950/10 to-transparent p-6 sm:p-8 text-white">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(59,130,246,0.3),_transparent_55%)] opacity-60" />
+      <div className="relative space-y-5">
+        <Badge className="bg-blue-500/20 text-blue-200 border border-blue-500/30 text-[9px] uppercase tracking-widest">
+          Market data
+        </Badge>
+        <div>
+          <h3 className="text-2xl sm:text-3xl font-black tracking-tight">{cta.title}</h3>
+          <p className="text-sm sm:text-base text-zinc-300 mt-2">{cta.subtitle}</p>
+        </div>
+        <Button asChild className="h-11 sm:h-12 rounded-full bg-white text-black font-bold">
+          <a href={cta.ctaHref}>{cta.ctaLabel}</a>
+        </Button>
+        {cta.description ? (
+          <p className="text-xs text-zinc-400">{cta.description}</p>
+        ) : null}
+      </div>
+    </Card>
+  );
 }
 
 function ProjectCard({ project, onClick }: ProjectCardProps) {

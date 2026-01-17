@@ -21,7 +21,8 @@ export default function JobsDashboard() {
   useEffect(() => {
     if (!user) return;
     setLoading(true);
-    const unsubscribe = subscribeToJobs(user.uid, (data) => {
+    const tenantId = user.uid;
+    const unsubscribe = subscribeToJobs(tenantId, (data) => {
         setJobs(data);
         setLoading(false);
     });
@@ -30,7 +31,8 @@ export default function JobsDashboard() {
 
   const handleCreateTestJob = async () => {
     if (!user) return;
-    const newJob = await createJob(user.uid, 'site_generation', { prompt: 'Luxury Villa' });
+    const tenantId = user.uid;
+    const newJob = await createJob(tenantId, 'site_generation', { prompt: 'Luxury Villa' });
     processJob(newJob.id as string);
   };
 

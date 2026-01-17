@@ -4,7 +4,7 @@ export type SmartSequenceDraft = {
   whatsapp?: { message: string };
 };
 
-export type SenderRunStatus = 'pending' | 'running' | 'done' | 'failed';
+export type SenderRunStatus = 'pending' | 'running' | 'suppressed' | 'done' | 'failed';
 
 export type SenderRun = {
   id: string;
@@ -20,6 +20,7 @@ export type SenderRun = {
   updatedAt: number;
 
   lastError?: string;
+  suppressedReason?: string;
   history?: Array<{
     at: number;
     channel: 'email' | 'sms' | 'whatsapp' | 'skip';

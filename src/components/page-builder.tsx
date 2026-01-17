@@ -136,7 +136,8 @@ const renderBlock = (block: BlockType, context?: SiteBlockContext) => {
         siteId: context?.siteId,
       }
     : {};
-  return <Component {...block.data} {...leadProps} />;
+  const chatProps = block.type === 'chat-agent' ? { siteId: context?.siteId } : {};
+  return <Component {...block.data} {...leadProps} {...chatProps} />;
 };
 
 const AddBlockPopover = ({ onSelectBlock, currentBlocks, variant = 'default' }: { onSelectBlock: (blockType: string, data?: any) => void, currentBlocks: string[], variant?: 'default' | 'mini' }) => {

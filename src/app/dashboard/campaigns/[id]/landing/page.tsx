@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Loader2, ExternalLink, Plus } from 'lucide-react';
+import { authorizedFetch } from '@/lib/auth-fetch';
 
 type Site = {
   id: string;
@@ -35,7 +36,7 @@ export default function CampaignLandingPage() {
     let mounted = true;
     (async () => {
       try {
-        const res = await fetch('/api/sites');
+        const res = await authorizedFetch('/api/sites');
         const data = await res.json();
         const items = (data?.sites || []) as any[];
         if (mounted) setSites(items);
@@ -60,14 +61,13 @@ export default function CampaignLandingPage() {
     setLoading(true);
     setErr(null);
     try {
-      const res = await fetch(`/api/campaigns/${id}/landing`, {
+      const res = await authorizedFetch(`/api/campaigns/${id}/landing`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ mode: 'external', url: externalUrl }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data?.error || 'Failed to save landing');
-      router.push(`/dashboard/campaigns/${id}`);
+      router.push(`/google-ads/campaigns/${id}`);
     } catch (e: any) {
       setErr(e?.message || 'Error');
     } finally {
@@ -79,14 +79,13 @@ export default function CampaignLandingPage() {
     setLoading(true);
     setErr(null);
     try {
-      const res = await fetch(`/api/campaigns/${id}/landing`, {
+      const res = await authorizedFetch(`/api/campaigns/${id}/landing`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ mode: 'surface', siteId: selectedSiteId }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data?.error || 'Failed to attach surface');
-      router.push(`/dashboard/campaigns/${id}`);
+      router.push(`/google-ads/campaigns/${id}`);
     } catch (e: any) {
       setErr(e?.message || 'Error');
     } finally {
@@ -102,7 +101,7 @@ export default function CampaignLandingPage() {
           <p className="text-sm opacity-70">Step 1: external URL or a published Builder surface.</p>
         </div>
         <div className="flex gap-2">
-          <Link href={`/dashboard/campaigns/${id}`}>
+          <Link href={`/google-ads/campaigns/${id}`}>
             <Button variant="outline">Back</Button>
           </Link>
         </div>
@@ -159,7 +158,7 @@ export default function CampaignLandingPage() {
               <Button disabled={loading || !selectedSiteId} onClick={saveSurface} className="flex-1">
                 {loading ? (<><Loader2 className="w-4 h-4 mr-2 animate-spin" />Attaching…</>) : 'Attach'}
               </Button>
-              <Link href={`/dashboard/sites/new?type=landing&returnTo=/dashboard/campaigns/${id}/landing`}>
+              <Link href={`/builder?start=1&returnTo=/google-ads/campaigns/${id}/landing`}>
                 <Button variant="outline">
                   <Plus className="w-4 h-4 mr-2" />
                   Create

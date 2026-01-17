@@ -4,11 +4,13 @@ import { FieldValue } from 'firebase-admin/firestore';
 import { getAdminDb } from '@/server/firebase-admin';
 import { requireRole, UnauthorizedError, ForbiddenError } from '@/server/auth';
 import { ALL_ROLES } from '@/lib/server/roles';
+import { enforceSameOrigin } from '@/lib/server/security';
 import {
   enforceUsageLimit,
   PlanLimitError,
   planLimitErrorResponse,
 } from '@/lib/server/billing';
+import { DEFAULT_LEAD_DIRECTION } from '@/lib/lead-direction';
 
 const payloadSchema = z.object({
   name: z.string().min(1),
@@ -20,6 +22,7 @@ const payloadSchema = z.object({
 
 export async function POST(req: NextRequest) {
   try {
+    enforceSameOrigin(req);
     const payload = payloadSchema.parse(await req.json());
     const { tenantId } = await requireRole(req, ALL_ROLES);
 
@@ -31,7 +34,6 @@ export async function POST(req: NextRequest) {
       .collection('leads')
       .add({
         tenantId,
-        campaignId: payload.campaignId || null,
         name: payload.name,
         email: payload.email,
         phone: payload.phone || null,
@@ -39,6 +41,7 @@ export async function POST(req: NextRequest) {
         campaignId: payload.campaignId || null,
         status: 'New',
         priority: 'Warm',
+        direction: DEFAULT_LEAD_DIRECTION,
         source: 'Manual Entry',
         createdAt: FieldValue.serverTimestamp(),
         updatedAt: FieldValue.serverTimestamp(),

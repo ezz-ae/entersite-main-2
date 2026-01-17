@@ -5,6 +5,7 @@ import { requireRole, UnauthorizedError, ForbiddenError } from '@/server/auth';
 import { createApiLogger } from '@/lib/logger';
 import { CAP } from '@/lib/capabilities';
 import { ADMIN_ROLES } from '@/lib/server/roles';
+import { enforceSameOrigin } from '@/lib/server/security';
 import {
   checkUsageLimit,
   enforceUsageLimit,
@@ -33,6 +34,7 @@ function toWhatsAppNumber(raw: string) {
 export async function POST(req: NextRequest) {
   const logger = createApiLogger(req, { route: 'POST /api/whatsapp/send' });
   try {
+    enforceSameOrigin(req);
     const { tenantId, uid } = await requireRole(req, ADMIN_ROLES);
     logger.setTenant(tenantId);
     logger.setActor(uid);

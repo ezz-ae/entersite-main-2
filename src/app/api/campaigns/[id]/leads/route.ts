@@ -6,10 +6,14 @@ import { ALL_ROLES } from '@/lib/server/roles';
 // Lists leads routed to a campaign. This is the backbone for "campaign CRM" views.
 // Note: Ordering by createdAt may require a Firestore composite index for (campaignId, createdAt).
 
-export async function GET(req: NextRequest, ctx: { params: { id: string } }) {
+export async function GET(
+  req: NextRequest,
+  { params: paramsPromise }: { params: Promise<{ id: string }> }
+) {
+  const { id } = await paramsPromise;
   try {
     const { tenantId } = await requireRole(req, ALL_ROLES);
-    const campaignId = ctx.params.id;
+    const campaignId = id;
     const db = getAdminDb();
 
     // Ensure campaign exists and belongs to tenant

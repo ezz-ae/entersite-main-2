@@ -28,6 +28,6 @@ export async function writeAudienceEvent(input: {
     privacy: { pii: false },
   };
 
-  await db.collection('events').doc(id).set(event);
+  await db.collection('tenants').doc(input.tenantId).collection('events').doc(id).set(event);
   return event;
 }

@@ -60,8 +60,8 @@ export async function POST(req: NextRequest) {
       application_context: {
         brand_name: 'Entrestate',
         landing_page: 'LOGIN',
-        return_url: `${appUrl}/dashboard/billing?payment=success`,
-        cancel_url: `${appUrl}/dashboard/billing?payment=cancelled`,
+        return_url: `${appUrl}/account/billing?payment=success`,
+        cancel_url: `${appUrl}/account/billing?payment=cancelled`,
       },
     };
 

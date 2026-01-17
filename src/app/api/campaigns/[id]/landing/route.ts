@@ -5,6 +5,7 @@ import { ALL_ROLES } from '@/lib/server/roles';
 import { getAdminDb } from '@/server/firebase-admin';
 import { setCampaignLanding } from '@/server/campaigns/campaign-store';
 import { assertCampaignOwnedByTenant } from '@/server/campaigns/campaign-guards';
+import { enforceSameOrigin } from '@/lib/server/security';
 
 const externalSchema = z.object({
   mode: z.literal('external'),
@@ -30,10 +31,15 @@ async function resolveSiteUrl(tenantId: string, siteId: string) {
   return publishedUrl;
 }
 
-export async function PATCH(req: NextRequest, ctx: { params: { id: string } }) {
+export async function PATCH(
+  req: NextRequest,
+  { params: paramsPromise }: { params: Promise<{ id: string }> }
+) {
+  const { id } = await paramsPromise;
   try {
+    enforceSameOrigin(req);
     const { tenantId } = await requireRole(req, ALL_ROLES);
-    await assertCampaignOwnedByTenant({ campaignId: ctx.params.id, tenantId });
+    await assertCampaignOwnedByTenant({ campaignId: id, tenantId });
 
     const raw = await req.json();
     const mode = raw?.mode;
@@ -41,7 +47,7 @@ export async function PATCH(req: NextRequest, ctx: { params: { id: string } }) {
     if (mode === 'external') {
       const body = externalSchema.parse(raw);
       const campaign = await setCampaignLanding({
-        campaignId: ctx.params.id,
+        campaignId: id,
         landing: { mode: 'external', url: body.url },
       });
       return NextResponse.json({ campaign });
@@ -53,7 +59,7 @@ export async function PATCH(req: NextRequest, ctx: { params: { id: string } }) {
       if (!url) return NextResponse.json({ error: 'Surface not published or not found' }, { status: 404 });
 
       const campaign = await setCampaignLanding({
-        campaignId: ctx.params.id,
+        campaignId: id,
         landing: { mode: 'surface', siteId: body.siteId, url },
       });
       return NextResponse.json({ campaign });

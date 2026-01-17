@@ -63,6 +63,7 @@ async function queueRefinerJob() {
 
   const jobRef = await db.collection('jobs').add({
     ownerUid: OWNER_UID,
+    tenantId: SMOKE_TENANT_ID,
     type: 'site_refiner',
     status: 'queued',
     plan: {

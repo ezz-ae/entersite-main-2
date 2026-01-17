@@ -105,7 +105,7 @@ const GUIDE_SECTIONS = [
     title: 'Launch Google Ads',
     subtitle: 'Start with a simple campaign you can grow.',
     steps: [
-      'Start Google Ads from the dashboard (no billing needed).',
+      'Start Google Ads from the module screen (no billing needed).',
       'Pick a budget and the area you want to target.',
       'We launch the ads and keep you updated.',
     ],
@@ -221,6 +221,12 @@ export function DocsPageContent() {
               className="h-12 px-6 rounded-full border border-white/10 bg-black/40 text-zinc-200 font-bold text-xs uppercase tracking-widest inline-flex items-center gap-2 hover:bg-white/5 transition-all"
             >
               Technical Docs <ArrowRight className="h-4 w-4" />
+            </Link>
+            <Link
+              href="/docs/library/SYSTEM_FEED_MAP"
+              className="h-12 px-6 rounded-full border border-white/10 bg-black/40 text-zinc-200 font-bold text-xs uppercase tracking-widest inline-flex items-center gap-2 hover:bg-white/5 transition-all"
+            >
+              System Map <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
         </div>

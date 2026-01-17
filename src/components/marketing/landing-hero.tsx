@@ -172,7 +172,7 @@ export function LandingHero() {
           <div className="mt-8 flex flex-col sm:flex-row justify-center items-center gap-3 text-zinc-500">
             <span className="text-xs font-medium">Or start with a quick form</span>
             <ArrowRight className="h-3 w-3" />
-            <Link href="/start" className="text-white font-bold text-xs hover:underline">Start without a brochure</Link>
+            <Link href="/login" className="text-white font-bold text-xs hover:underline">Login without a brochure</Link>
          </div>
        </motion.div>
      </div>

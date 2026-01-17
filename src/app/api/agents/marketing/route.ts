@@ -5,6 +5,7 @@ import { getGoogleModel, PRO_MODEL } from '@/lib/ai/google';
 import { requireRole, UnauthorizedError, ForbiddenError } from '@/server/auth';
 import { getAdminDb } from '@/server/firebase-admin';
 import { ALL_ROLES } from '@/lib/server/roles';
+import { enforceSameOrigin } from '@/lib/server/security';
 
 const agentResponseSchema = z.object({
   siteType: z.enum(['roadshow', 'developer-focus', 'partner-launch', 'full-company', 'freelancer', 'map-focused', 'ads-launch', 'agent-portfolio', 'custom']).optional(),
@@ -55,6 +56,7 @@ const requestSchema = z.object({
 
 export async function POST(req: NextRequest) {
     try {
+        enforceSameOrigin(req);
         const { tenantId } = await requireRole(req, ALL_ROLES);
         const ip = req.headers.get('x-forwarded-for') || 'anonymous';
         if (!consumeRateLimit(ip)) {

@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Plus, Loader2 } from 'lucide-react';
+import { authorizedFetch } from '@/lib/auth-fetch';
 
 type Campaign = {
   id: string;
@@ -23,7 +24,7 @@ export default function CampaignsPage() {
     let mounted = true;
     (async () => {
       try {
-        const res = await fetch('/api/campaigns');
+        const res = await authorizedFetch('/api/campaigns');
         const data = await res.json();
         if (mounted) setCampaigns(data?.campaigns || []);
       } finally {
@@ -42,7 +43,7 @@ export default function CampaignsPage() {
           <h1 className="text-xl font-semibold">Campaigns</h1>
           <p className="text-sm opacity-70">Campaign is the execution spine. Everything binds here.</p>
         </div>
-        <Link href="/dashboard/campaigns/new">
+        <Link href="/google-ads/start">
           <Button>
             <Plus className="w-4 h-4 mr-2" />
             New campaign
@@ -57,7 +58,7 @@ export default function CampaignsPage() {
       ) : (
         <div className="grid gap-3 md:grid-cols-2">
           {campaigns.map((c) => (
-            <Link key={c.id} href={`/dashboard/campaigns/${c.id}`} className="block">
+            <Link key={c.id} href={`/google-ads/campaigns/${c.id}`} className="block">
               <Card className="hover:opacity-95">
                 <CardHeader>
                   <CardTitle className="text-base">{c.name}</CardTitle>

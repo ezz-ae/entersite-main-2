@@ -5,6 +5,7 @@ import { requireRole, UnauthorizedError, ForbiddenError } from '@/server/auth';
 import { createApiLogger } from '@/lib/logger';
 import { CAP } from '@/lib/capabilities';
 import { ADMIN_ROLES } from '@/lib/server/roles';
+import { enforceSameOrigin } from '@/lib/server/security';
 import {
   checkUsageLimit,
   enforceUsageLimit,
@@ -28,6 +29,7 @@ const payloadSchema = z.object({
 export async function POST(req: NextRequest) {
   const logger = createApiLogger(req, { route: 'POST /api/sms/send' });
   try {
+    enforceSameOrigin(req);
     const { tenantId, uid } = await requireRole(req, ADMIN_ROLES);
     if (!CAP.twilio || !ACCOUNT_SID || !AUTH_TOKEN || !FROM_NUMBER) {
       logger.logError('Twilio not configured', 500);

@@ -1,9 +1,5 @@
-import { GoogleAdsDashboard } from '@/components/google-ads/google-ads-dashboard';
+import { redirect } from 'next/navigation';
 
 export default function GoogleAdsPage() {
-  return (
-    <div className="h-full bg-zinc-950">
-      <GoogleAdsDashboard />
-    </div>
-  );
+  redirect('/google-ads');
 }

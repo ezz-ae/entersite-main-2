@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { authorizedFetch } from '@/lib/auth-fetch';
 
 export default function NewCampaignPage() {
   const router = useRouter();
@@ -18,14 +19,13 @@ export default function NewCampaignPage() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch('/api/campaigns', {
+      const res = await authorizedFetch('/api/campaigns', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name: name.trim() || 'New Campaign', objective }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data?.error || 'Failed to create campaign');
-      router.push(`/dashboard/campaigns/${data.campaign.id}/landing`);
+      router.push(`/google-ads/campaigns/${data.campaign.id}/landing`);
     } catch (e: any) {
       setError(e?.message || 'Error');
     } finally {

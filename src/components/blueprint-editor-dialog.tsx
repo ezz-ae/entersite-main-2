@@ -61,7 +61,7 @@ export function BlueprintEditorDialog({
               className="min-h-[150px] bg-zinc-950 border-zinc-700 mt-2 text-base focus-visible:ring-blue-500"
               rows={6}
             />
-             <p className="text-xs text-zinc-500 mt-2">Feel free to edit the description to better match your vision. The Smart will use this to create your site.</p>
+             <p className="text-xs text-zinc-500 mt-2">Feel free to edit the description to better match your vision. The Smart builder will use this to craft your site.</p>
           </div>
          
         </div>

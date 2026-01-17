@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Loader2, Link as LinkIcon } from 'lucide-react';
+import { authorizedFetch } from '@/lib/auth-fetch';
 
 export default function CampaignOverviewPage() {
   const { id } = useParams<{ id: string }>();
@@ -17,7 +18,7 @@ export default function CampaignOverviewPage() {
     let mounted = true;
     (async () => {
       try {
-        const res = await fetch(`/api/campaigns/${id}`);
+        const res = await authorizedFetch(`/api/campaigns/${id}`);
         const data = await res.json();
         if (mounted) setCampaign(data?.campaign);
       } finally {
@@ -52,10 +53,10 @@ export default function CampaignOverviewPage() {
           </div>
         </div>
         <div className="flex gap-2">
-          <Link href="/dashboard/campaigns">
+          <Link href="/google-ads/campaigns">
             <Button variant="outline">Back</Button>
           </Link>
-          <Link href={`/dashboard/campaigns/${id}/landing`}>
+          <Link href={`/google-ads/campaigns/${id}/landing`}>
             <Button>Landing</Button>
           </Link>
         </div>
@@ -81,7 +82,7 @@ export default function CampaignOverviewPage() {
 
       <div className="grid md:grid-cols-2 gap-3">
         <a
-          href={campaign?.landing?.url ? `/dashboard/campaigns/${campaign.id}/ads` : undefined}
+          href={campaign?.landing?.url ? `/google-ads/campaigns/${campaign.id}/ads` : undefined}
           className={campaign?.landing?.url ? '' : 'pointer-events-none'}
         >
           <Card className={campaign?.landing?.url ? 'hover:bg-zinc-900/40 transition' : 'opacity-60'}>
@@ -94,7 +95,7 @@ export default function CampaignOverviewPage() {
           </Card>
         </a>
         <a
-          href={campaign?.landing?.url ? `/dashboard/campaigns/${campaign.id}/messaging` : undefined}
+          href={campaign?.landing?.url ? `/google-ads/campaigns/${campaign.id}/messaging` : undefined}
           className={campaign?.landing?.url ? '' : 'pointer-events-none'}
         >
           <Card className={campaign?.landing?.url ? 'hover:bg-zinc-900/40 transition' : 'opacity-60'}>

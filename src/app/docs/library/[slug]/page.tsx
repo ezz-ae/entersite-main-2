@@ -19,19 +19,21 @@ export default async function DocsLibrarySlugPage({ params }: { params: Promise<
   const docsDir = path.join(process.cwd(), 'docs');
   const file = path.join(docsDir, `${slug}.md`);
 
+  let doc: { title: string; html: string };
   try {
-    const doc = await readMarkdownFile(file, slug);
-    return (
-      <main className="min-h-screen bg-black text-white py-24">
-        <div className="container mx-auto px-6 max-w-3xl">
-          <article className="prose prose-invert max-w-none prose-headings:tracking-tight prose-a:text-blue-300 prose-a:no-underline hover:prose-a:underline">
-            <h1>{doc.title}</h1>
-            <div dangerouslySetInnerHTML={{ __html: doc.html }} />
-          </article>
-        </div>
-      </main>
-    );
+    doc = await readMarkdownFile(file, slug);
   } catch {
     notFound();
   }
+
+  return (
+    <main className="min-h-screen bg-black text-white py-24">
+      <div className="container mx-auto px-6 max-w-3xl">
+        <article className="prose prose-invert max-w-none prose-headings:tracking-tight prose-a:text-blue-300 prose-a:no-underline hover:prose-a:underline">
+          <h1>{doc.title}</h1>
+          <div dangerouslySetInnerHTML={{ __html: doc.html }} />
+        </article>
+      </div>
+    </main>
+  );
 }

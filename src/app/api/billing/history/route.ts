@@ -1,15 +1,13 @@
 import { NextResponse, type NextRequest } from 'next/server';
-import { requireRole } from '@/lib/server/auth';
+import { requireRole } from '@/server/auth';
 import { getAdminDb } from '@/server/firebase-admin';
 import { createApiLogger } from '@/lib/logger';
-
-// All roles should be able to view billing history.
-const ALL_ROLES: Role[] = ['public', 'agent', 'team_admin', 'agency_admin', 'super_admin'];
+import { ADMIN_ROLES } from '@/lib/server/roles';
 
 export async function GET(req: NextRequest) {
   const logger = createApiLogger(req, { route: 'GET /api/billing/history' });
   try {
-    const { tenantId } = await requireRole(req, ALL_ROLES);
+    const { tenantId } = await requireRole(req, ADMIN_ROLES);
     
     if (tenantId === 'public' || tenantId === 'anonymous') {
       return NextResponse.json({ history: [] });

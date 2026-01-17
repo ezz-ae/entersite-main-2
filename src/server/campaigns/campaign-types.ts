@@ -44,7 +44,6 @@ export type CampaignBindings = {
 export type Campaign = {
   id: string;
   tenantId: string;
-  ownerUid: string;
 
   name: string;
   objective: CampaignObjective;

@@ -6,6 +6,7 @@ import { requireRole, UnauthorizedError, ForbiddenError } from '@/server/auth';
 import { CAP } from '@/lib/capabilities';
 import { resend, fromEmail } from '@/lib/resend';
 import { ADMIN_ROLES } from '@/lib/server/roles';
+import { enforceSameOrigin } from '@/lib/server/security';
 import {
   PlanLimitError,
   ensureSubscription,
@@ -48,6 +49,7 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
+    enforceSameOrigin(req);
     const payload = payloadSchema.parse(await req.json());
     const { tenantId, email: inviterEmail, uid } = await requireRole(req, ADMIN_ROLES);
 
@@ -104,7 +106,7 @@ export async function POST(req: NextRequest) {
             <h2 style="margin: 0 0 12px;">You are invited</h2>
             <p>You have been invited to join an Entrestate workspace as <strong>${payload.role}</strong>.</p>
             <p>Open the link below to sign in or create your account:</p>
-            <p><a href="https://entrestate.com/start">https://entrestate.com/start</a></p>
+            <p><a href="https://entrestate.com/login">https://entrestate.com/login</a></p>
           </div>
         `,
       });

@@ -1,7 +1,9 @@
 import { NextResponse, type NextRequest } from 'next/server';
 import { requireRole } from '@/lib/server/auth';
+import type { Role } from '@/lib/server/auth';
 import { getAdminDb } from '@/server/firebase-admin';
 import { createApiLogger } from '@/lib/logger';
+import { enforceSameOrigin } from '@/lib/server/security';
 
 // Admins should be able to update tenant profile
 const ADMIN_ROLES: Role[] = ['team_admin', 'agency_admin', 'super_admin'];
@@ -45,6 +47,7 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
     const logger = createApiLogger(req, { route: 'POST /api/tenant/profile' });
     try {
+      enforceSameOrigin(req);
       const { tenantId } = await requireRole(req, ADMIN_ROLES);
       logger.setTenant(tenantId);
       

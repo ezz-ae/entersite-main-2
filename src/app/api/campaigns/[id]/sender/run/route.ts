@@ -5,6 +5,7 @@ import { requireRole, UnauthorizedError, ForbiddenError } from '@/server/auth';
 import { ALL_ROLES } from '@/lib/server/roles';
 import { createOrResetSenderRun } from '@/server/sender/sender-store';
 import { processDueSenderRuns } from '@/server/sender/sender-processor';
+import { enforceSameOrigin } from '@/lib/server/security';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -14,8 +15,13 @@ const bodySchema = z.object({
   limit: z.number().int().min(1).max(100).default(25),
 });
 
-export async function POST(req: NextRequest, ctx: { params: { id: string } }) {
+export async function POST(
+  req: NextRequest,
+  { params: paramsPromise }: { params: Promise<{ id: string }> }
+) {
+  const { id } = await paramsPromise;
   try {
+    enforceSameOrigin(req);
     const { tenantId } = await requireRole(req, ALL_ROLES);
     const json = await req.json().catch(() => ({}));
     const parsed = bodySchema.parse({
@@ -24,7 +30,7 @@ export async function POST(req: NextRequest, ctx: { params: { id: string } }) {
     });
 
     const db = getAdminDb();
-    const campaignRef = db.collection('tenants').doc(tenantId).collection('campaigns').doc(ctx.params.id);
+    const campaignRef = db.collection('tenants').doc(tenantId).collection('campaigns').doc(id);
     const campaignSnap = await campaignRef.get();
     if (!campaignSnap.exists) {
       return NextResponse.json({ error: 'Campaign not found' }, { status: 404 });
@@ -41,7 +47,7 @@ export async function POST(req: NextRequest, ctx: { params: { id: string } }) {
       .collection('tenants')
       .doc(tenantId)
       .collection('leads')
-      .where('campaignId', '==', ctx.params.id)
+      .where('campaignId', '==', id)
       .orderBy('createdAt', 'desc')
       .limit(parsed.limit)
       .get();
@@ -55,7 +61,7 @@ export async function POST(req: NextRequest, ctx: { params: { id: string } }) {
       const force = parsed.mode === 'all';
       const out = await createOrResetSenderRun({
         tenantId,
-        campaignId: ctx.params.id,
+        campaignId: id,
         leadId: String((lead as any).id),
         force,
       });
@@ -64,10 +70,10 @@ export async function POST(req: NextRequest, ctx: { params: { id: string } }) {
     }
 
     // Process immediately (sends first due step; subsequent steps are queued via nextAt)
-    const processed = await processDueSenderRuns({ tenantId, campaignId: ctx.params.id, limit: parsed.limit });
+    const processed = await processDueSenderRuns({ tenantId, campaignId: id, limit: parsed.limit });
 
     return NextResponse.json({
-      campaignId: ctx.params.id,
+      campaignId: id,
       mode: parsed.mode,
       touched,
       created,

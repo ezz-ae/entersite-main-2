@@ -44,7 +44,7 @@ export async function POST(req: NextRequest) {
         amount: Math.round(amountAed * 100),
         currency: payload.currency.toUpperCase(),
         description: skuInfo.label,
-        return_url: payload.returnUrl || 'https://entrestate.com/dashboard/billing?payment=success',
+        return_url: payload.returnUrl || 'https://entrestate.com/account/billing?payment=success',
         metadata: {
           tenantId,
           sku,

@@ -147,7 +147,7 @@ export default function SitesDashboardPage() {
       if (user) {
         setLoading(true);
         try {
-          const userSites = await getUserSites(user.uid);
+          const userSites = await getUserSites();
           setSites(userSites as SitePage[]);
         } catch (error) {
           console.error("Failed to load sites:", error);
@@ -410,7 +410,7 @@ export default function SitesDashboardPage() {
                                 </Button>
                             </Link>
                             
-                            <Link href="/dashboard/google-ads">
+                            <Link href="/google-ads">
                                 <Button variant="outline" className={cn(
                                     "h-11 rounded-full gap-2 border-white/10 transition-all px-6 font-bold text-xs uppercase tracking-widest bg-white/5 text-zinc-400 hover:text-white"
                                 )}>

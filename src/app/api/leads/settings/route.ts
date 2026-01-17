@@ -5,6 +5,7 @@ import { getAdminDb } from '@/server/firebase-admin';
 import { requireRole, UnauthorizedError, ForbiddenError } from '@/server/auth';
 import { CAP } from '@/lib/capabilities';
 import { ADMIN_ROLES } from '@/lib/server/roles';
+import { enforceSameOrigin } from '@/lib/server/security';
 
 const payloadSchema = z.object({
   notificationEmail: z.string().email().optional().nullable(),
@@ -43,6 +44,7 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
+    enforceSameOrigin(req);
     const payload = payloadSchema.parse(await req.json());
     const { tenantId } = await requireRole(req, ADMIN_ROLES);
 

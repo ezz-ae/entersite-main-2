@@ -54,7 +54,7 @@ const LeadDetailsModal = ({ project, onClose, onLeadSelect }) => {
         <div style={{ padding: '20px', borderBottom: '1px solid #E5E7EB', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div>
             <h3 style={{ margin: 0, fontSize: '18px', fontWeight: '700', color: '#111827' }}>{project.name}</h3>
-            <span style={{ fontSize: '12px', color: '#6B7280' }}>{project.leads} Leads Generated</span>
+            <span style={{ fontSize: '12px', color: '#6B7280' }}>{project.leads} Leads Captured</span>
           </div>
           <button 
             onClick={onClose} 

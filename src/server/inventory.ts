@@ -33,6 +33,7 @@ const ADMIN_PROJECT_MISMATCH =
 let cachedProjects: ProjectData[] = [];
 let cachedAt = 0;
 let hasFullInventoryLoaded = false;
+let adminErrorLogged = false;
 
 type FirestoreValue = {
   stringValue?: string;
@@ -387,8 +388,16 @@ export async function loadInventoryProjects(max = DEFAULT_MAX, forceRefresh = fa
       projects = snapshot.docs.map((doc) => normalizeProjectData(doc.data(), doc.id));
       console.log(`[inventory] Successfully loaded ${projects.length} projects from Firestore.`);
     }
-  } catch (error) {
-    console.error('[inventory] admin load failed', error);
+  } catch (error: any) {
+    const message = String(error?.message || '');
+    if (message.includes('Firebase Admin credentials not found')) {
+      if (!adminErrorLogged) {
+        console.warn('[inventory] Admin credentials missing; skipping admin inventory load.');
+        adminErrorLogged = true;
+      }
+    } else {
+      console.error('[inventory] admin load failed', error);
+    }
   }
 
   if (!projects.length) {
@@ -422,8 +431,16 @@ export async function loadInventoryProjectById(projectId: string) {
       if (snapshot.exists) {
         return normalizeProjectData(snapshot.data(), snapshot.id);
       }
-    } catch (error) {
-      console.error('[inventory] admin project lookup failed', error);
+    } catch (error: any) {
+      const message = String(error?.message || '');
+      if (message.includes('Firebase Admin credentials not found')) {
+        if (!adminErrorLogged) {
+          console.warn('[inventory] Admin credentials missing; skipping admin project lookup.');
+          adminErrorLogged = true;
+        }
+      } else {
+        console.error('[inventory] admin project lookup failed', error);
+      }
     }
 
     try {
@@ -502,7 +519,7 @@ export async function getRelevantProjects(message: string, context?: string, max
     .slice(0, max)
     .map((item) => item.project);
 
-  return scored.length ? scored : projects.slice(0, max);
+  return scored;
 }
 
 export function formatProjectContext(project: ProjectData) {

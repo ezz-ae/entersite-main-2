@@ -5,6 +5,7 @@ import { z } from 'zod';
 import { requireRole, UnauthorizedError, ForbiddenError } from '@/server/auth';
 import { ALL_ROLES } from '@/lib/server/roles';
 import { enforceRateLimit, getRequestIp } from '@/lib/server/rateLimit';
+import { enforceSameOrigin } from '@/lib/server/security';
 
 const requestSchema = z.object({
   topic: z.string().min(1),
@@ -29,6 +30,7 @@ const clampLength = (value: string, maxChars: number) => {
 
 export async function POST(req: NextRequest) {
   try {
+    enforceSameOrigin(req);
     const { tenantId } = await requireRole(req, ALL_ROLES);
     const ip = getRequestIp(req);
     if (!(await enforceRateLimit(`sms:create:${tenantId}:${ip}`, 30, 60_000))) {

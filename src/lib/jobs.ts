@@ -1,15 +1,15 @@
-import { 
-  collection, 
-  addDoc, 
-  updateDoc, 
-  doc, 
-  getDocs, 
-  query, 
-  orderBy, 
+import {
+  addDoc,
+  collection,
+  doc,
+  getDocs,
+  onSnapshot,
+  orderBy,
+  query,
   serverTimestamp,
   Timestamp,
-  onSnapshot,
-  where
+  updateDoc,
+  where,
 } from 'firebase/firestore';
 import { db } from '@/firebase';
 
@@ -23,7 +23,7 @@ export interface JobStep {
 
 export interface Job {
   id: string;
-  ownerUid: string;
+  tenantId: string;
   type: 'site_generation' | 'ad_campaign' | 'seo_audit' | 'site_refiner';
   status: 'queued' | 'running' | 'done' | 'error';
   plan: {
@@ -39,24 +39,33 @@ export interface Job {
 
 const JOBS_COLLECTION = 'jobs';
 
-export const createJob = async (ownerUid: string, type: Job['type'], params: any) => {
-  let planSteps = ['init'];
+const getPlanSteps = (type: Job['type']) => {
   if (type === 'site_generation') {
-    planSteps = ['renderBlocks', 'seoGenerate', 'adsGenerate', 'deploy'];
-  } else if (type === 'ad_campaign') {
-    planSteps = ['analyzeContent', 'generateKeywords', 'createHeadlines', 'budgetOptimization'];
-  } else if (type === 'site_refiner') {
-    planSteps = ['analyzeStructure', 'applyRefinements', 'finalReview'];
+    return ['renderBlocks', 'seoGenerate', 'adsGenerate', 'deploy'];
   }
+  if (type === 'ad_campaign') {
+    return ['analyzeContent', 'generateKeywords', 'createHeadlines', 'budgetOptimization'];
+  }
+  if (type === 'site_refiner') {
+    return ['analyzeStructure', 'applyRefinements', 'finalReview'];
+  }
+  return ['init'];
+};
 
+export const createJob = async (
+  tenantId: string,
+  type: Job['type'],
+  params: any,
+) => {
+  const planSteps = getPlanSteps(type);
   const jobData = {
-    ownerUid,
+    tenantId,
     type,
     status: 'queued',
     plan: {
-      flowId: `\${type}-flow`,
+      flowId: `${type}-flow`,
       steps: planSteps,
-      params
+      params,
     },
     steps: [],
     createdAt: serverTimestamp(),
@@ -67,71 +76,72 @@ export const createJob = async (ownerUid: string, type: Job['type'], params: any
   return { id: docRef.id, ...jobData };
 };
 
-export const getJobs = async (ownerUid: string) => {
+export const getJobs = async (tenantId: string) => {
   try {
     const q = query(
       collection(db, JOBS_COLLECTION),
-      where('ownerUid', '==', ownerUid),
-      orderBy('createdAt', 'desc')
+      where('tenantId', '==', tenantId),
+      orderBy('createdAt', 'desc'),
     );
     const querySnapshot = await getDocs(q);
-    return querySnapshot.docs.map(doc => ({
+    return querySnapshot.docs.map((doc) => ({
       id: doc.id,
-      ...doc.data()
+      ...doc.data(),
     })) as Job[];
   } catch (error) {
-    console.error("Error fetching jobs:", error);
+    console.error('Error fetching jobs:', error);
     return [];
   }
 };
 
-export const subscribeToJobs = (ownerUid: string, callback: (jobs: Job[]) => void) => {
+export const subscribeToJobs = (tenantId: string, callback: (jobs: Job[]) => void) => {
   const q = query(
     collection(db, JOBS_COLLECTION),
-    where('ownerUid', '==', ownerUid),
-    orderBy('createdAt', 'desc')
+    where('tenantId', '==', tenantId),
+    orderBy('createdAt', 'desc'),
   );
   return onSnapshot(q, (snapshot) => {
-    const jobs = snapshot.docs.map(doc => ({
+    const jobs = snapshot.docs.map((doc) => ({
       id: doc.id,
-      ...doc.data()
+      ...doc.data(),
     })) as Job[];
     callback(jobs);
   });
 };
 
 export const processJob = async (jobId: string) => {
-  console.log(`Processing job \${jobId}...`);
-  
+  console.log(`Processing job ${jobId}...`);
+
   try {
     const jobRef = doc(db, JOBS_COLLECTION, jobId);
-    
-    await updateDoc(jobRef, { 
-      status: 'running',
-      updatedAt: serverTimestamp() 
-    });
 
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
     await updateDoc(jobRef, {
-      steps: [{
-        name: 'init',
-        status: 'done',
-        result: 'System initialized',
-        timestamp: Date.now()
-      }],
-      updatedAt: serverTimestamp()
+      status: 'running',
+      updatedAt: serverTimestamp(),
     });
 
-    await new Promise(resolve => setTimeout(resolve, 2000));
+    await new Promise((resolve) => setTimeout(resolve, 2000));
 
-    await updateDoc(jobRef, { 
-      status: 'done', 
-      updatedAt: serverTimestamp() 
+    await updateDoc(jobRef, {
+      steps: [
+        {
+          name: 'init',
+          status: 'done',
+          result: 'System initialized',
+          timestamp: Date.now(),
+        },
+      ],
+      updatedAt: serverTimestamp(),
     });
 
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+
+    await updateDoc(jobRef, {
+      status: 'done',
+      updatedAt: serverTimestamp(),
+    });
   } catch (error) {
-    console.error("Error processing job:", error);
+    console.error('Error processing job:', error);
     const jobRef = doc(db, JOBS_COLLECTION, jobId);
     await updateDoc(jobRef, { status: 'error', updatedAt: serverTimestamp() });
   }

@@ -41,7 +41,7 @@ const SERVICE_DATA = {
         "Direct campaign generation"
     ],
     cta: "Explore Market Data",
-    href: "/discover"
+    href: "/inventory"
   },
   'google-ads': {
     title: "Ads Synchronization",
@@ -53,11 +53,11 @@ const SERVICE_DATA = {
         "One-click campaign launch",
         "High-intent keyword grouping",
         "Smart-optimized ad copy variations",
-        "Real-time performance dashboard",
+        "Real-time performance indicators",
         "Automatic tracking setup"
     ],
     cta: "Connect Google Ads",
-    href: "/dashboard/google-ads"
+    href: "/google-ads"
   },
   'instagram-bot': {
     title: "Social Automation",

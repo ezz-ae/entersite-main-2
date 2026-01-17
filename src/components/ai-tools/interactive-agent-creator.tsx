@@ -53,6 +53,11 @@ export function InteractiveAgentCreator() {
     const { toast } = useToast();
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
     const [agentName, setAgentName] = useState('Agent');
+    const [companyName, setCompanyName] = useState('');
+    const [marketFocus, setMarketFocus] = useState('');
+    const [cityFocus, setCityFocus] = useState('');
+    const [characterVibe, setCharacterVibe] = useState('');
+    const [successScenario, setSuccessScenario] = useState('');
     const [agentTone, setAgentTone] = useState('Professional & Persuasive');
     const [selectedMarkets, setSelectedMarkets] = useState<string[]>(['dubai']);
     const [messages, setMessages] = useState<Message[]>([
@@ -80,6 +85,16 @@ export function InteractiveAgentCreator() {
         setIsLoading(true);
 
         const history = [...messages, { role: 'user', text: userMsg }].slice(-6);
+        const contextParts = [
+            `Agent Name: ${agentName}`,
+            companyName ? `Company: ${companyName}` : null,
+            marketFocus ? `Market Focus: ${marketFocus}` : null,
+            cityFocus ? `City Focus: ${cityFocus}` : null,
+            characterVibe ? `Vibe: ${characterVibe}` : null,
+            successScenario ? `Success Scenario: ${successScenario}` : null,
+            `Tone: ${agentTone}`,
+            `Coverage: ${selectedMarkets.join(', ') || 'UAE'}`,
+        ].filter(Boolean);
         try {
             const response = await fetch(`/api/bot/preview/chat`, {
                 method: 'POST',
@@ -87,7 +102,7 @@ export function InteractiveAgentCreator() {
                 body: JSON.stringify({
                     message: userMsg,
                     history,
-                    context: `Agent Name: ${agentName}, Tone: ${agentTone}, Knowledge: ${selectedMarkets.join(', ')}`,
+                    context: contextParts.join('. '),
                 })
             });
             const data = await response.json();
@@ -186,6 +201,15 @@ export function InteractiveAgentCreator() {
                                     />
                                 </div>
                                 <div className="space-y-2">
+                                    <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Company Name</label>
+                                    <Input
+                                        value={companyName}
+                                        onChange={(e) => setCompanyName(e.target.value)}
+                                        className="bg-black border-white/10 h-11 rounded-xl text-white"
+                                        placeholder="e.g. Entrestate Realty"
+                                    />
+                                </div>
+                                <div className="space-y-2">
                                     <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Tone</label>
                                     <select 
                                         value={agentTone}
@@ -197,6 +221,52 @@ export function InteractiveAgentCreator() {
                                         <option>High-Energy Closer</option>
                                         <option>Luxury Concierge</option>
                                     </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Learning Brief */}
+                        <div className="space-y-6 pt-6 border-t border-white/5">
+                            <div className="flex items-center gap-2 text-purple-400">
+                                <BrainCircuit className="h-4 w-4" />
+                                <span className="text-[10px] font-black uppercase tracking-[0.2em]">Learning Brief</span>
+                            </div>
+                            <div className="space-y-4">
+                                <div className="space-y-2">
+                                    <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Market Focus</label>
+                                    <Input
+                                        value={marketFocus}
+                                        onChange={(e) => setMarketFocus(e.target.value)}
+                                        className="bg-black border-white/10 h-11 rounded-xl text-white"
+                                        placeholder="e.g. Luxury off-plan, high-yield rentals"
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">City Focus</label>
+                                    <Input
+                                        value={cityFocus}
+                                        onChange={(e) => setCityFocus(e.target.value)}
+                                        className="bg-black border-white/10 h-11 rounded-xl text-white"
+                                        placeholder="e.g. Dubai Marina, Abu Dhabi"
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Character Vibe</label>
+                                    <Input
+                                        value={characterVibe}
+                                        onChange={(e) => setCharacterVibe(e.target.value)}
+                                        className="bg-black border-white/10 h-11 rounded-xl text-white"
+                                        placeholder="e.g. Calm, investor-focused, luxury concierge"
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Successful Conversion Scenario</label>
+                                    <Textarea
+                                        value={successScenario}
+                                        onChange={(e) => setSuccessScenario(e.target.value)}
+                                        className="bg-black border-white/10 min-h-[110px] rounded-xl text-white"
+                                        placeholder="e.g. Buyer asks about Dubai Marina, share 2 options, confirm budget, then request WhatsApp for viewing."
+                                    />
                                 </div>
                             </div>
                         </div>

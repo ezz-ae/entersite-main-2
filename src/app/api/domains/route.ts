@@ -58,10 +58,8 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: 'Site not found' }, { status: 404 });
       }
       const siteData = siteSnap.data() || {};
-      if (siteData.tenantId && siteData.tenantId !== tenantId) {
-        return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-      }
-      if (!siteData.tenantId && siteData.ownerUid && siteData.ownerUid !== uid) {
+      const siteTenantId = siteData.tenantId as string | undefined;
+      if (!siteTenantId || siteTenantId !== tenantId) {
         return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
       }
 

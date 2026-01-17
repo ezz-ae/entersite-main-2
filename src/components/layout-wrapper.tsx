@@ -11,23 +11,23 @@ export function LayoutWrapper({ children }: { children: React.ReactNode }) {
   const isMobile = useIsMobile();
   
   const isEditor = pathname?.startsWith('/builder');
-  const isDashboard = pathname?.startsWith('/dashboard');
+  const isAccount = pathname?.startsWith('/account');
   const isAdmin = pathname?.startsWith('/admin');
   const isProfile = pathname?.startsWith('/profile');
   const isPublished = pathname?.startsWith('/p/');
   const isTrending = pathname === '/instagram-assistant';
 
-  // Hide global header/footer on app-like pages or dashboard
-  const hideChrome = isEditor || isDashboard || isAdmin || isProfile || isPublished || isTrending;
+  // Hide global header/footer on app-like pages
+  const hideChrome = isEditor || isAccount || isAdmin || isProfile || isPublished || isTrending;
 
   return (
-    <div className={cn(isMobile && isDashboard && "pb-20", "relative z-10")}>
+    <div className={cn(isMobile && isAccount && "pb-20", "relative z-10")}>
       <div className="min-h-screen">
           {children}
       </div>
       
-      {/* Mobile-Only Dashboard & App Navigation */}
-  {isMobile && (isDashboard || isTrending) && <MobileBottomNav />}
+      {/* Mobile module navigation */}
+  {isMobile && (isAccount || isTrending) && <MobileBottomNav />}
     </div>
   );
 }

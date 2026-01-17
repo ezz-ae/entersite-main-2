@@ -41,6 +41,7 @@ import { ComingSoonHeroBlock } from './blocks/hero/coming-soon-hero-block';
 import { CtaGridBlock } from './blocks/cta/cta-grid-block';
 import { BannerCtaBlock } from './blocks/cta/banner-cta-block';
 import { MapBlock } from './blocks/map-block';
+import { ChatAgentBlock } from './blocks/ai/chat-agent-block';
 import { LEAD_CAPTURE_BLOCKS, SiteBlockContext } from './blocks/block-context';
 
 const blockComponents: Record<string, React.ComponentType<any>> = {
@@ -82,6 +83,7 @@ const blockComponents: Record<string, React.ComponentType<any>> = {
   'coming-soon-hero': ComingSoonHeroBlock,
   'cta-grid': CtaGridBlock,
   'banner-cta': BannerCtaBlock,
+  'chat-agent': ChatAgentBlock,
 };
 
 const renderBlock = (block: BlockType, context?: SiteBlockContext) => {
@@ -96,7 +98,8 @@ const renderBlock = (block: BlockType, context?: SiteBlockContext) => {
         siteId: context?.siteId,
       }
     : {};
-  return <Component {...block.data} {...leadProps} />;
+  const chatProps = block.type === 'chat-agent' ? { siteId: context?.siteId } : {};
+  return <Component {...block.data} {...leadProps} {...chatProps} />;
 };
 
 interface PageRendererProps {

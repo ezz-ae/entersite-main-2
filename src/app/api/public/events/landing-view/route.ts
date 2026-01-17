@@ -2,12 +2,17 @@ import { NextResponse } from 'next/server';
 
 import { getPublishedSite } from '@/server/publish-service';
 import { writeAudienceEvent } from '@/server/audience/write-event';
+import { enforceRateLimit, getRequestIp } from '@/lib/server/rateLimit';
 
 // Public endpoint: accepts only a siteId and derives tenantId from the published site.
 // No PII allowed in payload.
 
 export async function POST(req: Request) {
   try {
+    const ip = getRequestIp(req);
+    if (!(await enforceRateLimit(`public:landing-view:${ip}`, 240, 60_000))) {
+      return NextResponse.json({ ok: false, error: 'Rate limit exceeded' }, { status: 429 });
+    }
     const body = await req.json();
     const siteId = String(body?.siteId || '').trim();
     const campaignDocId = body?.campaignDocId ? String(body.campaignDocId).trim() : undefined;

@@ -1,10 +1,12 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { requireRole, UnauthorizedError, ForbiddenError } from '@/server/auth';
-import { ALL_ROLES } from '@/server/roles';
+import { ALL_ROLES } from '@/lib/server/roles';
 import { processDueSenderRunsForTenant } from '@/server/sender/sender-processor';
+import { enforceSameOrigin } from '@/lib/server/security';
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   try {
+    enforceSameOrigin(req);
     const { tenantId } = await requireRole(req, ALL_ROLES);
     const { searchParams } = new URL(req.url);
     const limit = Number(searchParams.get('limit') || '50');

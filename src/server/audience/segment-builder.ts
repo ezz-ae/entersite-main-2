@@ -31,9 +31,11 @@ export async function buildAudienceSegments(params: {
 
   // Query events window (tenant scoped).
   let q: FirebaseFirestore.Query = db
+    .collection('tenants')
+    .doc(params.tenantId)
     .collection('events')
-    .where('tenantId', '==', params.tenantId)
-    .where('ts', '>=', cutoff);
+    .where('ts', '>=', cutoff)
+    .orderBy('ts', 'desc');
 
   if (params.campaignId) {
     q = q.where('campaignId', '==', params.campaignId);

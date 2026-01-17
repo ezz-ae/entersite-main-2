@@ -13,12 +13,11 @@ const createSchema = z.object({
 export async function POST(req: NextRequest) {
   try {
     enforceSameOrigin(req);
-    const { tenantId, uid } = await requireRole(req, ALL_ROLES);
+    const { tenantId } = await requireRole(req, ALL_ROLES);
     const body = createSchema.parse(await req.json());
 
     const campaign = await createCampaign({
       tenantId,
-      ownerUid: uid,
       name: body.name?.trim() || 'New Campaign',
       objective: body.objective || 'leads',
     });
@@ -34,8 +33,8 @@ export async function POST(req: NextRequest) {
 
 export async function GET(req: NextRequest) {
   try {
-    const { tenantId, uid } = await requireRole(req, ALL_ROLES);
-    const campaigns = await listCampaigns({ tenantId, ownerUid: uid });
+    const { tenantId } = await requireRole(req, ALL_ROLES);
+    const campaigns = await listCampaigns({ tenantId });
     return NextResponse.json({ campaigns });
   } catch (err: any) {
     if (err instanceof UnauthorizedError) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

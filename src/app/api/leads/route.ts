@@ -20,6 +20,7 @@ import { getPublishedSite } from '@/server/publish-service';
 import { writeAudienceEvent } from '@/server/audience/write-event';
 import { getCampaign } from '@/server/campaigns/campaign-store';
 import { createOrResetSenderRun } from '@/server/sender/sender-store';
+import { DEFAULT_LEAD_DIRECTION } from '@/lib/lead-direction';
 
 const NOTIFY_EMAIL_TO = process.env.NOTIFY_EMAIL_TO;
 const NOTIFY_SMS_TO = process.env.NOTIFY_SMS_TO;
@@ -61,7 +62,7 @@ async function resolvePublicTenant(payload: LeadPayload) {
   if (!siteKey) return null;
   const publishedSite = await getPublishedSite(siteKey);
   if (!publishedSite?.published) return null;
-  const tenantId = publishedSite.tenantId || publishedSite.ownerUid || null;
+  const tenantId = publishedSite.tenantId || null;
   if (!tenantId) return null;
   return { tenantId, siteId: publishedSite.id };
 }
@@ -151,11 +152,7 @@ export async function POST(req: NextRequest) {
       if (siteSnap.exists) {
         const siteData = siteSnap.data() || {};
         const siteTenant = siteData.tenantId as string | undefined;
-        const siteOwner = siteData.ownerUid as string | undefined;
-        if (siteTenant && siteTenant !== tenantId) {
-          return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-        }
-        if (!siteTenant && siteOwner && siteOwner !== context.uid) {
+        if (!siteTenant || siteTenant !== tenantId) {
           return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
         }
       } else {
@@ -196,6 +193,7 @@ export async function POST(req: NextRequest) {
       metadata: payload.metadata || null,
       status: 'New',
       priority: 'Warm',
+      direction: DEFAULT_LEAD_DIRECTION,
       createdAt: FieldValue.serverTimestamp(),
       updatedAt: FieldValue.serverTimestamp(),
     };
@@ -335,7 +333,7 @@ export async function POST(req: NextRequest) {
     }
 
     logger.logSuccess(201, { leadId: leadRef.id, siteId });
-    return NextResponse.json({ id: leadRef.id, tenantId }, { status: 201 });
+    return NextResponse.json({ id: leadRef.id }, { status: 201 });
   } catch (error) {
     console.error('[leads] capture error', error);
     if (error instanceof PlanLimitError) {

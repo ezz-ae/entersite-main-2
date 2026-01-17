@@ -75,6 +75,42 @@ service cloud.firestore {
         allow read, write: if isTenantAdmin(tenantId);
       }
 
+      match /agent_profile/{docId} {
+        allow read: if isTenantMember(tenantId);
+        allow write: if isTenantAdmin(tenantId);
+      }
+
+      match /agent_events/{docId} {
+        allow read: if isTenantMember(tenantId);
+        allow write: if isTenantAdmin(tenantId);
+      }
+
+      match /senderSequences/{docId} {
+        allow read: if isTenantMember(tenantId);
+        allow write: if isTenantAdmin(tenantId);
+      }
+
+      match /senderRuns/{docId} {
+        allow read: if isTenantMember(tenantId);
+        allow write: if isTenantAdmin(tenantId);
+      }
+
+      match /senderEvents/{docId} {
+        allow read: if isTenantMember(tenantId);
+        allow create: if isTenantAdmin(tenantId);
+        allow update, delete: if false;
+      }
+
+      match /audience_actions/{docId} {
+        allow read: if isTenantMember(tenantId);
+        allow write: if isTenantAdmin(tenantId);
+      }
+
+      match /audience_pool/{docId} {
+        allow read: if isTenantMember(tenantId);
+        allow write: if isTenantAdmin(tenantId);
+      }
+
       match /events/{docId} {
         allow read, write: if isTenantMember(tenantId);
       }
@@ -98,6 +134,10 @@ service cloud.firestore {
     match /subscriptions/{tenantId} {
       allow read: if isTenantMember(tenantId);
       allow write: if isTenantAdmin(tenantId);
+    }
+
+    match /global_audience_signals/{signalId} {
+      allow read, write: if false;
     }
 
     // Sites are tenant-owned

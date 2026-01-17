@@ -7,7 +7,7 @@ type SenderRun = {
   tenantId: string;
   campaignId: string;
   leadId: string;
-  status: 'pending' | 'running' | 'failed' | 'done';
+  status: 'pending' | 'running' | 'suppressed' | 'failed' | 'done';
   stepIndex: number;
   nextAt: number;
   updatedAt: number;
@@ -92,10 +92,11 @@ export function SenderQueueDashboard() {
   }, [status, limit]);
 
   const stats = useMemo(() => {
-    const s = { pending: 0, running: 0, failed: 0, done: 0 };
+    const s = { pending: 0, running: 0, suppressed: 0, failed: 0, done: 0 };
     for (const r of runs) {
       if (r.status === 'pending') s.pending += 1;
       else if (r.status === 'running') s.running += 1;
+      else if (r.status === 'suppressed') s.suppressed += 1;
       else if (r.status === 'failed') s.failed += 1;
       else if (r.status === 'done') s.done += 1;
     }
@@ -128,7 +129,7 @@ export function SenderQueueDashboard() {
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+        <div className="grid grid-cols-2 gap-3 md:grid-cols-5">
           <div className="rounded-lg bg-zinc-900 p-3">
             <div className="text-xs text-zinc-400">Pending</div>
             <div className="text-2xl font-semibold text-zinc-100">{stats.pending}</div>
@@ -136,6 +137,10 @@ export function SenderQueueDashboard() {
           <div className="rounded-lg bg-zinc-900 p-3">
             <div className="text-xs text-zinc-400">Running</div>
             <div className="text-2xl font-semibold text-zinc-100">{stats.running}</div>
+          </div>
+          <div className="rounded-lg bg-zinc-900 p-3">
+            <div className="text-xs text-zinc-400">Suppressed</div>
+            <div className="text-2xl font-semibold text-zinc-100">{stats.suppressed}</div>
           </div>
           <div className="rounded-lg bg-zinc-900 p-3">
             <div className="text-xs text-zinc-400">Failed</div>
@@ -158,6 +163,7 @@ export function SenderQueueDashboard() {
               <option value="all">All</option>
               <option value="pending">Pending</option>
               <option value="running">Running</option>
+              <option value="suppressed">Suppressed</option>
               <option value="failed">Failed</option>
               <option value="done">Done</option>
             </select>

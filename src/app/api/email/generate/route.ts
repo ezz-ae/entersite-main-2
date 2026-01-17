@@ -4,6 +4,7 @@ import { createGoogleGenerativeAI } from '@ai-sdk/google';
 import { requireRole, UnauthorizedError, ForbiddenError } from '@/server/auth';
 import { ALL_ROLES } from '@/lib/server/roles';
 import { enforceRateLimit, getRequestIp } from '@/lib/server/rateLimit';
+import { enforceSameOrigin } from '@/lib/server/security';
 
 /**
  * Smart Email Content Generator
@@ -21,6 +22,7 @@ const MODEL_ID = 'gemini-1.5-flash';
 
 export async function POST(req: NextRequest) {
     try {
+        enforceSameOrigin(req);
         const { tenantId } = await requireRole(req, ALL_ROLES);
         const ip = getRequestIp(req);
         if (!(await enforceRateLimit(`email:create:${tenantId}:${ip}`, 20, 60_000))) {

@@ -108,8 +108,8 @@ const ProjectDetailPage: NextPage = () => {
         : 'Steady'
     : 'Not shared';
   const launchPackHref = project?.id
-    ? `/start?intent=website&project=${encodeURIComponent(project.id)}`
-    : '/start?intent=website';
+    ? `/login?returnTo=/builder?start=1&project=${encodeURIComponent(project.id)}`
+    : '/login?returnTo=/builder?start=1';
 
   return (
     <div className="bg-black text-white min-h-screen">

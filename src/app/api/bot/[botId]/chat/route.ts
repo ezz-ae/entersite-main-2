@@ -1,16 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { generateText } from 'ai';
 import { z } from 'zod';
-import { getGoogleModel, FLASH_MODEL } from '@/lib/ai/google';
+import { generateChatText } from '@/lib/ai/chat';
+import { FLASH_MODEL } from '@/lib/ai/google';
 import { getAdminDb } from '@/server/firebase-admin';
 import { formatProjectContext, getRelevantProjects } from '@/server/inventory';
 import { requireRole, UnauthorizedError, ForbiddenError } from '@/server/auth';
 import { ALL_ROLES } from '@/lib/server/roles';
+import { enforceSameOrigin } from '@/lib/server/security';
+import { getAgentProfile } from '@/server/agent/agent-profile';
+import { listAgentEvents } from '@/server/agent/agent-events';
+import { buildAgentContext, getActiveAgentEvents } from '@/server/agent/agent-context';
 import {
   enforceUsageLimit,
   PlanLimitError,
   planLimitErrorResponse,
 } from '@/lib/server/billing';
+import { getChatKnowledgeContext } from '@/server/chat-context';
 
 const requestSchema = z.object({
   message: z.string().min(1),
@@ -42,6 +47,7 @@ function consumeRateLimit(key: string) {
 
 export async function POST(req: NextRequest, { params: paramsPromise }: { params: Promise<{ botId: string }> }) {
   try {
+    enforceSameOrigin(req);
     const params = await paramsPromise;
     const { tenantId } = await requireRole(req, ALL_ROLES);
     await enforceUsageLimit(getAdminDb(), tenantId, 'ai_conversations', 1);
@@ -57,16 +63,46 @@ export async function POST(req: NextRequest, { params: paramsPromise }: { params
       .map((entry) => `${entry.role === 'user' ? 'User' : 'Agent'}: ${entry.text}`)
       .join('\n');
 
+    let agentContext = '';
+    try {
+      const [profile, events] = await Promise.all([
+        getAgentProfile(tenantId),
+        listAgentEvents(tenantId, 20),
+      ]);
+      agentContext = buildAgentContext(profile, getActiveAgentEvents(events));
+    } catch (error) {
+      console.warn('[bot/chat] agent context failed', error);
+    }
+
+    let knowledgeContext = '';
+    try {
+      knowledgeContext = await getChatKnowledgeContext();
+    } catch (error) {
+      console.error('[bot/chat] knowledge context failed', error);
+    }
+
     const relevantProjects = await getRelevantProjects(payload.message, payload.context, 8);
     const projectContext = relevantProjects.length
       ? `\nRelevant listings:\n${relevantProjects.map(formatProjectContext).join('\n')}`
       : '';
 
     const prompt = `
+Platform & Inventory Reference:
+${knowledgeContext}
+
 Context: ${payload.context || 'web_widget'}.
+Always respond in the user's language. Supported: Arabic, English, Russian, Chinese. If unsure, use English.
 Use simple, non-technical language. If details are missing, say so and offer next steps.
+Follow Agent Context response style: short = 1-2 sentences, balanced = 2-4, detailed = 4-6 (bullets ok). Depth level: basic = plain facts, practical = actionable guidance, deep = insightful but concise.
 Ask one question at a time. If the buyer shows interest and contact details are missing, ask for name and WhatsApp or email.
+If the primary goal is Collect WhatsApp or Collect phone number, deliver helpful info first, then ask once.
+If the user asks how to contact you, use the contact details from Agent Context. If contact info is missing, ask for WhatsApp and promise a callback.
+If Company info is missing and the user asks about the company, say: "I don't have company info yet."
+If the user pushes back on the sales approach, soften by one level and stay helpful.
+If a takeover trigger is met, suggest a handoff according to the Agent Context method.
+If the user mentions a location/project that matches an active event, highlight the event and CTA, following the urgency tone.
 ${projectContext}
+${agentContext ? `\nAgent Context:\n${agentContext}` : ''}
 
 Conversation so far:
 ${historyText}
@@ -76,13 +112,12 @@ User (${params.botId}): ${payload.message}
 
     let reply = '';
     try {
-      const { text } = await generateText({
-        model: getGoogleModel(FLASH_MODEL),
+      reply = await generateChatText({
         system:
           "You are EntreSite's Smart sales concierge. Be concise, cite Dubai market data when possible, and always steer toward capturing name/contact if missing.",
         prompt,
+        googleModel: FLASH_MODEL,
       });
-      reply = text;
     } catch (error) {
       console.error('[bot/chat] ai error', error);
       const fallbackList = relevantProjects.slice(0, 3).map(formatProjectContext).join('\n');

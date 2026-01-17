@@ -9,9 +9,7 @@ export function AppHeader() {
   // Define base routes where the main site header should be hidden
   const hiddenHeaderRoutes = [
     '/builder',
-    '/dashboard',
     '/admin',
-    '/profile',
   ];
 
   // Check if the current pathname starts with any of the hidden routes

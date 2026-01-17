@@ -4,11 +4,15 @@ import { ALL_ROLES } from '@/lib/server/roles';
 import { getCampaign } from '@/server/campaigns/campaign-store';
 import { assertCampaignOwnedByTenant } from '@/server/campaigns/campaign-guards';
 
-export async function GET(req: NextRequest, ctx: { params: { id: string } }) {
+export async function GET(
+  req: NextRequest,
+  { params: paramsPromise }: { params: Promise<{ id: string }> }
+) {
+  const { id } = await paramsPromise;
   try {
     const { tenantId } = await requireRole(req, ALL_ROLES);
-    await assertCampaignOwnedByTenant({ campaignId: ctx.params.id, tenantId });
-    const campaign = await getCampaign({ campaignId: ctx.params.id });
+    await assertCampaignOwnedByTenant({ campaignId: id, tenantId });
+    const campaign = await getCampaign({ campaignId: id });
     return NextResponse.json({ campaign });
   } catch (err: any) {
     if (err instanceof UnauthorizedError) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

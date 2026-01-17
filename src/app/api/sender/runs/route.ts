@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { requireRole, UnauthorizedError, ForbiddenError } from '@/server/auth';
-import { ALL_ROLES } from '@/server/roles';
+import { ALL_ROLES } from '@/lib/server/roles';
 import { listSenderRuns } from '@/server/sender/sender-store';
 
 export async function GET(req: Request) {

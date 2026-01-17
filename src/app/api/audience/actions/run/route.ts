@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { requireRole, UnauthorizedError, ForbiddenError } from '@/server/auth';
 import { ADMIN_ROLES } from '@/lib/server/roles';
 import { runAudienceActions } from '@/server/audience/action-runner';
+import { enforceSameOrigin } from '@/lib/server/security';
 
 const schema = z.object({
   withinDays: z.number().int().min(1).max(180).optional(),
@@ -11,6 +12,7 @@ const schema = z.object({
 
 export async function POST(req: NextRequest) {
   try {
+    enforceSameOrigin(req);
     const payload = schema.parse(await req.json().catch(() => ({})));
     const { tenantId } = await requireRole(req, ADMIN_ROLES);
 

@@ -32,7 +32,7 @@ export function DevNavigation() {
       <NavLink href="/marketing-puzzle" icon={Puzzle} label="Puzzle" active={pathname === '/marketing-puzzle'} />
       <NavLink href="/blog" icon={FileText} label="Blog" active={pathname?.startsWith('/blog')} />
       <NavLink href="/docs" icon={Book} label="Docs" active={pathname?.startsWith('/docs')} />
-      <NavLink href="/profile" icon={User} label="Profile" active={pathname === '/profile'} />
+      <NavLink href="/account/profile" icon={User} label="Profile" active={pathname?.startsWith('/account/profile')} />
       <NavLink href="/p/demo" icon={Eye} label="Preview" active={pathname?.startsWith('/p/')} />
     </div>
   );

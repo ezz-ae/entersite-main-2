@@ -3,9 +3,11 @@ import { generateImage } from 'ai';
 import { getGoogleModel, IMAGE_MODEL } from '@/lib/ai/google';
 import { requireRole, UnauthorizedError, ForbiddenError } from '@/server/auth';
 import { ALL_ROLES } from '@/lib/server/roles';
+import { enforceSameOrigin } from '@/lib/server/security';
 
 export async function POST(req: NextRequest) {
     try {
+        enforceSameOrigin(req);
         await requireRole(req, ALL_ROLES);
         const { prompt } = await req.json();
 

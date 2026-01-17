@@ -109,10 +109,10 @@ Landing → Lead → Sender Run → Events → Segments → Actions
 Purpose: hold the entire execution state for marketing.
 
 Key UI routes:
-- `/dashboard/campaigns`
-- `/dashboard/campaigns/new`
-- `/dashboard/campaigns/[id]`
-- `/dashboard/campaigns/[id]/landing`
+- `/google-ads/campaigns`
+- `/google-ads/start`
+- `/google-ads/campaigns/[id]`
+- `/google-ads/campaigns/[id]/landing`
 
 Key API routes:
 - `GET/POST /api/campaigns`
@@ -144,7 +144,7 @@ Behavior:
 - Stores runtime launch details under campaign bindings
 
 UI:
-- `/dashboard/campaigns/[id]/ads`
+- `/google-ads/campaigns/[id]/ads`
 
 ### D) Leads pipe
 Purpose: ingest leads with attribution and allow campaign filtering.
@@ -163,8 +163,8 @@ Behavior:
 - Suppress after a lead becomes Hot
 
 UI:
-- `/dashboard/campaigns/[id]/messaging`
-- `/dashboard/sender-queue`
+- `/google-ads/campaigns/[id]/messaging`
+- `/sender/queue`
 
 Cron:
 - `/api/cron/sender-process`
@@ -186,8 +186,7 @@ Action hooks:
 - Sender suppression triggers action log
 
 UI:
-- `/dashboard/audience`
-- `/dashboard/audience/actions`
+- `/market`
 
 ---
 

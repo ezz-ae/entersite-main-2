@@ -1,10 +1,12 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { requireRole, UnauthorizedError, ForbiddenError } from '@/server/auth';
-import { ALL_ROLES } from '@/server/roles';
+import { ALL_ROLES } from '@/lib/server/roles';
 import { retrySenderRun } from '@/server/sender/sender-store';
+import { enforceSameOrigin } from '@/lib/server/security';
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   try {
+    enforceSameOrigin(req);
     const { tenantId } = await requireRole(req, ALL_ROLES);
     const body = await req.json().catch(() => ({}));
     const runId = String(body?.runId || '').trim();

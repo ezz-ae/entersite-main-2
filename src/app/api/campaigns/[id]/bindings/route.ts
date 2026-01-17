@@ -4,19 +4,25 @@ import { requireRole, UnauthorizedError, ForbiddenError } from '@/server/auth';
 import { ALL_ROLES } from '@/lib/server/roles';
 import { patchCampaignBindings } from '@/server/campaigns/campaign-store';
 import { assertCampaignOwnedByTenant } from '@/server/campaigns/campaign-guards';
+import { enforceSameOrigin } from '@/lib/server/security';
 
 const schema = z.object({
   bindings: z.record(z.any()),
 });
 
-export async function PATCH(req: NextRequest, ctx: { params: { id: string } }) {
+export async function PATCH(
+  req: NextRequest,
+  { params: paramsPromise }: { params: Promise<{ id: string }> }
+) {
+  const { id } = await paramsPromise;
   try {
+    enforceSameOrigin(req);
     const { tenantId } = await requireRole(req, ALL_ROLES);
-    await assertCampaignOwnedByTenant({ campaignId: ctx.params.id, tenantId });
+    await assertCampaignOwnedByTenant({ campaignId: id, tenantId });
 
     const body = schema.parse(await req.json());
     const campaign = await patchCampaignBindings({
-      campaignId: ctx.params.id,
+      campaignId: id,
       bindings: body.bindings,
     });
 
