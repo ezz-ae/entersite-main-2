@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import StickyFooter from './StickyFooter';
 import ForgivingInput from './ForgivingInput';
 import './mobile-styles.css';
@@ -9,11 +9,7 @@ const CommissionCalculatorScreen = ({ onBack }) => {
   const [agentSplit, setAgentSplit] = useState('50'); // Default 50/50 split
   const [result, setResult] = useState(null);
 
-  useEffect(() => {
-    calculate();
-  }, [salePrice, commissionRate, agentSplit]);
-
-  const calculate = () => {
+  const calculate = useCallback(() => {
     const price = parseFloat(salePrice.replace(/,/g, '')) || 0;
     const rate = parseFloat(commissionRate) || 0;
     const split = parseFloat(agentSplit) || 0;
@@ -27,7 +23,11 @@ const CommissionCalculatorScreen = ({ onBack }) => {
       agent: agentEarnings,
       broker: brokerEarnings
     });
-  };
+  }, [salePrice, commissionRate, agentSplit]);
+
+  useEffect(() => {
+    calculate();
+  }, [calculate]);
 
   return (
     <div className="screen-container" style={{ padding: '24px', paddingBottom: '100px' }}>

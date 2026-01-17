@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import StickyFooter from './StickyFooter';
 import ForgivingInput from './ForgivingInput';
 import './mobile-styles.css';
@@ -10,11 +10,7 @@ const MortgageCalculatorScreen = ({ onBack }) => {
   const [years, setYears] = useState('25');
   const [monthlyPayment, setMonthlyPayment] = useState(0);
 
-  useEffect(() => {
-    calculate();
-  }, [price, downPaymentPercent, interestRate, years]);
-
-  const calculate = () => {
+  const calculate = useCallback(() => {
     const p = parseFloat(price.replace(/,/g, '')) || 0;
     const dp = parseFloat(downPaymentPercent) || 0;
     const r = parseFloat(interestRate) || 0;
@@ -30,7 +26,11 @@ const MortgageCalculatorScreen = ({ onBack }) => {
     } else {
       setMonthlyPayment(0);
     }
-  };
+  }, [price, downPaymentPercent, interestRate, years]);
+
+  useEffect(() => {
+    calculate();
+  }, [calculate]);
 
   return (
     <div className="screen-container" style={{ padding: '24px', paddingBottom: '100px' }}>

@@ -47,9 +47,6 @@ const BuilderScreen = ({ onBack, onPublish }) => {
 
   return (
     <div className="screen-container" style={{ padding: '24px', paddingBottom: '100px' }}>
-      <div style={{ display: 'flex', alignItems: 'center', marginBottom: '16px' }}>
-        <button onClick={onBack} style={{ background: 'none', border: 'none', fontSize: '24px', marginRight: '16px', cursor: 'pointer', padding: 0, color: 'var(--text-tertiary)' }}>←</button>
-        <h1 className="screen-title" style={{ marginBottom: 0 }}>Site Builder</h1>
       {showThemeCustomizer && (
         <ThemeCustomizer 
           currentTheme={theme}
@@ -82,10 +79,8 @@ const BuilderScreen = ({ onBack, onPublish }) => {
 
       {/* Canvas */}
       <div className="builder-canvas">
-        {sections.map((section, index) => (
+        {sections.map((section) => (
           <div key={section.id} className="builder-section">
-            <span className="section-label">{sectionTypes[section.type]?.label || section.type} - {section.variant}</span>
-            <div style={{ fontSize: '16px', fontWeight: '600', color: 'var(--text-primary)' }}>
             <span className="section-label" style={{ fontFamily: theme.bodyFont }}>{sectionTypes[section.type]?.label || section.type} - {section.variant}</span>
             <div style={{ fontSize: '16px', fontWeight: '600', color: 'var(--text-primary)', fontFamily: theme.headingFont }}>
               {section.content}
