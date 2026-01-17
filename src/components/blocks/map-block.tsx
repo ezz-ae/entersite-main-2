@@ -13,7 +13,7 @@ interface MapBlockProps {
 
 export function MapBlock({
   headline = "Explore Properties on the Map",
-  subtext = "Use our interactive map to find properties in your desired location."
+  subtext = "Use this interactive map to find properties in your desired location."
 }: MapBlockProps) {
   
   const pins = [

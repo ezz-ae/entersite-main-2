@@ -18,7 +18,7 @@ This workspace contains the Entrestate OS marketing site, dashboard, API routes,
    cp .env.example .env
    ```
 
-   The template includes every variable referenced in the codebase (Firebase, Gemini, SendGrid, SMS, PayPal, Ziina, Vercel, Meta, cron secret, etc.). Never commit populated env files or provider keys.
+   The template includes every variable referenced in the codebase (Firebase, Content Engine, SendGrid, SMS, PayPal, Ziina, Vercel, Meta, cron secret, etc.). Never commit populated env files or provider keys.
 
 3. **Run the dev server**
 
@@ -48,7 +48,7 @@ The script loads the curated dataset in `src/data/entrestate-inventory.ts` and s
 - Secrets must stay out of git. The repository ignores `.env*` and provider dumps such as `sendgrid.env` (rotated/removed).
 - Firebase config is now read from environment variables—no more hardcoded keys in `src/firebase/config.ts`.
 - The Facebook SDK bootstrap reads `NEXT_PUBLIC_FACEBOOK_APP_ID` before loading the script; omit this env var if you don’t want the SDK on a given deployment.
-- Before shipping, update `firestore.rules` to the tenant-aware ruleset and deploy through the Firebase CLI.
+- Before launch, update `firestore.rules` to the tenant-aware ruleset and publish via the Firebase CLI.
 - Dashboard-only API routes (e.g., `/api/leads/list`, `/api/sms/send`, `/api/email/send`, `/api/payments/*`, `/api/domains`) require a Firebase ID token via `Authorization: Bearer <idToken>`; fetch the token with `getIdToken()` on the client before calling these endpoints, and include the tenant ID when applicable.
 
 ## Next Steps

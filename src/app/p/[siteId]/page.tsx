@@ -1,11 +1,18 @@
 import { getPublishedSite } from '@/server/publish-service';
 import { PageRenderer } from '@/components/page-renderer';
+import { LandingViewTracker } from '@/components/audience/landing-view-tracker';
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 
 interface Props {
   params: Promise<{ siteId: string }>;
-  searchParams?: Promise<{ variant?: string }>;
+  searchParams?: Promise<{ 
+    variant?: string;
+    campaignDocId?: string;
+    utm_source?: string;
+    utm_medium?: string;
+    utm_campaign?: string;
+  }>;
 }
 
 // Revalidate every 60 seconds
@@ -32,6 +39,10 @@ export default async function PublishedPage({ params, searchParams }: Props) {
   const { siteId } = await params;
   const resolvedSearchParams = searchParams ? await searchParams : undefined;
   const variant = resolvedSearchParams?.variant;
+  const campaignDocId = resolvedSearchParams?.campaignDocId;
+  const utmSource = resolvedSearchParams?.utm_source;
+  const utmMedium = resolvedSearchParams?.utm_medium;
+  const utmCampaign = resolvedSearchParams?.utm_campaign;
   const page = await getPublishedSite(siteId);
 
   if (!page) {
@@ -45,6 +56,13 @@ export default async function PublishedPage({ params, searchParams }: Props) {
 
   return (
     <main className="min-h-screen bg-background text-foreground">
+      <LandingViewTracker
+        siteId={siteId}
+        campaignDocId={campaignDocId}
+        utmSource={utmSource}
+        utmMedium={utmMedium}
+        utmCampaign={utmCampaign}
+      />
       {shouldUseRefined && (
         <div className="bg-amber-100 text-amber-800 text-sm text-center py-3 px-4 border-b border-amber-200">
           Viewing the draft version for <span className="font-semibold">{page.title}</span>. Remove <code className="bg-white/60 px-2 py-0.5 rounded text-xs">?variant=refined</code> to see the live version.

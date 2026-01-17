@@ -82,8 +82,8 @@ export function ExpertChatConfig() {
     <div className="space-y-8 animate-in fade-in duration-700">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h2 className="text-3xl font-bold tracking-tight text-white">Expert AI Sales Agent</h2>
-          <p className="text-zinc-500">Train your agent on your company details and deploy to Instagram in seconds.</p>
+          <h2 className="text-3xl font-bold tracking-tight text-white">Expert Smart Sales Agent</h2>
+          <p className="text-zinc-500">Train your agent on your company details and connect to Instagram in seconds.</p>
         </div>
         <div className="flex gap-2">
            <Badge variant="outline" className="bg-blue-500/10 text-blue-500 border-blue-500/20 px-3 py-1">
@@ -108,7 +108,7 @@ export function ExpertChatConfig() {
                 <Building2 className="h-5 w-5 text-blue-500" />
                 Agent Identity
               </CardTitle>
-              <CardDescription>Tell the AI who it represents and how it should speak.</CardDescription>
+              <CardDescription>Tell the Smart who it represents and how it should speak.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
                <div className="grid md:grid-cols-2 gap-6">

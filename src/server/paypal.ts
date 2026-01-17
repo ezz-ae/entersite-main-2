@@ -1,6 +1,12 @@
 const PAYPAL_CLIENT_ID = process.env.PAYPAL_CLIENT_ID;
 const PAYPAL_CLIENT_SECRET = process.env.PAYPAL_CLIENT_SECRET;
-const PAYPAL_BASE_URL = process.env.PAYPAL_API_BASE || 'https://api-m.paypal.com';
+
+// Prefer explicit base (advanced), otherwise pick by mode.
+// Mode can be: sandbox | live
+const PAYPAL_MODE = (process.env.PAYPAL_MODE || 'live').toLowerCase();
+const PAYPAL_BASE_URL =
+  process.env.PAYPAL_API_BASE ||
+  (PAYPAL_MODE === 'sandbox' ? 'https://api-m.sandbox.paypal.com' : 'https://api-m.paypal.com');
 
 type TokenCache = {
   token: string;

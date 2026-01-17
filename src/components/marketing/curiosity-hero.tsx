@@ -70,7 +70,7 @@ export function CuriosityHero() {
                 </h1>
                 
                 <p className="text-zinc-400 text-xl md:text-2xl max-w-3xl mx-auto font-light">
-                    The all-in-one platform to design, market, and manage your properties, powered by AI.
+                    The all-in-one platform to design, market, and manage your properties, powered by Smart.
                 </p>
 
                 <div className="pointer-events-auto pt-8">

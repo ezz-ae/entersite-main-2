@@ -2,8 +2,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { FieldValue } from 'firebase-admin/firestore';
 import { getAdminDb } from '@/server/firebase-admin';
+import { analyzeSiteRefiner, ensureSitePage } from '@/lib/refiner';
+import { hasChatAgent } from '@/lib/chat-agent';
 import { requireRole, UnauthorizedError, ForbiddenError } from '@/server/auth';
 import { ALL_ROLES } from '@/lib/server/roles';
+import { enforceSameOrigin } from '@/lib/server/security';
 import {
   checkUsageLimit,
   PlanLimitError,
@@ -23,6 +26,7 @@ const normalizeDomain = (domain: string) => domain.replace(/^https?:\/\//, '').r
 
 export async function POST(request: NextRequest) {
   try {
+    enforceSameOrigin(request);
     const { siteId } = await request.json();
     if (!siteId) {
       return NextResponse.json({ message: 'Site ID is required' }, { status: 400 });
@@ -38,12 +42,8 @@ export async function POST(request: NextRequest) {
     }
 
     const siteData = siteSnap.data() || {};
-    const ownerUid = siteData.ownerUid as string | undefined;
     const siteTenantId = siteData.tenantId as string | undefined;
-    if (siteTenantId && siteTenantId !== tenantId) {
-      return NextResponse.json({ message: 'Forbidden' }, { status: 403 });
-    }
-    if (!siteTenantId && ownerUid && ownerUid !== uid) {
+    if (!siteTenantId || siteTenantId !== tenantId) {
       return NextResponse.json({ message: 'Forbidden' }, { status: 403 });
     }
 
@@ -55,6 +55,8 @@ export async function POST(request: NextRequest) {
     const subdomain = existingSubdomain || (baseSlug ? `${baseSlug}-${suffix}` : `site-${suffix}`);
     const customDomain = typeof siteData.customDomain === 'string' ? siteData.customDomain : '';
     const publishedUrl = customDomain ? `https://${customDomain}` : `https://${subdomain}.${siteDomain}`;
+    const pageData = ensureSitePage(siteData as any);
+    const chatAgentEnabled = hasChatAgent(pageData.blocks);
 
     await checkUsageLimit(db, tenantId, 'landing_pages');
 
@@ -63,6 +65,7 @@ export async function POST(request: NextRequest) {
         published: true,
         publishedUrl,
         subdomain,
+        chatAgentEnabled,
         lastPublishedAt: FieldValue.serverTimestamp(),
       },
       { merge: true }
@@ -70,10 +73,23 @@ export async function POST(request: NextRequest) {
 
     await recordTrialEvent(db, tenantId, 'landing_page_published');
 
+    const updatedSnapshot = await siteRef.get();
+    const updatedPageData = ensureSitePage(updatedSnapshot.data() as any);
+    const report = analyzeSiteRefiner(updatedPageData);
+    await siteRef.set(
+      {
+        refinerStatus: 'review',
+        lastRefinedAt: report.generatedAt,
+        refinerReport: report,
+      },
+      { merge: true },
+    );
+
     return NextResponse.json({
       siteId,
       publishedUrl,
       subdomain,
+      refinerReport: report,
     });
   } catch (error) {
     console.error('[publish/vercel] error', error);

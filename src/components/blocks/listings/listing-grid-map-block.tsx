@@ -16,7 +16,7 @@ interface ListingGridMapBlockProps {
 
 export function ListingGridMapBlock({ 
     headline = "Explore Projects on Map", 
-    subtext = "Visualize the location of our premium developments.",
+    subtext = "Visualize the location of this premium developments.",
     projects = []
 }: ListingGridMapBlockProps) {
   

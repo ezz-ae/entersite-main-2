@@ -70,7 +70,7 @@ function Step1Description({ formData, handleChange, nextStep, onBack }: any) {
             <StepHeader 
                 icon={<Bot className="h-6 w-6 text-zinc-300"/>}
                 title="Describe Your Project"
-                subtitle="Tell our AI what you want to build. Be as specific as you can!"
+                subtitle="Tell our Smart what you want to build. Be as specific as you can!"
             />
             <CardContent className="px-6 py-0">
                 <div className="space-y-4">

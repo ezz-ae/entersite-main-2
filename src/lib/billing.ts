@@ -12,6 +12,12 @@ export type BillingSummary = {
   subscription: {
     plan: BillingPlanId;
     status: 'trial' | 'active' | 'past_due' | 'canceled';
+    vatNumber?: string | null;
+    monthlySpendCap?: number | null;
+    monthlySpendUsed?: number;
+    pauseWhenCapReached?: boolean;
+    isPausedDueToSpendCap?: boolean;
+    paymentModel?: 'prepaid' | 'postpaid';
     currentPeriodStart?: string | null;
     currentPeriodEnd?: string | null;
     cancelAtPeriodEnd?: boolean | null;
@@ -90,4 +96,40 @@ export async function startCheckout(sku: BillingSku, provider: 'paypal' | 'ziina
     throw new Error('No checkout URL returned');
   }
   return checkoutUrl;
+}
+
+export type BillingHistoryEvent = {
+  id: string;
+  type: string;
+  cost?: number;
+  createdAt: string;
+  metadata?: Record<string, unknown>;
+};
+
+export async function fetchBillingHistory() {
+  const response = await authorizedFetch('/api/billing/history');
+  if (!response.ok) {
+    throw new Error('Failed to load billing history');
+  }
+  return (await response.json()) as { history: BillingHistoryEvent[] };
+}
+
+export type BillingSettingsUpdate = {
+  vatNumber?: string | null;
+  monthlySpendCap?: number | null;
+  pauseWhenCapReached?: boolean;
+  paymentModel?: 'prepaid' | 'postpaid';
+};
+
+export async function updateBillingSettings(body: BillingSettingsUpdate) {
+  const response = await authorizedFetch('/api/billing/settings', {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  });
+  if (!response.ok) {
+    const data = await response.json().catch(() => null);
+    throw new Error(data?.error || 'Failed to update billing settings');
+  }
+  return response.json();
 }

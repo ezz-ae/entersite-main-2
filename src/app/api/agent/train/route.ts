@@ -12,9 +12,11 @@ import {
   planLimitErrorResponse,
 } from '@/lib/server/billing';
 import { getAdminDb } from '@/server/firebase-admin';
+import { enforceSameOrigin } from '@/lib/server/security';
 
 export async function POST(req: NextRequest) {
   try {
+    enforceSameOrigin(req);
     const { tenantId } = await requireRole(req, ADMIN_ROLES);
     await enforceUsageLimit(getAdminDb(), tenantId, 'ai_agents', 1);
     const formData = await req.formData();

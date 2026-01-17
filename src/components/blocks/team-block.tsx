@@ -24,7 +24,7 @@ export function TeamBlock({
   members = [
       { name: "Sarah Jenkins", role: "Senior Consultant", bio: "Specializing in luxury penthouses with over 10 years of experience." },
       { name: "David Chen", role: "Investment Advisor", bio: "Expert in high-yield property investments and portfolio management." },
-      { name: "Maria Rodriguez", role: "Sales Director", bio: "Leading our sales strategies with a focus on client satisfaction." },
+      { name: "Maria Rodriguez", role: "Sales Director", bio: "Leading this sales strategies with a focus on client satisfaction." },
       { name: "James Wilson", role: "Property Manager", bio: "Ensuring your assets are maintained to the highest standards." }
   ]
 }: TeamBlockProps) {

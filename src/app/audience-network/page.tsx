@@ -53,7 +53,7 @@ export default function AudienceNetworkPublicPage() {
 
                     <div className="flex flex-col sm:flex-row items-center justify-center gap-6 pt-8">
                         <Button asChild className="h-12 sm:h-14 md:h-16 px-8 md:px-10 rounded-full bg-blue-600 text-white font-black text-base sm:text-lg hover:bg-blue-700 shadow-[0_0_50px_-10px_rgba(37,99,235,0.5)] transition-all w-full sm:w-auto">
-                            <Link href="/dashboard/billing">Unlock Buyer Pool <ArrowRight className="ml-2 h-6 w-6" /></Link>
+                            <Link href="/account/billing">Unlock Buyer Pool <ArrowRight className="ml-2 h-6 w-6" /></Link>
                         </Button>
                         <Button onClick={handleScrollToSegments} variant="outline" className="h-12 sm:h-14 md:h-16 px-8 md:px-10 rounded-full border-white/10 bg-white/5 text-white font-bold text-base sm:text-lg hover:bg-white/10 w-full sm:w-auto">
                             Explore Segments
@@ -155,7 +155,7 @@ export default function AudienceNetworkPublicPage() {
                                     </div>
                                     <div className="pt-6 sm:pt-8 border-t border-white/5 text-center">
                                         <Button asChild className="w-full h-12 sm:h-14 md:h-16 rounded-2xl bg-white text-black font-black text-base sm:text-lg hover:scale-105 transition-all">
-                                            <Link href="/dashboard/meta-audience">View Audience Details</Link>
+                                            <Link href="/market">View Audience Details</Link>
                                         </Button>
                                     </div>
                                 </div>
@@ -200,7 +200,7 @@ function DeliveryCard({ icon: Icon, title, desc, price, tag, color }: any) {
                 </div>
                 <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Pilot plan required</p>
                 <Button asChild className="w-full h-14 rounded-2xl bg-white text-black font-black hover:bg-zinc-200">
-                    <Link href="/dashboard/billing">Join Pilot <ChevronRight className="ml-2 h-4 w-4" /></Link>
+                    <Link href="/account/billing">Join Pilot <ChevronRight className="ml-2 h-4 w-4" /></Link>
                 </Button>
             </div>
         </Card>

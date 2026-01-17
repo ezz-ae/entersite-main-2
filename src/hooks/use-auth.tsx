@@ -14,8 +14,10 @@ export const useAuth = () => {
     setError(null);
     try {
       await signInWithEmailAndPassword(auth, email, password);
+      return true;
     } catch (error: unknown) {
       setError(error instanceof Error ? error.message : 'Something went wrong.');
+      return false;
     } finally {
       setLoading(false);
     }
@@ -26,8 +28,10 @@ export const useAuth = () => {
     setError(null);
     try {
       await createUserWithEmailAndPassword(auth, email, password);
+      return true;
     } catch (error: unknown) {
       setError(error instanceof Error ? error.message : 'Something went wrong.');
+      return false;
     } finally {
       setLoading(false);
     }

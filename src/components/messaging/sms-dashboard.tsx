@@ -115,7 +115,7 @@ export function SmsCampaignDashboard() {
 
     setAiLoading(true);
     try {
-      const res = await authorizedFetch('/api/sms/generate', {
+      const res = await authorizedFetch('/api/sms/create', {
         method: 'POST',
         body: JSON.stringify({
           topic: aiTopic.trim(),
@@ -126,12 +126,12 @@ export function SmsCampaignDashboard() {
       const data = await res.json();
 
       if (!res.ok) {
-        throw new Error(data?.error || 'Failed to generate SMS');
+        throw new Error(data?.error || 'Failed to create SMS');
       }
 
       if (data.message) setMessage(data.message);
 
-      toast({ title: 'AI draft ready', description: 'Review and edit before sending.' });
+      toast({ title: 'Smart draft ready', description: 'Review and edit before sending.' });
     } catch (error: any) {
       toast({
         title: 'Generation failed',
@@ -178,8 +178,8 @@ export function SmsCampaignDashboard() {
               <div className="rounded-2xl border border-white/10 bg-black/40 p-4 space-y-3">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                   <div>
-                    <p className="text-xs font-bold uppercase tracking-widest text-zinc-500">AI Draft</p>
-                    <p className="text-sm text-zinc-400">Give the topic and let AI write the SMS.</p>
+                    <p className="text-xs font-bold uppercase tracking-widest text-zinc-500">Smart Draft</p>
+                    <p className="text-sm text-zinc-400">Give the topic and let Smart write the SMS.</p>
                   </div>
                   <Button
                     onClick={handleGenerate}
@@ -187,7 +187,7 @@ export function SmsCampaignDashboard() {
                     disabled={aiLoading}
                   >
                     {aiLoading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : null}
-                    Generate Draft
+                    Create Draft
                   </Button>
                 </div>
                 <Input

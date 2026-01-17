@@ -12,7 +12,7 @@ const PersonaSelector = ({ selectedPersona, onSelect }) => {
   return (
     <div style={{ marginBottom: '24px' }}>
       <label style={{ display: 'block', fontSize: '14px', fontWeight: '700', color: 'var(--text-tertiary)', marginBottom: '12px' }}>
-        AI Tone of Voice
+        Tone of Voice
       </label>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
         {personas.map((p) => (

@@ -2,9 +2,11 @@ import { NextRequest, NextResponse } from 'next/server';
 import { generateSiteStructure } from '@/lib/ai/vertex-service';
 import { requireRole, UnauthorizedError, ForbiddenError } from '@/server/auth';
 import { ALL_ROLES } from '@/lib/server/roles';
+import { enforceSameOrigin } from '@/lib/server/security';
 
 export async function POST(req: NextRequest) {
     try {
+        enforceSameOrigin(req);
         await requireRole(req, ALL_ROLES);
         const { prompt } = await req.json();
         
@@ -16,14 +18,14 @@ export async function POST(req: NextRequest) {
         
         return NextResponse.json(object);
     } catch (error) {
-        console.error("Vertex AI Error:", error);
+        console.error("Vertex Smart Error:", error);
         if (error instanceof UnauthorizedError) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
         if (error instanceof ForbiddenError) {
             return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
         }
-        // Fallback to a high-quality static structure if AI fails
+        // Fallback to a high-quality static structure if Smart fails
         return NextResponse.json({
             title: "Luxury Real Estate",
             blocks: [

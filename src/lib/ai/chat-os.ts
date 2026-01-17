@@ -32,7 +32,7 @@ export const generateAgentResponse = async (
     marketData?: any 
   }
 ) => {
-  // This would use Genkit or AI SDK to query our project database + schema
+  // This would use Genkit or Smart SDK to query our project database + schema
   // and return a response that sounds like a real estate expert.
   
   // prompt: "You are the lead sales agent for [Project Name]. Use the following verified data: [Schema]. 

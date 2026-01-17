@@ -21,7 +21,8 @@ export default function JobsDashboard() {
   useEffect(() => {
     if (!user) return;
     setLoading(true);
-    const unsubscribe = subscribeToJobs(user.uid, (data) => {
+    const tenantId = user.uid;
+    const unsubscribe = subscribeToJobs(tenantId, (data) => {
         setJobs(data);
         setLoading(false);
     });
@@ -30,7 +31,8 @@ export default function JobsDashboard() {
 
   const handleCreateTestJob = async () => {
     if (!user) return;
-    const newJob = await createJob(user.uid, 'site_generation', { prompt: 'Luxury Villa' });
+    const tenantId = user.uid;
+    const newJob = await createJob(tenantId, 'site_generation', { prompt: 'Luxury Villa' });
     processJob(newJob.id as string);
   };
 
@@ -45,7 +47,7 @@ export default function JobsDashboard() {
   if (!user) {
     return (
       <div className="min-h-screen bg-black text-white flex items-center justify-center">
-        <p className="text-zinc-500 text-lg">Sign in to monitor AI jobs.</p>
+        <p className="text-zinc-500 text-lg">Sign in to monitor background jobs.</p>
       </div>
     );
   }
@@ -57,7 +59,7 @@ export default function JobsDashboard() {
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 border-b border-white/5 pb-10">
           <div>
             <h1 className="text-4xl font-black tracking-tighter uppercase italic text-white">System Logs</h1>
-            <p className="text-zinc-500 text-lg font-light">Monitor real-time AI workload and system orchestration.</p>
+            <p className="text-zinc-500 text-lg font-light">Monitor real-time background workload and system orchestration.</p>
           </div>
           <div className="flex gap-3">
             <Button 
@@ -215,7 +217,7 @@ const STEP_STATUS_STYLES: Record<
 function JobStepsRow({ job }: { job: Job }) {
     const steps = job.steps || [];
     const totalPlanned = job.plan?.steps?.length || 0;
-    const title = job.type === 'site_refiner' ? 'Refiner AI timeline' : 'Step timeline';
+    const title = job.type === 'site_refiner' ? 'Refiner timeline' : 'Step timeline';
 
     return (
         <TableRow className="border-white/5 bg-black/40">

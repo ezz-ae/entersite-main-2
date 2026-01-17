@@ -9,7 +9,7 @@ export interface ProjectFilter {
   availability?: 'Available' | 'Sold Out' | 'Coming Soon';
 }
 
-const DEFAULT_LIMIT = 24;
+const DEFAULT_LIMIT = 25;
 
 export const searchProjects = async (query: string, filters?: ProjectFilter): Promise<ProjectData[]> => {
   const params = new URLSearchParams();

@@ -108,8 +108,8 @@ const ProjectDetailPage: NextPage = () => {
         : 'Steady'
     : 'Not shared';
   const launchPackHref = project?.id
-    ? `/start?intent=website&project=${encodeURIComponent(project.id)}`
-    : '/start?intent=website';
+    ? `/login?returnTo=/builder?start=1&project=${encodeURIComponent(project.id)}`
+    : '/login?returnTo=/builder?start=1';
 
   return (
     <div className="bg-black text-white min-h-screen">
@@ -211,7 +211,7 @@ const ProjectDetailPage: NextPage = () => {
                 <Card className="bg-white text-black rounded-2xl p-6 sm:p-8 sticky top-6">
                     <h3 className="text-xl sm:text-2xl font-black mb-3">Launch Pack</h3>
                     <p className="text-sm text-zinc-600 mb-6">
-                      Generate a listing page, follow-up message, and share link in minutes.
+                      Create a listing page, follow-up message, and share link in minutes.
                     </p>
                     <Button asChild className="w-full h-12 rounded-full bg-black text-white font-bold">
                       <a href={launchPackHref} className="inline-flex items-center justify-center gap-2">
@@ -221,7 +221,7 @@ const ProjectDetailPage: NextPage = () => {
                 </Card>
                 <Card className="bg-blue-600 text-white rounded-2xl p-6 sm:p-8 text-center">
                     <h3 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4">Interested in this project?</h3>
-                    <p className="text-blue-200 mb-5 sm:mb-6 text-sm sm:text-base">Contact our sales team for a private consultation.</p>
+                    <p className="text-blue-200 mb-5 sm:mb-6 text-sm sm:text-base">Request a private consultation.</p>
                     <Button className="bg-white text-blue-600 hover:bg-zinc-200 w-full font-bold">Request a Call</Button>
                 </Card>
                 <Card className="bg-zinc-900 border-white/10 rounded-2xl p-6 sm:p-8">

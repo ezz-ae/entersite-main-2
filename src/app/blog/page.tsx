@@ -5,6 +5,7 @@ import { Sparkles, BrainCircuit } from 'lucide-react';
 import { BlogPostCard } from '@/components/marketing/blog-post-card';
 import { fetchBlogPosts, BlogPost } from '@/server/content';
 import { shouldUseRemoteContent } from '@/server/remote-config';
+import { fetchLocalBlogPosts } from '@/server/local-blog';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -23,7 +24,7 @@ export const metadata: Metadata = {
 const DEFAULT_POSTS: BlogPost[] = [
   {
     id: 'uae-market-2025',
-    title: 'UAE Real Estate 2025: The Rise of AI Agents',
+    title: 'UAE Real Estate 2025: The Rise of Smart Agents',
     excerpt: 'How artificial intelligence is turning local brokerages into global investment engines.',
     author: 'Sarah Jenkins',
     date: 'Oct 12, 2025',
@@ -34,7 +35,7 @@ const DEFAULT_POSTS: BlogPost[] = [
   {
     id: 'brochure-to-conversion',
     title: 'Turning PDF Brochures into High-Yield Portals',
-    excerpt: 'The science behind our automated architect engine and why it works for investors.',
+    excerpt: 'The science behind the automated architect engine and why it works for investors.',
     author: 'David Chen',
     date: 'Oct 08, 2025',
     category: 'Productivity',
@@ -55,7 +56,9 @@ const DEFAULT_POSTS: BlogPost[] = [
 
 export default async function BlogPage() {
   const canUseRemote = shouldUseRemoteContent;
-  const posts = canUseRemote ? (await fetchBlogPosts()) : [];
+  const remote = canUseRemote ? (await fetchBlogPosts()) : [];
+  const local = await fetchLocalBlogPosts(12);
+  const posts = remote.length > 0 ? remote : local;
   const data = posts.length > 0 ? posts : DEFAULT_POSTS;
 
   return (
@@ -102,7 +105,7 @@ export default async function BlogPage() {
             </div>
             <div className="max-w-2xl relative z-10 space-y-4">
                 <h2 className="text-5xl md:text-7xl font-black tracking-tighter leading-none">Join the Intelligence.</h2>
-                <p className="text-xl text-blue-100 font-medium">Get UAE market trends and AI strategy guides delivered weekly.</p>
+                <p className="text-xl text-blue-100 font-medium">Get UAE market trends and Smart strategy guides delivered weekly.</p>
             </div>
             <div className="w-full md:w-auto relative z-10 flex flex-col sm:flex-row gap-3">
                 <input 

@@ -4,6 +4,7 @@ import { paypalRequest } from '@/server/paypal';
 import { requireRole, UnauthorizedError, ForbiddenError } from '@/server/auth';
 import { ADMIN_ROLES } from '@/lib/server/roles';
 import { BILLING_SKUS, resolveBillingSku } from '@/lib/server/billing';
+import { enforceSameOrigin } from '@/lib/server/security';
 
 const requestSchema = z.object({
   planId: z.string().optional(),
@@ -24,6 +25,7 @@ function getCheckoutUrl() {
 
 export async function POST(req: NextRequest) {
   try {
+    enforceSameOrigin(req);
     const { tenantId } = await requireRole(req, ADMIN_ROLES);
     const payload = requestSchema.parse(await req.json());
     const sku = resolveBillingSku(payload.sku || payload.planId);
@@ -58,8 +60,8 @@ export async function POST(req: NextRequest) {
       application_context: {
         brand_name: 'Entrestate',
         landing_page: 'LOGIN',
-        return_url: `${appUrl}/dashboard/billing?payment=success`,
-        cancel_url: `${appUrl}/dashboard/billing?payment=cancelled`,
+        return_url: `${appUrl}/account/billing?payment=success`,
+        cancel_url: `${appUrl}/account/billing?payment=cancelled`,
       },
     };
 

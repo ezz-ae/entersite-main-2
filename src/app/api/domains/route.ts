@@ -10,6 +10,7 @@ import {
   PlanLimitError,
   planLimitErrorResponse,
 } from '@/lib/server/billing';
+import { enforceSameOrigin } from '@/lib/server/security';
 
 const VERCEL_TOKEN = process.env.VERCEL_API_TOKEN;
 const PROJECT_ID = process.env.VERCEL_PROJECT_ID;
@@ -24,6 +25,7 @@ const normalizeDomain = (value: string) => value.replace(/^https?:\/\//, '').rep
 
 export async function POST(req: NextRequest) {
   try {
+    enforceSameOrigin(req);
     const { tenantId, uid } = await requireRole(req, ADMIN_ROLES);
     if (!CAP.vercel || !VERCEL_TOKEN || !PROJECT_ID) {
       return NextResponse.json({ error: 'Domain connection is not set up yet.' }, { status: 500 });
@@ -56,10 +58,8 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: 'Site not found' }, { status: 404 });
       }
       const siteData = siteSnap.data() || {};
-      if (siteData.tenantId && siteData.tenantId !== tenantId) {
-        return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-      }
-      if (!siteData.tenantId && siteData.ownerUid && siteData.ownerUid !== uid) {
+      const siteTenantId = siteData.tenantId as string | undefined;
+      if (!siteTenantId || siteTenantId !== tenantId) {
         return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
       }
 

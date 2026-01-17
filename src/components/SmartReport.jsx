@@ -55,7 +55,7 @@ const SmartReport = ({ data }) => {
 
       <div style={{ marginTop: '24px', padding: '16px', backgroundColor: 'var(--bg-secondary)', borderRadius: '12px', border: '1px solid var(--border-color)' }}>
         <h4 style={{ fontSize: '14px', fontWeight: '700', margin: '0 0 8px 0', color: 'var(--text-primary)' }}>
-          💡 AI Insight
+          💡 Insight
         </h4>
         <p style={{ fontSize: '13px', color: 'var(--text-secondary)', margin: 0, lineHeight: '1.5' }}>
           Your cost per lead is <strong>5% lower</strong> than the market average for this area. We recommend increasing your budget by AED 50 to capture more volume.

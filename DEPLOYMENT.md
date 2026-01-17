@@ -41,7 +41,7 @@ Server (admin):
   - `FIREBASE_CLIENT_EMAIL`
   - `FIREBASE_PRIVATE_KEY` (with `\n` line breaks)
 
-AI (required for chat + AI endpoints):
+Content Engine (used by chat and smart writing):
 - **Either** `GEMINI_API_KEY` **or** `GOOGLE_GENERATIVE_AI_API_KEY`
 
 Rate limiting (required in production):
@@ -259,7 +259,7 @@ Expected:
 
 - **Admin credentials missing**: `/api/health` returns `firebase: error`.
   - Fix: set `FIREBASE_ADMIN_SDK_CONFIG` or split admin keys.
-- **AI key missing**: chat preview returns 500 or fallback.
+- **Automation key missing**: chat preview returns 500 or fallback.
   - Fix: set `GEMINI_API_KEY` or `GOOGLE_GENERATIVE_AI_API_KEY`.
 - **Rate limiting disabled**: public endpoints are unthrottled.
   - Fix: set `UPSTASH_REDIS_REST_URL/TOKEN` and ensure `RATE_LIMIT_DISABLED=false`.

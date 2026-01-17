@@ -129,7 +129,7 @@ export function PublishSuccessDialog({
                         </Button>
                     </div>
                     <p className="text-xs text-zinc-500">
-                        Want your own domain? Connect it in <Link href="/dashboard/domain" className="text-white underline">Domains</Link>.
+                        Want your own domain? Connect it in <Link href="/account/integrations" className="text-white underline">Integrations</Link>.
                     </p>
 
                     <div className="grid grid-cols-2 gap-4">
@@ -163,7 +163,7 @@ export function PublishSuccessDialog({
                                     This project is ready for traffic. Start a launch campaign with a small daily budget to get more views.
                                 </p>
                                 <Button size="sm" className="mt-4 h-9 rounded-lg bg-white text-black font-bold text-xs px-6" asChild>
-                                    <Link href="/dashboard/google-ads">Start Ad Plan</Link>
+                                    <Link href="/google-ads">Start Ad Plan</Link>
                                 </Button>
                             </div>
                         </div>

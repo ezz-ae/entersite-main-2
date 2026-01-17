@@ -4,16 +4,21 @@ import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
-import { 
-  LayoutDashboard, 
-  Globe, 
-  Megaphone, 
-  Users, 
-  Bot, 
-  ImageIcon, 
-  CreditCard, 
-  LogOut, 
-  Palette
+import {
+  BarChart3,
+  Bot,
+  CreditCard,
+  Globe,
+  Library,
+  LifeBuoy,
+  Link2,
+  LogOut,
+  Search,
+  ShieldCheck,
+  Target,
+  User,
+  Users,
+  Zap,
 } from 'lucide-react';
 import { EntreSiteLogo } from '@/components/icons';
 import { Button } from '@/components/ui/button';
@@ -25,23 +30,27 @@ interface DashboardLayoutProps {
 
 export function DashboardLayout({ children }: DashboardLayoutProps) {
   const pathname = usePathname();
-  const showSidebar = pathname !== '/dashboard';
+  const showSidebar = !pathname?.startsWith('/account');
 
   const navigation = [
-    { name: 'Overview', href: '/dashboard', icon: LayoutDashboard },
-    { name: 'My Sites', href: '/dashboard/sites', icon: Globe },
-    { name: 'Web Address', href: '/dashboard/domain', icon: Globe },
-    { name: 'Marketing', href: '/dashboard/marketing', icon: Megaphone },
-    { name: 'Leads', href: '/dashboard/leads', icon: Users },
-    { name: 'AI Studio', href: '/dashboard/ai-tools', icon: Bot },
-    { name: 'Media', href: '/dashboard/assets', icon: ImageIcon },
-    { name: 'Brand', href: '/dashboard/brand', icon: Palette },
-    { name: 'Team', href: '/dashboard/team', icon: Users },
+    { name: 'Account', href: '/account', icon: User },
+    { name: 'Google Ads', href: '/google-ads', icon: Search },
+    { name: 'Smart Sender', href: '/sender', icon: Zap },
+    { name: 'Site Builder', href: '/builder', icon: Globe },
+    { name: 'Chat Agent', href: '/chat-agent', icon: Bot },
+    { name: 'Market', href: '/market', icon: BarChart3 },
+    { name: 'Inventory', href: '/inventory', icon: Library },
+    { name: 'Lead Director', href: '/leads', icon: Target },
+    { name: 'Agencies', href: '/agencies', icon: Users },
+    { name: 'Integrations', href: '/integrations', icon: Link2 },
+    { name: 'Analytics', href: '/analytics', icon: BarChart3 },
+    { name: 'Quality Index', href: '/quality-index', icon: ShieldCheck },
   ];
   
   const bottomNavigation = [
-    { name: 'Billing', href: '/dashboard/billing', icon: CreditCard },
-  ]
+    { name: 'Billing', href: '/account/billing', icon: CreditCard },
+    { name: 'Support', href: '/support', icon: LifeBuoy },
+  ];
 
   return (
     <div className="min-h-screen bg-zinc-900 flex font-sans">
@@ -49,7 +58,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
       {showSidebar && (
         <aside className="w-64 bg-zinc-900/50 border-r border-white/5 flex-col fixed inset-y-0 z-50 hidden md:flex">
           <div className="h-20 flex items-center px-6 border-b border-white/5">
-            <Link href="/dashboard" className="flex items-center gap-2">
+            <Link href="/account" className="flex items-center gap-2">
               <EntreSiteLogo className="h-6 w-6 text-white" />
               <span className="font-bold text-lg text-white">EntreSite</span>
             </Link>
@@ -57,7 +66,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
 
           <div className="flex-1 overflow-y-auto py-4 px-4 space-y-1">
             {navigation.map((item) => {
-              const isActive = (pathname === item.href) || (item.href !== '/dashboard' && pathname.startsWith(item.href));
+              const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
               return (
                 <Link
                   key={item.name}
@@ -118,7 +127,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
           {/* Mobile Header */}
           {showSidebar && (
                <div className="h-20 flex items-center justify-between px-6 bg-zinc-900/50 border-b border-white/5 md:hidden">
-                  <Link href="/dashboard" className="flex items-center gap-2">
+                  <Link href="/account" className="flex items-center gap-2">
                      <EntreSiteLogo className="h-6 w-6 text-white" />
                      <span className="font-bold text-lg text-white">EntreSite</span>
                   </Link>

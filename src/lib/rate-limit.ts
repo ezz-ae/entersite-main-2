@@ -41,10 +41,9 @@ export async function consumeRateLimit(key: string, limit: number, windowMs: num
     return result.success;
   }
 
-  if (process.env.NODE_ENV === 'production') {
-    console.error('[rate-limit] Upstash not configured; rate limit disabled.');
-    return true;
-  }
+  // Fallback: in-memory sliding window.
+  // This is not perfect in serverless environments (state is per-instance),
+  // but it still meaningfully reduces abuse and accidental request storms.
 
   const now = Date.now();
   const bucket = buckets.get(key);

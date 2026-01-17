@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { getAdminDb } from '@/server/firebase-admin';
 import { requireRole, UnauthorizedError, ForbiddenError } from '@/server/auth';
 import { ALL_ROLES } from '@/lib/server/roles';
+import { enforceSameOrigin } from '@/lib/server/security';
 
 const payloadSchema = z.object({
   siteIds: z.array(z.string().min(1)).min(1),
@@ -15,6 +16,7 @@ type SiteStats = {
 
 export async function POST(req: NextRequest) {
   try {
+    enforceSameOrigin(req);
     const body = await req.json();
     const { siteIds } = payloadSchema.parse(body);
     const { tenantId } = await requireRole(req, ALL_ROLES);

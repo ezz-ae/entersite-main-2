@@ -3,26 +3,26 @@
 import React from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { 
-  Globe, 
-  Users, 
+import {
+  Globe,
   MessageSquare,
-  Palette,
-  Link2,
-  Megaphone,
   Target,
-  ImageIcon
+  Search,
+  Zap,
+  Library,
+  BarChart3,
+  User,
 } from 'lucide-react';
 
 const services = [
-    { name: 'Sites', href: '/dashboard/sites', icon: Globe, description: 'Create and publish project pages.' },
-    { name: 'Web Address', href: '/dashboard/domain', icon: Link2, description: 'Connect or buy a web address.' },
-    { name: 'Marketing', href: '/dashboard/marketing', icon: Megaphone, description: 'Run ads, email, and SMS in one place.' },
-    { name: 'Leads', href: '/dashboard/leads', icon: Target, description: 'Track and follow up with new leads.' },
-    { name: 'Chat', href: '/dashboard/chat-agent', icon: MessageSquare, description: 'Answer buyer questions automatically.' },
-    { name: 'Media', href: '/dashboard/assets', icon: ImageIcon, description: 'Keep images and files organized.' },
-    { name: 'Brand', href: '/dashboard/brand', icon: Palette, description: 'Keep logos and colors consistent.' },
-    { name: 'Team', href: '/dashboard/team', icon: Users, description: 'Invite teammates and manage access.' },
+    { name: 'Google Ads', href: '/google-ads', icon: Search, description: 'Launch search campaigns with clear budgets.' },
+    { name: 'Smart Sender', href: '/sender', icon: Zap, description: 'Multi-channel sequences and follow-up runs.' },
+    { name: 'Site Builder', href: '/builder', icon: Globe, description: 'Launch surfaces for campaigns and chat.' },
+    { name: 'Chat Agent', href: '/chat-agent', icon: MessageSquare, description: 'Agent setup, takeover rules, and events.' },
+    { name: 'Market', href: '/market', icon: BarChart3, description: 'Signals, demand, and comparisons.' },
+    { name: 'Inventory', href: '/inventory', icon: Library, description: 'Projects and market facts.' },
+    { name: 'Lead Director', href: '/leads', icon: Target, description: 'Pipeline and lead flow.' },
+    { name: 'Account', href: '/account', icon: User, description: 'Billing, integrations, and security.' },
 ];
 
 const cardVariants = {
@@ -33,7 +33,6 @@ const cardVariants = {
     transition: {
       delay: i * 0.05,
       duration: 0.3,
-      ease: 'easeOut'
     }
   })
 };

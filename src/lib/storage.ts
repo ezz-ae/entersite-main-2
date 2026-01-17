@@ -51,7 +51,7 @@ export const ProjectLibrary = {
         const response = await fetch(externalUrl);
         const blob = await response.blob();
         
-        // 2. Generate a filename
+        // 2. Create a filename
         const ext = externalUrl.split('.').pop()?.split('?')[0] || 'jpg';
         const filename = `imported-\${Date.now()}.\${ext}`;
         

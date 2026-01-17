@@ -22,7 +22,7 @@ export const generateSiteStructure = async (prompt: string) => {
                 keywords: z.array(z.string())
             })
         }),
-        system: `You are the Entrestate AI Architect. Design high-converting real estate landing pages.
+        system: `You are the Entrestate Smart Architect. Design high-converting real estate landing pages.
                  Always include a chat-agent and an sms-lead block.`,
         prompt: `Design a high-fidelity landing page for: "${prompt}"`,
     });

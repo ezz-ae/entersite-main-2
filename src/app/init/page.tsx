@@ -118,7 +118,7 @@ export default function InitControlRoom() {
                      <div className="p-8 rounded-2xl bg-blue-600/5 border border-blue-500/10 space-y-4">
                         <h4 className="text-[10px] font-black uppercase text-blue-500 tracking-widest">Smart Insights</h4>
                         <p className="text-xs text-zinc-400 leading-relaxed font-medium italic">
-                            "Your dashboard is preparing the latest project insights."
+                            "Your workspace is preparing the latest project insights."
                         </p>
                      </div>
                 </div>

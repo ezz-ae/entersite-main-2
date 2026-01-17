@@ -28,7 +28,7 @@ export function ImageGenTool() {
   const handleGenerate = async () => {
     setIsGenerating(true);
     try {
-      const response = await authorizedFetch('/api/ai/generate-image', {
+      const response = await authorizedFetch('/api/ai/create-image', {
         method: 'POST',
         body: JSON.stringify({ prompt }),
         headers: { 'Content-Type': 'application/json' }
@@ -47,7 +47,7 @@ export function ImageGenTool() {
       <div className="flex justify-between items-center">
         <div>
           <h2 className="text-3xl font-bold tracking-tight">Imagen 3 Studio</h2>
-          <p className="text-muted-foreground">Architectural-grade property renders powered by Vertex AI.</p>
+          <p className="text-muted-foreground">Architectural-grade property renders powered by Vertex Smart.</p>
         </div>
         <div className="flex gap-2">
            <Badge variant="outline" className="bg-orange-500/10 text-orange-600 border-orange-500/20">
@@ -100,7 +100,7 @@ export function ImageGenTool() {
                     {isGenerating ? (
                        <> <Loader2 className="mr-2 h-5 w-5 animate-spin" /> Materializing... </>
                     ) : (
-                       <> <Sparkles className="mr-2 h-5 w-5" /> Generate Render </>
+                       <> <Sparkles className="mr-2 h-5 w-5" /> Create Render </>
                     )}
                  </Button>
               </CardContent>

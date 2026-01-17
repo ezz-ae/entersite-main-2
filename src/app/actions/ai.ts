@@ -3,7 +3,7 @@
 import { generateAdsFromPageContent, GenerateAdsInput, suggestNextBlocksFlow, SuggestNextBlocksInput } from '@/ai';
 
 /**
- * Server action to generate Google Ads from page content.
+ * Server action to create Google Ads from page content.
  * This function is executed only on the server.
  */
 export async function generateGoogleAdsAction(input: GenerateAdsInput) {
@@ -12,7 +12,7 @@ export async function generateGoogleAdsAction(input: GenerateAdsInput) {
     return output;
   } catch (error) {
     console.error('Error generating Google Ads:', error);
-    throw new Error('Failed to generate ads from AI');
+    throw new Error('Failed to create ads from Smart');
   }
 }
 
@@ -26,12 +26,12 @@ export async function suggestNextBlocksAction(input: SuggestNextBlocksInput) {
     return output;
   } catch (error) {
     console.error('Error suggesting next blocks:', error);
-    throw new Error('Failed to suggest next blocks from AI');
+    throw new Error('Failed to suggest next blocks from Smart');
   }
 }
 
 /**
- * Server action to generate a site.
+ * Server action to create a site.
  * This function is executed only on the server.
  */
 export async function generateSiteAction(input: any) {
@@ -41,12 +41,12 @@ export async function generateSiteAction(input: any) {
     return { success: true, message: 'Site generation initiated (dummy response)' };
   } catch (error) {
     console.error('Error generating site:', error);
-    throw new Error('Failed to generate site');
+    throw new Error('Failed to create site');
   }
 }
 
 /**
- * Server action to generate an email.
+ * Server action to create an email.
  * This function is executed only on the server.
  */
 export async function generateEmailAction(input: any) {
@@ -56,12 +56,12 @@ export async function generateEmailAction(input: any) {
     return { success: true, message: 'Email generation initiated (dummy response)' };
   } catch (error) {
     console.error('Error generating email:', error);
-    throw new Error('Failed to generate email');
+    throw new Error('Failed to create email');
   }
 }
 
 /**
- * Server action to generate an SMS.
+ * Server action to create an SMS.
  * This function is executed only on the server.
  */
 export async function generateSmsAction(input: any) {
@@ -71,6 +71,6 @@ export async function generateSmsAction(input: any) {
     return { success: true, message: 'SMS generation initiated (dummy response)' };
   } catch (error) {
     console.error('Error generating SMS:', error);
-    throw new Error('Failed to generate SMS');
+    throw new Error('Failed to create SMS');
   }
 }
