@@ -34,7 +34,7 @@ export function EditorHeader({
       
       {/* Left Side: Exit & Title */}
       <div className="flex items-center gap-4">
-          <Link href="/dashboard/sites">
+          <Link href="/builder/sites">
               <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full text-zinc-500 hover:text-white hover:bg-white/5">
                   <ChevronLeft className="h-5 w-5" />
               </Button>

@@ -4,9 +4,11 @@ import { getAdminDb } from '@/server/firebase-admin';
 import { requireRole, UnauthorizedError, ForbiddenError } from '@/server/auth';
 import { ADMIN_ROLES } from '@/lib/server/roles';
 import { logBillingEvent } from '@/lib/server/billing';
+import { enforceSameOrigin } from '@/lib/server/security';
 
 export async function POST(req: NextRequest) {
   try {
+    enforceSameOrigin(req);
     const { tenantId } = await requireRole(req, ADMIN_ROLES);
     const db = getAdminDb();
     const ref = db.collection('subscriptions').doc(tenantId);

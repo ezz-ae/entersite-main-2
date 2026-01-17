@@ -14,12 +14,12 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
       title: 'Project Details | Market Feed | Entrestate',
       description: 'Project details, pricing, and availability.',
       alternates: {
-        canonical: `/discover/${encodeURIComponent(projectId)}`,
+        canonical: `/inventory/project/${encodeURIComponent(projectId)}`,
       },
       openGraph: {
         title: 'Project Details | Market Feed | Entrestate',
         description: 'Project details, pricing, and availability.',
-        url: `/discover/${encodeURIComponent(projectId)}`,
+        url: `/inventory/project/${encodeURIComponent(projectId)}`,
       },
     };
   }
@@ -33,12 +33,12 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
     title: `${project.name} | Market Feed | Entrestate`,
     description,
     alternates: {
-      canonical: `/discover/${encodeURIComponent(projectId)}`,
+      canonical: `/inventory/project/${encodeURIComponent(projectId)}`,
     },
     openGraph: {
       title: `${project.name} | Market Feed | Entrestate`,
       description,
-      url: `/discover/${encodeURIComponent(projectId)}`,
+      url: `/inventory/project/${encodeURIComponent(projectId)}`,
       images: project.images?.length
         ? [
             {

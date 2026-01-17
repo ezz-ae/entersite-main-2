@@ -18,7 +18,7 @@ interface LaunchHeroBlockProps {
 
 export function LaunchHeroBlock({
   headline = "The Future of Living Arrives Soon",
-  subtext = "Be the first to know about our upcoming waterfront masterpiece. Exclusive pre-launch pricing for early registrants.",
+  subtext = "Be the first to know about this upcoming waterfront masterpiece. Exclusive pre-launch pricing for early registrants.",
   launchDate = "November 15, 2025",
   backgroundImage = SAFE_IMAGES.hero[0] // Use safe image
 }: LaunchHeroBlockProps) {

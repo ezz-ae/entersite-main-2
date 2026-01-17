@@ -67,6 +67,17 @@ export interface ProjectData {
   brochureUrl?: string;
 }
 
+export type InventoryCta = {
+  id: string;
+  type: 'inventory-cta';
+  title: string;
+  subtitle: string;
+  ctaLabel: string;
+  ctaHref: string;
+  description?: string;
+  isBotTarget?: boolean;
+};
+
 
 export interface Block {
   blockId: string;
@@ -81,7 +92,6 @@ export interface SitePage {
   blocks: Block[];
   canonicalListings: string[];
   brochureUrl: string;
-  ownerUid?: string;
   tenantId?: string;
   refinerStatus?: 'queued' | 'running' | 'review' | 'done' | 'error';
   lastRefinedAt?: string | Date;
@@ -102,6 +112,31 @@ export interface SitePage {
   };
   createdAt: string;
   updatedAt: string;
+  refinerReport?: RefinerReport;
+}
+
+export type RefinerIssueCode =
+  | 'contrast'
+  | 'hero_image'
+  | 'cta_absence'
+  | 'cta_generic'
+  | 'phone_cta'
+  | 'form_fields'
+  | 'next_step';
+
+export type RefinerIssue = {
+  code: RefinerIssueCode;
+  level: 'warning' | 'info';
+  message: string;
+  detail?: string;
+  section?: string;
+};
+
+export interface RefinerReport {
+  issues: RefinerIssue[];
+  summary: string;
+  score: number;
+  generatedAt: string;
 }
 
 export interface ProjectFilter {

@@ -121,7 +121,7 @@ export function ReadyBuilds() {
             <FeatureCard 
                 icon={Zap} 
                 title="Quick Draft" 
-                desc="Generate a draft page in minutes from any brochure." 
+                desc="Create a draft page in minutes from any brochure." 
             />
             <FeatureCard 
                 icon={ShieldCheck} 

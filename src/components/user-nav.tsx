@@ -1,8 +1,8 @@
 'use client';
 
-import { useState } from 'react';
 import { CreditCard, LogOut, PlusCircle, Settings, User as UserIcon } from "lucide-react";
 import Link from "next/link";
+import { usePathname } from 'next/navigation';
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -19,32 +19,31 @@ import { auth } from "@/lib/firebase/client";
 import { signOut } from "firebase/auth";
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { ClientOnly } from "@/components/client-only";
-import { LoginDialog } from "./auth/login-dialog";
 
 export function UserNav() {
   const [user] = useAuthState(auth);
-  const [isLoginOpen, setIsLoginOpen] = useState(false);
+  const pathname = usePathname();
 
   const handleLogout = () => {
     signOut(auth);
   };
 
   if (!user) {
+    const loginHref = pathname ? `/login?returnTo=${encodeURIComponent(pathname)}` : '/login';
     return (
         <ClientOnly>
             <Button
+              asChild
               variant="ghost"
               className="h-10 px-4 rounded-full border border-white/10 text-xs font-bold uppercase tracking-widest"
-              onClick={() => setIsLoginOpen(true)}
             >
-              Log In
+              <Link href={loginHref}>Login</Link>
             </Button>
-            <LoginDialog isOpen={isLoginOpen} onOpenChange={setIsLoginOpen} />
         </ClientOnly>
     )
   }
 
-  const displayName = user?.displayName || user?.email?.split('@')[0] || "User";
+  const displayName = user?.displayName || user?.phoneNumber || user?.email?.split('@')[0] || "User";
   const initials = displayName.substring(0, 2).toUpperCase();
 
   return (
@@ -62,28 +61,28 @@ export function UserNav() {
             <div className="flex flex-col space-y-1">
                 <p className="text-sm font-bold leading-none">{displayName}</p>
                 <p className="text-xs leading-none text-zinc-500 mt-1">
-                {user?.email}
+                {user?.phoneNumber || user?.email}
                 </p>
             </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator className="bg-white/5" />
             <DropdownMenuGroup className="space-y-1">
-            <Link href="/profile">
+            <Link href="/account">
                 <DropdownMenuItem className="rounded-lg cursor-pointer hover:bg-white/5">
                     <UserIcon className="mr-2 h-4 w-4 text-zinc-500" />
-                    <span>Profile</span>
+                    <span>Account</span>
                 </DropdownMenuItem>
             </Link>
-            <Link href="/dashboard/billing">
+            <Link href="/account/billing">
                 <DropdownMenuItem className="rounded-lg cursor-pointer hover:bg-white/5">
                     <CreditCard className="mr-2 h-4 w-4 text-zinc-500" />
                     <span>Billing</span>
                 </DropdownMenuItem>
             </Link>
-            <Link href="/dashboard/brand">
+            <Link href="/builder">
                 <DropdownMenuItem className="rounded-lg cursor-pointer hover:bg-white/5">
                     <Settings className="mr-2 h-4 w-4 text-zinc-500" />
-                    <span>Brand</span>
+                    <span>Builder</span>
                 </DropdownMenuItem>
             </Link>
             </DropdownMenuGroup>

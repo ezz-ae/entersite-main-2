@@ -4,6 +4,7 @@ import { CAP } from '@/lib/capabilities';
 import { resend, fromEmail } from '@/lib/resend';
 import { requireRole, UnauthorizedError, ForbiddenError } from '@/server/auth';
 import { ALL_ROLES } from '@/lib/server/roles';
+import { enforceSameOrigin } from '@/lib/server/security';
 
 const SUPPORT_EMAIL = process.env.SUPPORT_EMAIL || 'support@entrestate.com';
 
@@ -16,6 +17,7 @@ const payloadSchema = z.object({
 
 export async function POST(req: NextRequest) {
   try {
+    enforceSameOrigin(req);
     await requireRole(req, ALL_ROLES);
     if (!CAP.resend || !resend) {
       return NextResponse.json({ error: 'Support email is not configured' }, { status: 500 });

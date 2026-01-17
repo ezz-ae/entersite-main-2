@@ -28,7 +28,7 @@ export default function ProfilePage() {
   const [companyName, setCompanyName] = useState('');
   const [officeAddress, setOfficeAddress] = useState('');
 
-  const displayName = user?.displayName || user?.email?.split('@')[0] || 'You';
+  const displayName = user?.displayName || user?.phoneNumber || user?.email?.split('@')[0] || 'You';
   const initials = useMemo(() => {
     const parts = displayName.split(' ').filter(Boolean);
     const letters = parts.slice(0, 2).map((part) => part[0]?.toUpperCase()).join('');

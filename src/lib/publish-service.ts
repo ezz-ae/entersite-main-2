@@ -15,11 +15,10 @@ export interface VercelPublishResult {
  * Publishes a site by invoking the dedicated Vercel deployment API endpoint.
  *
  * @param {SitePage} page - The site page object to be published.
- * @param {string} [ownerUid] - The UID of the site owner.
  * @returns {Promise<VercelPublishResult>} A promise that resolves with the publishing result.
  * @throws Will throw an error if the publishing process fails.
  */
-export const publishSite = async (page: SitePage, ownerUid?: string): Promise<VercelPublishResult> => {
+export const publishSite = async (page: SitePage): Promise<VercelPublishResult> => {
   if (!page.id) {
     throw new Error('Site must be saved before publishing.');
   }

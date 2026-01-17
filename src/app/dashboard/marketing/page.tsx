@@ -2,33 +2,51 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { ArrowRight, Mail, Megaphone, Search, Smartphone, Users } from 'lucide-react';
+import { Activity, ArrowRight, ListChecks, Mail, Megaphone, Search, Smartphone, Users } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 
 const CHANNELS = [
   {
     title: 'Google Ads',
     description: 'Launch and track your ads.',
-    href: '/dashboard/google-ads',
+    href: '/google-ads',
     icon: Search,
   },
   {
     title: 'Email Campaigns',
     description: 'Send project updates to your buyer list.',
-    href: '/dashboard/email-marketing',
+    href: '/sender/new',
     icon: Mail,
   },
   {
     title: 'SMS Campaigns',
     description: 'Send quick updates and open house alerts.',
-    href: '/dashboard/sms-marketing',
+    href: '/sender/new',
     icon: Smartphone,
   },
   {
     title: 'Buyer Audience',
     description: 'Use your buyer list for ads.',
-    href: '/dashboard/meta-audience',
+    href: '/market',
     icon: Users,
+  },
+  {
+    title: 'Sender Queue',
+    description: 'See what actually sent, failed, and what is next.',
+    href: '/sender/queue',
+    icon: ListChecks,
+  },
+  {
+    title: 'Audience Network',
+    description: 'Events → Segments (hot/warm/cold).',
+    href: '/market',
+    icon: Activity,
+  },
+  {
+    title: 'Audience Actions',
+    description: 'Execution log (hot transitions, suppression).',
+    href: '/market',
+    icon: Activity,
   },
 ];
 

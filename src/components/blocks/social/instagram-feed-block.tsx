@@ -9,7 +9,7 @@ import { getRandomImage } from '@/lib/images';
 
 export function InstagramFeedBlock({
   headline = "Follow Us on Instagram",
-  subtext = "See our latest property tours and market updates @RealEstateDubai",
+  subtext = "See this latest property tours and market updates @RealEstateDubai",
   handle = "@RealEstateDubai"
 }: { headline?: string, subtext?: string, handle?: string }) {
   

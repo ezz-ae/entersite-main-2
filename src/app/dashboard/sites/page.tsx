@@ -71,7 +71,7 @@ const getRefinerMeta = (site: SitePage): RefinerMeta => {
     return {
       badgeLabel: 'Draft Ready',
       badgeClassName: 'bg-amber-500/15 text-amber-200 border border-amber-300/40',
-      description: 'Review the Refiner AI polish and apply it to go live.',
+      description: 'Review the Refiner polish and apply it to go live.',
       timeLabel: lastRefinedDate ? `Draft saved ${timeDistance}` : 'Awaiting review',
       ctaLabel: 'Review Draft',
       ctaHref: reviewHref,
@@ -106,9 +106,9 @@ const getRefinerMeta = (site: SitePage): RefinerMeta => {
   return {
     badgeLabel: 'Refiner Available',
     badgeClassName: 'bg-white/5 text-zinc-200 border border-white/10',
-    description: 'Run Refiner AI to tighten copy, spacing, and conversions before you launch.',
+    description: 'Run Refiner to tighten copy, spacing, and conversions before you launch.',
     timeLabel: 'Never refined',
-    ctaLabel: 'Run Refiner AI',
+    ctaLabel: 'Run Refiner',
     ctaHref: baseHref,
     ctaClassName: ''
   };
@@ -147,7 +147,7 @@ export default function SitesDashboardPage() {
       if (user) {
         setLoading(true);
         try {
-          const userSites = await getUserSites(user.uid);
+          const userSites = await getUserSites();
           setSites(userSites as SitePage[]);
         } catch (error) {
           console.error("Failed to load sites:", error);
@@ -195,7 +195,7 @@ export default function SitesDashboardPage() {
         // For now, we will use a hardcoded project ID.
         // In the future, we will create a project first.
         const projectId = "demo-project";
-        const response = await apiFetch('/api/generate/landing', {
+        const response = await apiFetch('/api/create/landing', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -255,10 +255,10 @@ export default function SitesDashboardPage() {
                 <DialogHeader className="p-4">
                     <DialogTitle className="text-3xl font-bold flex items-center gap-3">
                         <Sparkles className="h-8 w-8 text-blue-500" />
-                        AI Site Architect
+                        Site Architect
                     </DialogTitle>
                     <DialogDescription className="text-zinc-500 text-lg font-light mt-2">
-                        Give our AI a project brief. We'll handle the sitemap, content, and data integration.
+                        Give Smart Builder a project brief. It will handle the sitemap, content, and data integration.
                     </DialogDescription>
                 </DialogHeader>
                 <div className="px-4">
@@ -304,7 +304,7 @@ export default function SitesDashboardPage() {
                 </div>
                 <DialogFooter className="p-4 pt-0">
                     <Button type="submit" className="w-full h-14 text-lg font-bold bg-blue-600 hover:bg-blue-700 rounded-2xl" onClick={handleCreateSite}>
-                        Generate Landing Page
+                        Create Landing Page
                     </Button>
                 </DialogFooter>
             </DialogContent>
@@ -331,10 +331,10 @@ export default function SitesDashboardPage() {
               </div>
               <div className="space-y-1">
                   <h3 className="text-xl font-bold text-white">No Projects Found</h3>
-                  <p className="text-zinc-500 max-w-sm">You haven't built any sites yet. Use the AI Architect to create your first high-converting landing page.</p>
+                  <p className="text-zinc-500 max-w-sm">You haven't built any sites yet. Use the Smart Architect to create your first high-converting landing page.</p>
               </div>
               <Button variant="outline" className="rounded-full border-white/10" onClick={() => setIsModalOpen(true)}>
-                  Launch AI Architect
+                  Open Site Architect
               </Button>
           </div>
       ) : (
@@ -410,7 +410,7 @@ export default function SitesDashboardPage() {
                                 </Button>
                             </Link>
                             
-                            <Link href="/dashboard/google-ads">
+                            <Link href="/google-ads">
                                 <Button variant="outline" className={cn(
                                     "h-11 rounded-full gap-2 border-white/10 transition-all px-6 font-bold text-xs uppercase tracking-widest bg-white/5 text-zinc-400 hover:text-white"
                                 )}>

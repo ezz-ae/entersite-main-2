@@ -17,6 +17,10 @@ import {
 } from '@/lib/server/billing';
 import { enforceRateLimit, getRequestIp } from '@/lib/server/rateLimit';
 import { getPublishedSite } from '@/server/publish-service';
+import { writeAudienceEvent } from '@/server/audience/write-event';
+import { getCampaign } from '@/server/campaigns/campaign-store';
+import { createOrResetSenderRun } from '@/server/sender/sender-store';
+import { DEFAULT_LEAD_DIRECTION } from '@/lib/lead-direction';
 
 const NOTIFY_EMAIL_TO = process.env.NOTIFY_EMAIL_TO;
 const NOTIFY_SMS_TO = process.env.NOTIFY_SMS_TO;
@@ -35,6 +39,8 @@ const payloadSchema = z.object({
   attribution: z.record(z.any()).optional(),
   metadata: z.record(z.any()).optional(),
   siteId: z.string().optional(),
+  // Optional campaign linkage (usually provided via attribution captured from query params)
+  campaignDocId: z.string().optional(),
 });
 
 type LeadPayload = z.infer<typeof payloadSchema>;
@@ -56,9 +62,35 @@ async function resolvePublicTenant(payload: LeadPayload) {
   if (!siteKey) return null;
   const publishedSite = await getPublishedSite(siteKey);
   if (!publishedSite?.published) return null;
-  const tenantId = publishedSite.tenantId || publishedSite.ownerUid || null;
+  const tenantId = publishedSite.tenantId || null;
   if (!tenantId) return null;
   return { tenantId, siteId: publishedSite.id };
+}
+
+async function resolveCampaignId(db: Firestore, tenantId: string, payload: LeadPayload) {
+  const attribution = (payload.attribution || {}) as Record<string, any>;
+  const metadata = (payload.metadata || {}) as Record<string, any>;
+
+  const candidate =
+    (attribution.campaignDocId as string | undefined) ||
+    (payload.campaignDocId as string | undefined) ||
+    (attribution.campaignId as string | undefined) ||
+    (metadata.campaignDocId as string | undefined) ||
+    (metadata.campaignId as string | undefined);
+
+  const campaignId = candidate ? String(candidate).trim() : '';
+  if (!campaignId) return null;
+
+  const snap = await db.collection('campaigns').doc(campaignId).get();
+  if (!snap.exists) {
+    // Don’t allow poisoning leads with random IDs
+    throw new Error('Invalid campaign');
+  }
+  const data = snap.data() as any;
+  if (data?.tenantId !== tenantId) {
+    throw new Error('Invalid campaign');
+  }
+  return campaignId;
 }
 
 export async function POST(req: NextRequest) {
@@ -120,11 +152,7 @@ export async function POST(req: NextRequest) {
       if (siteSnap.exists) {
         const siteData = siteSnap.data() || {};
         const siteTenant = siteData.tenantId as string | undefined;
-        const siteOwner = siteData.ownerUid as string | undefined;
-        if (siteTenant && siteTenant !== tenantId) {
-          return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-        }
-        if (!siteTenant && siteOwner && siteOwner !== context.uid) {
+        if (!siteTenant || siteTenant !== tenantId) {
           return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
         }
       } else {
@@ -134,9 +162,24 @@ export async function POST(req: NextRequest) {
 
     await enforceUsageLimit(db, tenantId, 'leads', 1);
 
+    let campaignId: string | null = null;
+    try {
+      campaignId = await resolveCampaignId(db, tenantId, payload);
+    } catch (e) {
+      return NextResponse.json({ error: 'Invalid campaign attribution' }, { status: 400 });
+    }
+
+    // Normalize attribution to always carry the campaignDocId when we resolve a valid campaign.
+    const normalizedAttribution = (() => {
+      if (!campaignId) return payload.attribution || null;
+      const base = (payload.attribution || {}) as Record<string, any>;
+      return { ...base, campaignDocId: base.campaignDocId || campaignId };
+    })();
+
     const leadData = {
       tenantId,
       siteId,
+      campaignId,
       project: payload.project || null,
       projectId: payload.projectId || null,
       pageSlug: payload.pageSlug || null,
@@ -146,10 +189,11 @@ export async function POST(req: NextRequest) {
       message: payload.message || null,
       source: payload.source || payload.context?.service || 'Website',
       context: payload.context || null,
-      attribution: payload.attribution || null,
+      attribution: normalizedAttribution,
       metadata: payload.metadata || null,
       status: 'New',
       priority: 'Warm',
+      direction: DEFAULT_LEAD_DIRECTION,
       createdAt: FieldValue.serverTimestamp(),
       updatedAt: FieldValue.serverTimestamp(),
     };
@@ -159,6 +203,39 @@ export async function POST(req: NextRequest) {
       .doc(tenantId)
       .collection('leads')
       .add(leadData);
+
+    // Audience Network event (no PII)
+    try {
+      await writeAudienceEvent({
+        tenantId,
+        campaignId,
+        actor: context?.uid ? { type: 'user', uid: context.uid } : { type: 'lead', leadId: leadRef.id },
+        type: 'landing.form_submit',
+        payload: {
+          siteId: siteId || undefined,
+          source: (payload.source || payload.context?.service || 'Website') as string,
+          hasEmail: !!payload.email,
+          hasPhone: !!payload.phone,
+        },
+      });
+    } catch {
+      // never block lead capture
+    }
+
+    // V1: Auto-enqueue Smart Sender for campaign leads (no manual clicks required)
+    if (campaignId) {
+      try {
+        const campaign = await getCampaign({ campaignId });
+        const sender = (campaign.bindings?.sender || {}) as any;
+        const draft = (sender.smartSequenceDraft || {}) as Record<string, any>;
+        const hasAnyStep = !!(draft.emailSubject || draft.emailHtml || draft.smsText || draft.whatsappText);
+        if (sender.enabled && hasAnyStep) {
+          await createOrResetSenderRun({ tenantId, campaignId, leadId: leadRef.id });
+        }
+      } catch {
+        // never block lead capture
+      }
+    }
 
     // Optional notifications + CRM webhook
     const settingsSnap = await db
@@ -256,7 +333,7 @@ export async function POST(req: NextRequest) {
     }
 
     logger.logSuccess(201, { leadId: leadRef.id, siteId });
-    return NextResponse.json({ id: leadRef.id, tenantId }, { status: 201 });
+    return NextResponse.json({ id: leadRef.id }, { status: 201 });
   } catch (error) {
     console.error('[leads] capture error', error);
     if (error instanceof PlanLimitError) {

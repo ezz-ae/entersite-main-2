@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAdminDb } from '@/server/firebase-admin';
 import { requireRole, UnauthorizedError, ForbiddenError } from '@/server/auth';
-import { ALL_ROLES } from '@/lib/server/roles';
+import { ADMIN_ROLES } from '@/lib/server/roles';
 import { getBillingSummary } from '@/lib/server/billing';
 
 export async function GET(req: NextRequest) {
   try {
-    const { tenantId } = await requireRole(req, ALL_ROLES);
+    const { tenantId } = await requireRole(req, ADMIN_ROLES);
     const db = getAdminDb();
     const summary = await getBillingSummary(db, tenantId);
 

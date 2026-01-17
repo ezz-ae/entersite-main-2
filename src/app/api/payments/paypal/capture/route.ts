@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { paypalRequest } from '@/server/paypal';
 import { requireRole, UnauthorizedError, ForbiddenError } from '@/server/auth';
 import { ADMIN_ROLES } from '@/lib/server/roles';
+import { enforceSameOrigin } from '@/lib/server/security';
 
 const requestSchema = z.object({
   orderId: z.string().min(1),
@@ -10,6 +11,7 @@ const requestSchema = z.object({
 
 export async function POST(req: NextRequest) {
   try {
+    enforceSameOrigin(req);
     await requireRole(req, ADMIN_ROLES);
     const payload = requestSchema.parse(await req.json());
 

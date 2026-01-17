@@ -4,9 +4,10 @@ import { createGoogleGenerativeAI } from '@ai-sdk/google';
 import { requireRole, UnauthorizedError, ForbiddenError } from '@/server/auth';
 import { ALL_ROLES } from '@/lib/server/roles';
 import { enforceRateLimit, getRequestIp } from '@/lib/server/rateLimit';
+import { enforceSameOrigin } from '@/lib/server/security';
 
 /**
- * AI Email Content Generator
+ * Smart Email Content Generator
  * COST OPTIMIZED: Switched to 1.5-FLASH
  */
 
@@ -21,9 +22,10 @@ const MODEL_ID = 'gemini-1.5-flash';
 
 export async function POST(req: NextRequest) {
     try {
+        enforceSameOrigin(req);
         const { tenantId } = await requireRole(req, ALL_ROLES);
         const ip = getRequestIp(req);
-        if (!(await enforceRateLimit(`email:generate:${tenantId}:${ip}`, 20, 60_000))) {
+        if (!(await enforceRateLimit(`email:create:${tenantId}:${ip}`, 20, 60_000))) {
           return NextResponse.json({ error: 'Rate limit exceeded' }, { status: 429 });
         }
         const { topic, context } = await req.json();

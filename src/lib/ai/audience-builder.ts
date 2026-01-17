@@ -14,7 +14,7 @@ export interface AudienceCriteria {
 
 export const buildExpertAudience = async (criteria: AudienceCriteria) => {
     // 1. Query our lead database for people interested in similar projects
-    // 2. Generate a "Lookalike" seed based on successful converters in that area
+    // 2. Create a "Lookalike" seed based on successful converters in that area
     // 3. Return a Meta-ready JSON structure for the Audience API
     
     return {

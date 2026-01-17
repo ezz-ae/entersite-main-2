@@ -3,15 +3,13 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { 
-  LayoutDashboard, 
-  Globe, 
-  Target, 
-  MessageSquare, 
-  PlusCircle, 
+import {
+  Search,
+  Globe,
+  Target,
+  MessageSquare,
+  PlusCircle,
   User,
-  Settings,
-  Zap
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -19,17 +17,17 @@ export function MobileBottomNav() {
   const pathname = usePathname();
 
   const navItems = [
-    { href: '/dashboard', icon: LayoutDashboard, label: 'Home' },
-    { href: '/dashboard/sites', icon: Globe, label: 'Sites' },
+    { href: '/account', icon: User, label: 'Account' },
+    { href: '/google-ads', icon: Search, label: 'Ads' },
     { href: '/builder', icon: PlusCircle, label: 'Build', primary: true },
-    { href: '/dashboard/leads', icon: Target, label: 'Leads' },
-    { href: '/dashboard/chat-agent', icon: MessageSquare, label: 'Chat' },
+    { href: '/leads', icon: Target, label: 'Leads' },
+    { href: '/chat-agent', icon: MessageSquare, label: 'Chat' },
   ];
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-[100] h-20 bg-zinc-950/80 backdrop-blur-2xl border-t border-white/5 flex items-center justify-around px-2 pb-safe">
       {navItems.map((item) => {
-        const isActive = pathname === item.href;
+        const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
         
         if (item.primary) {
           return (

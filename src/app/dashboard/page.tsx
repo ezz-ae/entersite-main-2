@@ -56,15 +56,15 @@ export default function DashboardPage() {
       : {
           label: 'Start your first launch',
           description: 'Publish a listing page and capture your next lead.',
-          href: '/start?intent=website',
+          href: '/builder?start=1',
           disabled: false,
         };
 
   return (
     <div className="space-y-12">
          <div>
-            <h1 className="text-4xl font-bold tracking-tight text-white">Dashboard</h1>
-            <p className="text-xl text-muted-foreground font-light">Choose what you want to work on today.</p>
+            <h1 className="text-4xl font-bold tracking-tight text-white">System Overview</h1>
+            <p className="text-xl text-muted-foreground font-light">Choose what you want to work on next.</p>
         </div>
 
         <Card className="bg-white/5 border border-blue-500/20 rounded-3xl">
@@ -123,7 +123,7 @@ export default function DashboardPage() {
               </Button>
             ) : (
               <Button asChild variant="outline" className="h-11 rounded-full border-white/10 bg-white/5 text-white font-bold">
-                <a href="/discover">View market feed</a>
+                <a href="/inventory">View market inventory</a>
               </Button>
             )}
           </CardContent>

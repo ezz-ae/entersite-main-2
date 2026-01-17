@@ -7,19 +7,21 @@ import { cn } from "@/lib/utils";
 import { motion } from 'framer-motion';
 
 import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
-import { 
-  Bell, 
-  Users,
-  MessageSquare,
-  Globe,
+import {
+  Bell,
+  Bot,
+  Library,
+  LifeBuoy,
   Link2,
+  Search,
+  ShieldCheck,
   Target,
-  LayoutDashboard,
+  Users,
+  User,
+  Zap,
+  Globe,
   CreditCard,
-  Megaphone,
-  ImageIcon,
-  Palette,
-  User
+  BarChart,
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { UserNav } from "@/components/user-nav";
@@ -27,19 +29,23 @@ import { EntrestateLogo } from "@/components/icons";
 import { MobileBottomNav } from "@/components/mobile-app/mobile-bottom-nav";
 
 const mainNavItems = [
-    { href: "/dashboard", icon: LayoutDashboard, label: "Overview" },
-    { href: "/dashboard/sites", icon: Globe, label: "Sites" },
-    { href: "/dashboard/domain", icon: Link2, label: "Web Address" },
-    { href: "/dashboard/marketing", icon: Megaphone, label: "Marketing" },
-    { href: "/dashboard/leads", icon: Target, label: "Leads" },
-    { href: "/dashboard/chat-agent", icon: MessageSquare, label: "Chat" },
-    { href: "/dashboard/assets", icon: ImageIcon, label: "Media" },
-    { href: "/dashboard/brand", icon: Palette, label: "Brand" },
-    { href: "/dashboard/team", icon: Users, label: "Team" },
+    { href: "/account", icon: User, label: "Account" },
+    { href: "/google-ads", icon: Search, label: "Google Ads" },
+    { href: "/sender", icon: Zap, label: "Smart Sender" },
+    { href: "/builder", icon: Globe, label: "Site Builder" },
+    { href: "/chat-agent", icon: Bot, label: "Chat Agent" },
+    { href: "/market", icon: BarChart, label: "Market" },
+    { href: "/inventory", icon: Library, label: "Inventory" },
+    { href: "/leads", icon: Target, label: "Lead Director" },
+    { href: "/agencies", icon: Users, label: "Agencies" },
+    { href: "/integrations", icon: Link2, label: "Integrations" },
+    { href: "/analytics", icon: BarChart, label: "Analytics" },
+    { href: "/quality-index", icon: ShieldCheck, label: "Quality Index" },
 ];
 
 const secondaryNavItems = [
-    { href: "/dashboard/billing", icon: CreditCard, label: "Billing" },
+    { href: "/account/billing", icon: CreditCard, label: "Billing" },
+    { href: "/support", icon: LifeBuoy, label: "Support" },
 ];
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -84,7 +90,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                             <div className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
                             <span className="text-[10px] font-bold text-blue-500 uppercase tracking-widest">All Systems Go</span>
                         </div>
-                        <Link href="/profile" className="hidden md:inline-flex">
+                        <Link href="/account/profile" className="hidden md:inline-flex">
                             <Button variant="ghost" size="sm" className="gap-2 text-zinc-400 hover:text-white hover:bg-white/5">
                                 <User className="h-4 w-4" />
                                 Profile
@@ -110,7 +116,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
 function NavItem({ item }: { item: typeof mainNavItems[0] }) {
     const pathname = usePathname();
-    const isActive = pathname === item.href;
+    const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
 
     return (
         <Tooltip>

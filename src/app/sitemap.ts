@@ -7,16 +7,27 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   const routes = [
     '/',
-    '/instagram-assistant',
-    '/instagram-assistant/demo',
     '/google-ads',
-    '/audience-network',
-    '/discover',
+    '/sender',
+    '/builder',
+    '/chat-agent',
+    '/market',
+    '/inventory',
+    '/leads',
+    '/agencies',
+    '/integrations',
+    '/knowledge',
+    '/analytics',
+    '/quality-index',
     '/docs',
+    '/docs/library',
     '/support',
     '/status',
-    '/start',
+    '/login',
+    '/account',
     '/blog',
+    '/roadmap',
+    '/changelog',
   ];
 
   return routes.map((path) => ({

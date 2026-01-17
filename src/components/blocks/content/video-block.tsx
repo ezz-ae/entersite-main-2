@@ -14,7 +14,7 @@ interface VideoBlockProps {
 
 export function VideoBlock({
   headline = "Experience the Lifestyle",
-  subtext = "Take a virtual tour of our community and see what life is like at Elysian Residence.",
+  subtext = "Take a virtual tour of this community and see what life is like at Elysian Residence.",
   videoThumbnail = "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&q=80&w=2000",
   videoUrl = "#"
 }: VideoBlockProps) {

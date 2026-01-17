@@ -6,6 +6,7 @@ import { getAdminDb } from '@/server/firebase-admin';
 import { CAP } from '@/lib/capabilities';
 import { resend, fromEmail } from '@/lib/resend';
 import { ADMIN_ROLES } from '@/lib/server/roles';
+import { enforceSameOrigin } from '@/lib/server/security';
 import {
   checkUsageLimit,
   PlanLimitError,
@@ -24,6 +25,7 @@ const normalizeDomain = (value: string) => value.replace(/^https?:\/\//, '').rep
 
 export async function POST(req: NextRequest) {
   try {
+    enforceSameOrigin(req);
     const payload = payloadSchema.parse(await req.json());
     const { tenantId, uid, email } = await requireRole(req, ADMIN_ROLES);
     const normalizedDomain = normalizeDomain(payload.domain);
@@ -37,10 +39,8 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: 'Site not found' }, { status: 404 });
       }
       const siteData = siteSnap.data() || {};
-      if (siteData.tenantId && siteData.tenantId !== tenantId) {
-        return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-      }
-      if (!siteData.tenantId && siteData.ownerUid && siteData.ownerUid !== uid) {
+      const siteTenantId = siteData.tenantId as string | undefined;
+      if (!siteTenantId || siteTenantId !== tenantId) {
         return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
       }
     }

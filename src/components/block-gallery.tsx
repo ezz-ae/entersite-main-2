@@ -174,7 +174,7 @@ const availableBlocks = [
   {
     type: 'chat-widget',
     name: 'Chat Widget',
-    description: 'Floating chat button for WhatsApp or AI Assistant.',
+    description: 'Floating chat button for WhatsApp or Smart Assistant.',
   },
   {
     type: 'mortgage-calculator',

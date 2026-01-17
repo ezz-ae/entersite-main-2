@@ -90,7 +90,7 @@ export const availableBlocks: BlockConfig[] = [
     {
         type: 'chat-widget',
         name: 'Chat Widget',
-        description: 'AI-powered chat assistant for visitors.',
+        description: 'Smart-powered chat assistant for visitors.',
         category: 'ai',
         icon: MessageCircle,
         defaultData: {

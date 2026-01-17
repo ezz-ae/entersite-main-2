@@ -35,12 +35,12 @@ export function RightSidebar({ selectedBlock, onUpdateBlock }: RightSidebarProps
                 <h3 className="text-xl font-bold text-white capitalize">{selectedBlock.type.replace('-', ' ')}</h3>
             </div>
 
-            {/* AI Assistant Hook */}
+            {/* Smart Assistant Hook */}
             <div className="p-4">
                 <div className="bg-gradient-to-br from-indigo-500/10 to-purple-500/10 rounded-2xl p-4 border border-indigo-500/20 group hover:border-indigo-500/40 transition-all cursor-pointer">
                     <div className="flex items-center gap-2 mb-2">
                         <Sparkles className="h-4 w-4 text-indigo-400" />
-                        <span className="text-xs font-bold text-indigo-300 uppercase tracking-wider">AI Optimizer</span>
+                        <span className="text-xs font-bold text-indigo-300 uppercase tracking-wider">Smart Optimizer</span>
                     </div>
                     <p className="text-xs text-zinc-400 leading-relaxed mb-3">
                         Rewrite headlines or optimize images for this {selectedBlock.type} based on current market trends.

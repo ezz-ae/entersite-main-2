@@ -9,6 +9,7 @@ import {
   PlanLimitError,
   planLimitErrorResponse,
 } from '@/lib/server/billing';
+import { enforceSameOrigin } from '@/lib/server/security';
 
 const payloadSchema = z.object({
   site: z.record(z.any()),
@@ -16,18 +17,28 @@ const payloadSchema = z.object({
 
 export async function GET(req: NextRequest) {
   try {
-    const { tenantId, uid } = await requireRole(req, ALL_ROLES);
+    const { tenantId } = await requireRole(req, ALL_ROLES);
     const db = getAdminDb();
-    const [tenantSnapshot, ownerSnapshot] = await Promise.all([
-      db.collection('sites').where('tenantId', '==', tenantId).limit(50).get(),
-      db.collection('sites').where('ownerUid', '==', uid).limit(50).get(),
-    ]);
+    const tenantSnapshot = await db
+      .collection('sites')
+      .where('tenantId', '==', tenantId)
+      .limit(50)
+      .get();
 
-    const siteMap = new Map<string, FirebaseFirestore.QueryDocumentSnapshot>();
-    tenantSnapshot.docs.forEach((doc) => siteMap.set(doc.id, doc));
-    ownerSnapshot.docs.forEach((doc) => siteMap.set(doc.id, doc));
+    const formatTimestamp = (value: any) => {
+      if (!value) return null;
+      if (typeof value === 'string') return value;
+      if (typeof value?.toDate === 'function') {
+        try {
+          return value.toDate().toISOString();
+        } catch {
+          return null;
+        }
+      }
+      return null;
+    };
 
-    const sites = Array.from(siteMap.values()).map((doc) => {
+    const sites = tenantSnapshot.docs.map((doc) => {
       const data = doc.data();
       const published = Boolean(data.published);
       const customDomain = data.customDomain || null;
@@ -41,6 +52,9 @@ export async function GET(req: NextRequest) {
         publishedUrl,
         url,
         published,
+        refinerStatus: data.refinerStatus || null,
+        lastRefinedAt: formatTimestamp(data.lastRefinedAt),
+        lastPublishedAt: formatTimestamp(data.lastPublishedAt),
       };
     });
 
@@ -59,7 +73,8 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
-    const { tenantId, uid } = await requireRole(req, ALL_ROLES);
+    enforceSameOrigin(req);
+    const { tenantId } = await requireRole(req, ALL_ROLES);
     const payload = payloadSchema.parse(await req.json());
     const db = getAdminDb();
     const site = payload.site || {};
@@ -70,19 +85,14 @@ export async function POST(req: NextRequest) {
       const siteSnap = await siteRef.get();
       if (siteSnap.exists) {
         const siteData = siteSnap.data() || {};
-        if (siteData.tenantId && siteData.tenantId !== tenantId) {
+        if (!siteData.tenantId || siteData.tenantId !== tenantId) {
           return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
         }
-        if (!siteData.tenantId && siteData.ownerUid && siteData.ownerUid !== uid) {
-          return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-        }
-
         await siteRef.set(
           {
             ...site,
             id: siteId,
-            ownerUid: siteData.ownerUid || uid,
-            tenantId: siteData.tenantId || tenantId,
+            tenantId,
             updatedAt: FieldValue.serverTimestamp(),
           },
           { merge: true },
@@ -99,7 +109,6 @@ export async function POST(req: NextRequest) {
       {
         ...site,
         id: newSiteId,
-        ownerUid: uid,
         tenantId,
         createdAt: FieldValue.serverTimestamp(),
         updatedAt: FieldValue.serverTimestamp(),

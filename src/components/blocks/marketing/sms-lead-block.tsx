@@ -14,7 +14,7 @@ interface SmsLeadBlockProps {
 
 export function SmsLeadBlock({
   headline = "Get Instant Updates via SMS",
-  subtext = "Never miss a price drop or a new unit release. Join our VIP broadcast list.",
+  subtext = "Never miss a price drop or a new unit release. Join this VIP broadcast list.",
   buttonText = "Join VIP List",
   projectContext = "Creek Harbour"
 }: SmsLeadBlockProps) {

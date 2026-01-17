@@ -4,14 +4,15 @@ import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Search, Loader2, Activity, MapPin } from "lucide-react";
-import type { ProjectData } from '@/lib/types';
+import type { ProjectData, InventoryCta } from '@/lib/types';
 import { ProjectCard } from '@/components/project-card';
 
 interface Props {
   initialProjects: ProjectData[];
 }
 
-const PROJECTS_PER_PAGE = 12;
+const PROJECTS_PER_PAGE = 25;
+type InventoryItem = ProjectData | InventoryCta;
 
 const buildQueryString = (params: Record<string, string | number | undefined>) => {
   const search = new URLSearchParams();
@@ -28,26 +29,24 @@ export function ProjectDiscoveryClient({ initialProjects }: Props) {
   const [city, setCity] = useState('all');
   const [status, setStatus] = useState('all');
   const [loading, setLoading] = useState(false);
-  const [projects, setProjects] = useState<ProjectData[]>(initialProjects.slice(0, PROJECTS_PER_PAGE));
+  const [projects, setProjects] = useState<InventoryItem[]>(initialProjects.slice(0, PROJECTS_PER_PAGE));
   const [totalResults, setTotalResults] = useState(initialProjects.length);
   const [page, setPage] = useState(1);
   const [cityOptions, setCityOptions] = useState<string[]>(['Dubai', 'Abu Dhabi', 'Sharjah']);
 
-  const mergeProjects = (existing: ProjectData[], incoming: ProjectData[]) => {
-    const map = new Map<string, ProjectData>();
-    existing.forEach((project) => {
-      if (project.id) {
-        map.set(project.id, project);
+  const mergeProjects = (existing: InventoryItem[], incoming: InventoryItem[]) => {
+    const merged: InventoryItem[] = [];
+    const seen = new Set<string>();
+    [...existing, ...incoming].forEach((item) => {
+      if (!item?.id) {
+        merged.push(item);
+        return;
       }
+      if (seen.has(item.id)) return;
+      seen.add(item.id);
+      merged.push(item);
     });
-    incoming.forEach((project) => {
-      if (project.id) {
-        map.set(project.id, project);
-      }
-    });
-    const fallback = existing.filter((project) => !project.id);
-    const merged = Array.from(map.values());
-    return fallback.length ? [...fallback, ...merged] : merged;
+    return merged;
   };
 
   const fetchProjects = async (
@@ -120,7 +119,8 @@ export function ProjectDiscoveryClient({ initialProjects }: Props) {
   };
 
   const totalPages = Math.max(1, Math.ceil(totalResults / PROJECTS_PER_PAGE));
-  const canLoadMore = projects.length < totalResults;
+  const projectCount = projects.filter((item) => !isInventoryCta(item)).length;
+  const canLoadMore = projectCount < totalResults;
 
   return (
     <section className="bg-black text-white py-16 sm:py-24 md:py-32 border-y border-white/5 relative overflow-hidden">
@@ -212,7 +212,11 @@ export function ProjectDiscoveryClient({ initialProjects }: Props) {
         ) : projects.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
                 {projects.map((project, index) => (
+                  isInventoryCta(project) ? (
+                    <InventoryCtaCard key={project.id || `cta-${index}`} cta={project} />
+                  ) : (
                     <ProjectCard key={project.id || index} project={project} />
+                  )
                 ))}
             </div>
         ) : (
@@ -236,18 +240,45 @@ export function ProjectDiscoveryClient({ initialProjects }: Props) {
         {!loading && totalResults > PROJECTS_PER_PAGE && (
           <div className="mt-12 flex flex-col sm:flex-row items-center justify-center gap-4">
             <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">
-              Showing {projects.length} of {totalResults}
+              Showing {projectCount} of {totalResults}
             </span>
             <Button
               className="h-12 px-6 rounded-full bg-blue-600 hover:bg-blue-700 text-white font-bold"
               disabled={page >= totalPages || !canLoadMore}
               onClick={() => fetchProjects(page + 1, { append: true })}
             >
-              Load 12 More
+              Load {PROJECTS_PER_PAGE} More
             </Button>
           </div>
         )}
       </div>
     </section>
+  );
+}
+
+function isInventoryCta(item: InventoryItem): item is InventoryCta {
+  return (item as InventoryCta).type === 'inventory-cta';
+}
+
+function InventoryCtaCard({ cta }: { cta: InventoryCta }) {
+  return (
+    <div className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-gradient-to-br from-blue-600/25 via-blue-950/20 to-transparent p-6 sm:p-8 text-white">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(59,130,246,0.25),_transparent_55%)] opacity-80" />
+      <div className="relative space-y-5">
+        <div className="inline-flex items-center gap-2 rounded-full border border-blue-500/30 bg-blue-500/10 px-3 py-1 text-[9px] font-bold uppercase tracking-widest text-blue-200">
+          Market data
+        </div>
+        <div>
+          <h3 className="text-2xl sm:text-3xl font-black tracking-tight">{cta.title}</h3>
+          <p className="text-sm sm:text-base text-zinc-300 mt-2">{cta.subtitle}</p>
+        </div>
+        <Button asChild className="h-11 sm:h-12 rounded-full bg-white text-black font-bold">
+          <a href={cta.ctaHref}>{cta.ctaLabel}</a>
+        </Button>
+        {cta.description ? (
+          <p className="text-xs text-zinc-400">{cta.description}</p>
+        ) : null}
+      </div>
+    </div>
   );
 }

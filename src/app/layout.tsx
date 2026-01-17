@@ -1,6 +1,7 @@
 
 import type { Metadata } from 'next';
 import './globals.css';
+import '../../mobile-styles.css';
 import { Toaster } from '@/components/ui/toaster';
 import { ThemeProvider } from '@/components/theme-provider';
 import Script from 'next/script';
@@ -21,7 +22,7 @@ const inter = localFont({
 export const metadata: Metadata = {
   title: 'Entrestate',
   description:
-    'All-in-one real estate platform to launch websites, generate leads, and manage your pipeline in one place.',
+    'All-in-one real estate platform to launch websites, create leads, and manage your follow-up in one place.',
   metadataBase: new URL('https://entrestate.com'),
   openGraph: {
     type: 'website',

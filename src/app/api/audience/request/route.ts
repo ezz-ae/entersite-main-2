@@ -8,6 +8,7 @@ import {
   FeatureAccessError,
   featureAccessErrorResponse,
 } from '@/lib/server/billing';
+import { enforceSameOrigin } from '@/lib/server/security';
 
 const payloadSchema = z.object({
   listType: z.enum(['imported', 'pilot']),
@@ -49,6 +50,7 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
+    enforceSameOrigin(req);
     const payload = payloadSchema.parse(await req.json());
     const { tenantId } = await requireRole(req, ADMIN_ROLES);
 

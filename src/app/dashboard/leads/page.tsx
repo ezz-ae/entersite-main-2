@@ -44,6 +44,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from '@/components/ui/textarea';
 import { authorizedFetch } from '@/lib/auth-fetch';
 import { AddLeadDialog } from '@/components/leads/AddLeadDialog';
+import { LEAD_DIRECTIONS, LEAD_DIRECTION_DEFINITIONS, type LeadDirection } from '@/lib/lead-direction';
 
 interface LeadRecord {
   id: string;
@@ -52,6 +53,9 @@ interface LeadRecord {
   phone?: string;
   status?: 'New' | 'Contacted' | 'Qualified' | 'Lost';
   priority?: 'Hot' | 'Warm' | 'Cold';
+  direction?: LeadDirection;
+  fairnessScore?: number;
+  hotScore?: number;
   source?: string;
   project?: string;
   createdAt?: string;
@@ -64,6 +68,33 @@ interface Note {
     createdAt: string;
 }
 
+function formatFairnessScore(score?: number | null) {
+  if (typeof score !== 'number' || Number.isNaN(score)) return '—';
+  const normalized = score <= 1 ? score * 100 : score;
+  return `${Math.round(normalized)}%`;
+}
+
+function directionBadgeClass(direction?: LeadDirection) {
+  switch (direction) {
+    case 'READY':
+      return 'bg-emerald-500 text-white';
+    case 'WARMING':
+      return 'bg-yellow-500 text-white';
+    case 'EXPLORING':
+      return 'bg-blue-500 text-white';
+    case 'NOISE':
+      return 'bg-zinc-700 text-zinc-200';
+    case 'RISK':
+      return 'bg-red-500 text-white';
+    default:
+      return 'bg-zinc-800 text-zinc-400';
+  }
+}
+
+function resolveLeadDirection(lead: LeadRecord): LeadDirection {
+  return lead.direction || 'EXPLORING';
+}
+
 export default function LeadCrmPage() {
   const [leads, setLeads] = useState<LeadRecord[]>([]);
   const [loading, setLoading] = useState(true);
@@ -73,6 +104,7 @@ export default function LeadCrmPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | LeadRecord['status']>('all');
   const [priorityFilter, setPriorityFilter] = useState<'all' | LeadRecord['priority']>('all');
+  const [directionFilter, setDirectionFilter] = useState<'all' | LeadDirection>('all');
   const [isAddLeadOpen, setAddLeadOpen] = useState(false);
   const [settingsLoading, setSettingsLoading] = useState(true);
   const [settingsSaving, setSettingsSaving] = useState(false);
@@ -140,7 +172,7 @@ export default function LeadCrmPage() {
     if (!user) {
       setLeads([]);
       setLoading(false);
-      setError('Please sign in to access your lead dashboard.');
+      setError('Please sign in to access your lead director.');
       return;
     }
     loadLeads();
@@ -157,8 +189,9 @@ export default function LeadCrmPage() {
 
     const matchesStatus = statusFilter !== 'all' ? lead.status === statusFilter : true;
     const matchesPriority = priorityFilter !== 'all' ? lead.priority === priorityFilter : true;
+    const matchesDirection = directionFilter !== 'all' ? lead.direction === directionFilter : true;
 
-    return matchesSearch && matchesStatus && matchesPriority;
+    return matchesSearch && matchesStatus && matchesPriority && matchesDirection;
   });
 
   const now = Date.now();
@@ -205,7 +238,7 @@ export default function LeadCrmPage() {
 
   const handleExport = () => {
     if (!leads.length) return;
-    const headers = ['Name', 'Email', 'Phone', 'Project', 'Source', 'Status', 'Priority', 'Created At'];
+    const headers = ['Name', 'Email', 'Phone', 'Project', 'Source', 'Status', 'Priority', 'Direction', 'Fairness', 'Created At'];
     const rows = leads.map((lead) => ([
       lead.name || '',
       lead.email || '',
@@ -214,6 +247,8 @@ export default function LeadCrmPage() {
       lead.source || '',
       lead.status || '',
       lead.priority || '',
+      lead.direction || '',
+      formatFairnessScore(lead.fairnessScore),
       lead.createdAt || '',
     ]));
     const csv = [headers, ...rows]
@@ -317,6 +352,22 @@ export default function LeadCrmPage() {
                             <DropdownMenuItem onClick={() => setPriorityFilter('Cold')}>Cold</DropdownMenuItem>
                         </DropdownMenuContent>
                     </DropdownMenu>
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button variant="outline" className="h-10 rounded-xl gap-2 border-white/10 bg-white/5">
+                                <Filter className="h-4 w-4" /> 
+                                <span>Direction: {directionFilter === 'all' ? 'All' : directionFilter}</span>
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="bg-zinc-950 border-white/10 text-white">
+                            <DropdownMenuItem onClick={() => setDirectionFilter('all')}>All</DropdownMenuItem>
+                            {LEAD_DIRECTIONS.map((direction) => (
+                              <DropdownMenuItem key={direction} onClick={() => setDirectionFilter(direction)}>
+                                {direction}
+                              </DropdownMenuItem>
+                            ))}
+                        </DropdownMenuContent>
+                    </DropdownMenu>
                 </div>
              </CardHeader>
              <CardContent className="p-0">
@@ -350,7 +401,13 @@ export default function LeadCrmPage() {
                                 </div>
                             </div>
                             <div className="flex items-center gap-10">
-                                <div className="text-right hidden sm:block">
+                                <div className="text-right hidden sm:block space-y-2">
+                                    <Badge className={cn(
+                                        "px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest border-0",
+                                        directionBadgeClass(resolveLeadDirection(lead))
+                                    )}>
+                                        {resolveLeadDirection(lead)}
+                                    </Badge>
                                     <Badge className={cn(
                                         "px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest border-0",
                                         (lead.priority || '').toLowerCase() === 'hot' ? "bg-orange-500 text-white" :
@@ -359,7 +416,10 @@ export default function LeadCrmPage() {
                                     )}>
                                         {(lead.priority || 'Cold').toUpperCase()}
                                     </Badge>
-                                    <p className="text-[10px] text-zinc-600 font-bold mt-2 flex items-center justify-end gap-1.5 uppercase">
+                                    <p className="text-[10px] text-zinc-600 font-bold flex items-center justify-end gap-1.5 uppercase">
+                                        DFL {formatFairnessScore(lead.fairnessScore)}
+                                    </p>
+                                    <p className="text-[10px] text-zinc-600 font-bold flex items-center justify-end gap-1.5 uppercase">
                                         <Clock className="h-3 w-3" /> {lead.createdAt ? formatDistanceToNow(new Date(lead.createdAt), { addSuffix: true }) : 'Just now'}
                                     </p>
                                 </div>
@@ -519,6 +579,9 @@ function LeadDetailPanel({ lead, onClose, onUpdate }: { lead: LeadRecord, onClos
     const [draftSms, setDraftSms] = useState('');
     const [draftEmail, setDraftEmail] = useState<{ subject: string; body: string } | null>(null);
     const [draftError, setDraftError] = useState<string | null>(null);
+    const resolvedDirection = resolveLeadDirection(lead);
+    const directionDefinition = LEAD_DIRECTION_DEFINITIONS[resolvedDirection];
+    const fairnessLabel = formatFairnessScore(lead.fairnessScore);
 
     const loadNotes = useCallback(async () => {
         try {
@@ -594,7 +657,7 @@ function LeadDetailPanel({ lead, onClose, onUpdate }: { lead: LeadRecord, onClos
         setDrafting('sms');
         setDraftError(null);
         try {
-            const res = await authorizedFetch('/api/sms/generate', {
+            const res = await authorizedFetch('/api/sms/create', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -620,7 +683,7 @@ function LeadDetailPanel({ lead, onClose, onUpdate }: { lead: LeadRecord, onClos
         setDrafting('email');
         setDraftError(null);
         try {
-            const res = await authorizedFetch('/api/email/generate', {
+            const res = await authorizedFetch('/api/email/create', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -664,6 +727,26 @@ function LeadDetailPanel({ lead, onClose, onUpdate }: { lead: LeadRecord, onClos
                              <p className="text-sm text-zinc-300 italic">{lead.message}</p>
                         </div>
                     )}
+                    <div className="rounded-xl border border-white/5 bg-zinc-900/80 p-4 space-y-2">
+                        <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">Lead direction</p>
+                        <div className="flex flex-wrap gap-2">
+                            <Badge className={cn(
+                                "px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest border-0",
+                                directionBadgeClass(resolvedDirection)
+                            )}>
+                                {resolvedDirection}
+                            </Badge>
+                            <Badge className="px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest border-0 bg-zinc-800 text-zinc-200">
+                                DFL {fairnessLabel}
+                            </Badge>
+                            {lead.hotScore != null ? (
+                                <Badge className="px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest border-0 bg-red-500/20 text-red-300">
+                                    Hot {lead.hotScore}
+                                </Badge>
+                            ) : null}
+                        </div>
+                        <p className="text-xs text-zinc-400">{directionDefinition.action}</p>
+                    </div>
 
                     <div className="space-y-4">
                         <h3 className="text-sm font-bold uppercase tracking-widest text-zinc-500">Quick follow-up</h3>
@@ -814,7 +897,7 @@ function AuthRequiredNotice({ isLoading, message }: { isLoading: boolean; messag
                     {isLoading ? 'Verifying Access' : 'Access Restricted'}
                 </CardTitle>
                 <CardDescription className="text-zinc-500 text-base max-w-md mx-auto">
-                    {isLoading ? 'Checking your credentials to unlock your lead manager.' : (message || 'Please sign in to access your leads dashboard.')}
+                    {isLoading ? 'Checking your credentials to unlock your lead manager.' : (message || 'Please sign in to access your lead director.')}
                 </CardDescription>
             </CardHeader>
             <CardContent>

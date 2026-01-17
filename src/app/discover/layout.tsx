@@ -5,13 +5,13 @@ export const metadata: Metadata = {
   description:
     'Browse project listings, pricing ranges, and handover timelines from your inventory sources.',
   alternates: {
-    canonical: '/discover',
+    canonical: '/inventory',
   },
   openGraph: {
     title: 'Market Feed | Entrestate',
     description:
       'Browse project listings, pricing ranges, and handover timelines from your inventory sources.',
-    url: '/discover',
+    url: '/inventory',
   },
 };
 

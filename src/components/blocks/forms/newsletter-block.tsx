@@ -19,7 +19,7 @@ interface NewsletterBlockProps {
 
 export function NewsletterBlock({
   headline = "Stay Ahead of the Market",
-  subtext = "Subscribe to our newsletter for exclusive off-plan alerts, market analysis, and investment tips delivered straight to your inbox.",
+  subtext = "Subscribe to this newsletter for exclusive off-plan alerts, market analysis, and investment tips delivered straight to your inbox.",
   ctaText = "Subscribe Now",
   tenantId = "public",
   projectName = "Newsletter",

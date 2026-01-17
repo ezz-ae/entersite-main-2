@@ -41,7 +41,7 @@ const SERVICE_DATA = {
         "Direct campaign generation"
     ],
     cta: "Explore Market Data",
-    href: "/discover"
+    href: "/inventory"
   },
   'google-ads': {
     title: "Ads Synchronization",
@@ -52,17 +52,17 @@ const SERVICE_DATA = {
     features: [
         "One-click campaign launch",
         "High-intent keyword grouping",
-        "AI-optimized ad copy variations",
-        "Real-time performance dashboard",
+        "Smart-optimized ad copy variations",
+        "Real-time performance indicators",
         "Automatic tracking setup"
     ],
     cta: "Connect Google Ads",
-    href: "/dashboard/google-ads"
+    href: "/google-ads"
   },
   'instagram-bot': {
     title: "Social Automation",
     tagline: "Always-On Instagram Replies",
-    description: "Turn your Instagram profile into a sales engine. Our AI bot handles project inquiries, qualifies investors, and pushes hot leads to your WhatsApp.",
+    description: "Turn your Instagram profile into a sales engine. Our Smart bot handles project inquiries, qualifies investors, and pushes hot leads to your WhatsApp.",
     icon: Facebook,
     color: "pink",
     features: [

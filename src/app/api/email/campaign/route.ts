@@ -7,6 +7,7 @@ import { resend, fromEmail } from '@/lib/resend';
 import { ADMIN_ROLES } from '@/lib/server/roles';
 import { enforceRateLimit, getRequestIp } from '@/lib/server/rateLimit';
 import { createApiLogger } from '@/lib/logger';
+import { enforceSameOrigin } from '@/lib/server/security';
 import {
   checkUsageLimit,
   enforceUsageLimits,
@@ -30,6 +31,7 @@ const payloadSchema = z.object({
 export async function POST(req: NextRequest) {
   const logger = createApiLogger(req, { route: 'POST /api/email/campaign' });
   try {
+    enforceSameOrigin(req);
     const payload = payloadSchema.parse(await req.json());
     const { tenantId } = await requireRole(req, ADMIN_ROLES);
     const ip = getRequestIp(req);

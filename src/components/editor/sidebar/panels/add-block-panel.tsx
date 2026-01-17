@@ -25,9 +25,9 @@ interface AddBlockPanelProps {
 
 const BLOCK_LIBRARY = [
     {
-        category: 'AI & Intelligence',
+        category: 'Smart & Intelligence',
         blocks: [
-            { type: 'chat-agent', name: 'Expert Chat Agent', icon: Bot, badge: 'New', desc: 'Expert AI that knows all projects.' },
+            { type: 'chat-agent', name: 'Expert Chat Agent', icon: Bot, badge: 'New', desc: 'Expert Smart that knows all projects.' },
             { type: 'roi-calculator', name: 'ROI Calculator', icon: BarChart, desc: 'Real-time property math.' },
         ]
     },
@@ -95,7 +95,7 @@ export function AddBlockPanel({ page, onPageUpdate }: AddBlockPanelProps) {
        </div>
 
        <div className="p-4 space-y-8">
-          {/* AI Recommendation Hook */}
+          {/* Smart Recommendation Hook */}
           <div className="bg-gradient-to-br from-blue-600/10 to-indigo-600/10 rounded-2xl p-4 border border-blue-500/20">
              <div className="flex items-center gap-2 mb-2">
                 <Sparkles className="h-3 w-3 text-blue-400" />

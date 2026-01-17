@@ -2,9 +2,11 @@ import { suggestNextBlocksFlow } from '@/ai/flows/suggest-next-blocks';
 import { NextRequest, NextResponse } from 'next/server';
 import { requireRole, UnauthorizedError, ForbiddenError } from '@/server/auth';
 import { ALL_ROLES } from '@/lib/server/roles';
+import { enforceSameOrigin } from '@/lib/server/security';
 
 export async function POST(req: NextRequest) {
   try {
+    enforceSameOrigin(req);
     await requireRole(req, ALL_ROLES);
     const body = await req.json();
     const result = await suggestNextBlocksFlow.run(body);

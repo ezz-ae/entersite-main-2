@@ -22,17 +22,17 @@ export function TestimonialBlock({
   subtext = "See how brokers and developers simplify marketing with Entrestate.",
   testimonials = [
     {
-      quote: "Entrestate made it easy to turn brochures into clean, shareable pages and keep our messaging consistent.",
+      quote: "Entrestate made it easy to turn brochures into clean, shareable pages and keep this messaging consistent.",
       author: "Fatima Al-Marzouqi",
       role: "CEO, Prestige Properties",
     },
     {
-      quote: "The ads tools give us a clear starting point and help our team launch campaigns faster.",
+      quote: "The ads tools give us a clear starting point and help this team launch campaigns faster.",
       author: "Johnathan Smith",
       role: "Marketing Director, Skyline Developments",
     },
     {
-      quote: "The chat assistant answers common questions and routes serious inquiries to our team.",
+      quote: "The chat assistant answers common questions and routes serious inquiries to this team.",
       author: "Chen Wei",
       role: "Founder, Urban Nest Realty",
     },

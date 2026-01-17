@@ -7,6 +7,7 @@ import {
 } from 'firebase-admin/firestore';
 import { applicationDefault, getApps, initializeApp } from 'firebase-admin/app';
 import type { SitePage, Block } from '@/lib/types';
+import { analyzeSiteRefiner, ensureSitePage } from '@/lib/refiner';
 
 function initAdmin() {
   if (!getApps().length) {
@@ -23,6 +24,7 @@ const db = (() => {
 
 type JobDoc = {
   ownerUid: string;
+  tenantId: string;
   status: 'queued' | 'running' | 'done' | 'error';
   plan: {
     params: Record<string, any>;
@@ -144,6 +146,10 @@ async function processJob(jobId: string, jobData: JobDoc) {
     `Refiner finished for ${jobData.plan?.params?.siteTitle || siteId || 'site'}.`,
   );
 
+  const report = analyzeSiteRefiner(
+    ensureSitePage(refinedSnapshot || snapshot || jobData.plan?.params?.snapshot),
+  );
+
   await jobRef.update({
     status: 'done',
     result: {
@@ -151,6 +157,7 @@ async function processJob(jobId: string, jobData: JobDoc) {
         refinedSnapshot,
         refinedHtml: htmlPreview,
       },
+      refinerReport: report,
     },
     updatedAt: FieldValue.serverTimestamp(),
   });
@@ -165,6 +172,7 @@ async function processJob(jobId: string, jobData: JobDoc) {
         refinerDraftSnapshot: refinedSnapshot,
         refinerDraftHtml: htmlPreview,
         refinerPreviewUrl: jobData.plan?.params?.previewUrl,
+        refinerReport: report,
       },
       { merge: true },
     );

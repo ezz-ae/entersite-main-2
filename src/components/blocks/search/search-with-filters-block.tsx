@@ -22,7 +22,7 @@ interface SearchWithFiltersBlockProps {
 
 export function SearchWithFiltersBlock({
   headline = "Find Your Perfect Property",
-  subtext = "Use our advanced filters to browse thousands of properties in the UAE."
+  subtext = "Use this advanced filters to browse thousands of properties in the UAE."
 }: SearchWithFiltersBlockProps) {
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [priceRange, setPriceRange] = useState([1000000]);

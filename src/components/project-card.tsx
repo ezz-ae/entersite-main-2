@@ -86,7 +86,7 @@ export function ProjectCard({ project, index = 0 }: ProjectCardProps) {
       ? publicUrl.startsWith('http')
         ? publicUrl
         : `${window.location.origin}${publicUrl}`
-      : `${window.location.origin}/discover/${encodeURIComponent(project.id)}`;
+      : `${window.location.origin}/inventory/project/${encodeURIComponent(project.id)}`;
     try {
       await navigator.clipboard.writeText(url);
       toast({ title: "Link copied", description: "Project link copied to clipboard." });

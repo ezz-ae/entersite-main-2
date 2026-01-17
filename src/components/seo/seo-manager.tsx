@@ -145,7 +145,7 @@ export function SeoManager() {
                         <div>
                             <h4 className="font-semibold text-yellow-900 dark:text-yellow-100">Missing Meta Descriptions</h4>
                             <p className="text-sm text-yellow-700 dark:text-yellow-300 mt-1">3 pages are missing meta descriptions. This affects click-through rates.</p>
-                            <Button size="sm" variant="outline" className="mt-3 bg-white text-yellow-800 border-yellow-200">Auto-Fix with AI</Button>
+                            <Button size="sm" variant="outline" className="mt-3 bg-white text-yellow-800 border-yellow-200">Auto-Fix with Smart</Button>
                         </div>
                     </div>
 

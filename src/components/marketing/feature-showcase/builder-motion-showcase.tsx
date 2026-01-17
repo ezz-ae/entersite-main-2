@@ -155,7 +155,7 @@ export function BuilderMotionShowcase() {
                         >
                             <MousePointerClick className="h-10 w-10 text-white fill-black" />
                             <div className="ml-5 mt-2 bg-white text-black text-[10px] font-bold px-3 py-1.5 rounded-full shadow-xl border border-black/10">
-                                AI Architect is optimizing...
+                                Smart Architect is optimizing...
                             </div>
                         </motion.div>
                     </div>
@@ -176,7 +176,7 @@ export function BuilderMotionShowcase() {
                         <div className="p-4 bg-gradient-to-br from-orange-900/20 to-purple-900/20 rounded-xl border border-white/10">
                              <div className="flex items-center gap-2 mb-2">
                                  <Sparkles className="h-3 w-3 text-orange-400" />
-                                 <span className="text-[10px] font-bold text-orange-400 uppercase tracking-widest">AI Suggestion</span>
+                                 <span className="text-[10px] font-bold text-orange-400 uppercase tracking-widest">Smart Suggestion</span>
                              </div>
                              <div className="h-2 w-full bg-white/10 rounded mb-2" />
                              <div className="h-2 w-2/3 bg-white/10 rounded" />

@@ -19,7 +19,7 @@ interface ListingGridBlockProps {
 
 export function ListingGridBlock({
     headline = "Featured Properties",
-    subtext = "Discover our handpicked selection of premium real estate opportunities.",
+    subtext = "Discover this handpicked selection of premium real estate opportunities.",
     initialFilter = {},
     projects: initialProjects = []
 }: ListingGridBlockProps) {

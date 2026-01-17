@@ -295,7 +295,7 @@ const createPage = (
         canonicalListings: [],
         brochureUrl: "",
         seo: {
-            title: `${title} | EntreSite AI`,
+            title: `${title} | EntreSite Smart`,
             description: `This is the ${title} page.`,
             keywords: [],
         },

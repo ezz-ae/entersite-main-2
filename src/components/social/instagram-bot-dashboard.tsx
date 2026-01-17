@@ -103,7 +103,7 @@ export function InstagramBotDashboard() {
                              </div>
 
                              <div className="p-4 border rounded-xl bg-card space-y-3">
-                                 <Label>Open AI Response Prompt</Label>
+                                 <Label>Open Smart Response Prompt</Label>
                                  <Textarea 
                                     placeholder="You are a helpful real estate assistant. If someone asks about availability, ask for their preferred budget..." 
                                     className="min-h-[100px] text-sm"

@@ -21,10 +21,10 @@ interface FaqBlockProps {
 
 export function FaqBlock({ 
     headline = "Frequently Asked Questions", 
-    subtext = "Find answers to common questions about our properties and services.",
+    subtext = "Find answers to common questions about this properties and services.",
     faqItems = [
         { question: "What types of properties do you offer?", answer: "We offer a wide range of properties including luxury villas, modern apartments, and exclusive townhouses in prime locations." },
-        { question: "Can I schedule a viewing online?", answer: "Yes, you can easily schedule a private viewing through our contact form. One of our agents will get in touch with you to confirm the details." },
+        { question: "Can I schedule a viewing online?", answer: "Yes, you can easily schedule a private viewing through this contact form. One of this agents will get in touch with you to confirm the details." },
         { question: "Are there financing options available?", answer: "We work with several trusted financial partners to offer you flexible financing options. Please contact us for more information." }
     ]
 }: FaqBlockProps) {

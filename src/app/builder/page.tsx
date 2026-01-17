@@ -74,7 +74,7 @@ function BuilderContent() {
         setIsLoadingSite(true);
         setIsStarted(true);
         try {
-            const sites = await getUserSites(user.uid);
+            const sites = await getUserSites();
             const found = sites.find(s => s.id === id);
             if (found) {
                 setPage(found as SitePage);
@@ -97,7 +97,7 @@ function BuilderContent() {
         setIsGenerating(true);
         
         try {
-            const response = await fetch('/api/ai/generate-site', {
+            const response = await fetch('/api/ai/create-site', {
                 method: 'POST',
                 body: JSON.stringify({ prompt }),
                 headers: { 'Content-Type': 'application/json' }
@@ -107,7 +107,7 @@ function BuilderContent() {
                 const data = await response.json();
                 setPage(prev => ({ 
                     ...prev, 
-                    title: data.pageTitle || data.title || 'AI Generated Site',
+                    title: data.pageTitle || data.title || 'Smart Builder Site',
                     blocks: data.blocks.map((b: any, i: number) => ({
                         ...b,
                         blockId: `\${b.type}-\${i}-\${Date.now()}`,
@@ -117,7 +117,7 @@ function BuilderContent() {
                 }));
             }
         } catch (error) {
-            console.error("Failed to generate site:", error);
+            console.error("Failed to create site:", error);
         } finally {
             setIsGenerating(false);
         }
@@ -209,7 +209,7 @@ function BuilderContent() {
         }
         
         try {
-            const savedSiteId = await saveSite(user.uid, page);
+            const savedSiteId = await saveSite(page);
             if (!page.id) {
                 setPage(prev => ({ ...prev, id: savedSiteId }));
                 router.replace(`/builder?siteId=\${savedSiteId}`);
@@ -230,7 +230,8 @@ function BuilderContent() {
 
     useEffect(() => {
         if (!user) return;
-        const unsubscribe = subscribeToJobs(user.uid, (jobList) => {
+        const tenantId = page.tenantId || user.uid;
+        const unsubscribe = subscribeToJobs(tenantId, (jobList) => {
             const targetJob = jobList.find((job) => {
                 if (job.type !== 'site_refiner') return false;
                 if (activeRefinerJobId) {
@@ -286,7 +287,7 @@ function BuilderContent() {
                     ...(baseSnapshotFromJob ? { refinerBaseSnapshot: baseSnapshotFromJob } : {}),
                 });
                 toast({
-                    title: 'Refiner AI running',
+                    title: 'Refiner running',
                     description: 'Analyzing structure and applying finishing touches.',
                 });
             } else if (targetJob.status === 'done') {
@@ -342,13 +343,13 @@ function BuilderContent() {
             }
         });
         return () => unsubscribe();
-    }, [user, page.id, page.title, page.lastRefinerJobId, activeRefinerJobId, router, toast, persistRefinerMetadata]);
+    }, [user, page.id, page.title, page.lastRefinerJobId, page.tenantId, activeRefinerJobId, router, toast, persistRefinerMetadata]);
 
     const handleRefinerRun = async () => {
         if (!user) {
             toast({
                 title: "Please Sign In",
-                description: "Sign in to run Refiner AI.",
+                description: "Sign in to run Refiner.",
                 variant: "destructive",
             });
             return;
@@ -356,18 +357,19 @@ function BuilderContent() {
         if (!page.id) {
             toast({
                 title: "Save required",
-                description: "Save your site before running Refiner AI.",
+                description: "Save your site before running Refiner.",
                 variant: "destructive",
             });
             return;
         }
+        const tenantId = page.tenantId || user.uid;
         setIsRefining(true);
         const baseSnapshot = cloneSitePage(page);
         try {
-            const jobRecord = await createJob(user.uid, 'site_refiner', {
+            const jobRecord = await createJob(tenantId, 'site_refiner', {
                 siteId: page.id,
                 siteTitle: page.title,
-                tenantId: page.tenantId || user.uid,
+                tenantId,
                 snapshot: baseSnapshot,
             });
             if (jobRecord?.id) {
@@ -389,13 +391,13 @@ function BuilderContent() {
             }
             toast({
                 title: "Refiner queued",
-                description: "Your design is running through Refiner AI. Check Jobs for status.",
+                description: "Your design is running through Refiner. Check Jobs for status.",
             });
         } catch (error) {
             console.error('Failed to queue refiner job', error);
             toast({
                 title: "Refiner failed",
-                description: "Could not start Refiner AI. Try saving and retry.",
+                description: "Could not start Refiner. Try saving and retry.",
                 variant: "destructive",
             });
             setIsRefining(false);
@@ -434,7 +436,7 @@ function BuilderContent() {
         };
         try {
             setPage(updatedPage);
-            await saveSite(user.uid, updatedPage);
+            await saveSite(updatedPage);
             setRefinerDraft(null);
             setRefinerDraftHtml(null);
             setRefinerPreviewUrl(null);
@@ -603,6 +605,7 @@ function RefinerReviewSplit({ page, tenantId, projectName, onApply, onExit, isAp
     const refinedTenantId = refinedPage?.tenantId || tenantId;
     const refinedProjectName = refinedPage?.title || projectName;
     const compareLayout = viewMode === 'compare';
+    const refinerReport = page.refinerReport;
 
     return (
         <div className="min-h-full bg-white text-black">
@@ -611,7 +614,7 @@ function RefinerReviewSplit({ page, tenantId, projectName, onApply, onExit, isAp
                     <div>
                         <p className="text-xs font-semibold uppercase tracking-[0.3em] text-amber-600">Refiner Draft Ready</p>
                         <p className="text-sm text-amber-900/70">
-                            Compare the original build for <span className="font-semibold text-amber-900">{projectName}</span> with the Refiner AI draft.
+                            Compare the original build for <span className="font-semibold text-amber-900">{projectName}</span> with the Refiner draft.
                         </p>
                     </div>
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
@@ -655,6 +658,29 @@ function RefinerReviewSplit({ page, tenantId, projectName, onApply, onExit, isAp
                         </Button>
                     ))}
                 </div>
+                {refinerReport ? (
+                    <div className="grid gap-2 text-left text-xs text-amber-900/80">
+                        <div className="flex items-center justify-between">
+                            <span className="text-[10px] uppercase tracking-[0.4em] text-amber-600">Refiner Score</span>
+                            <span className="text-lg font-bold">{refinerReport.score}</span>
+                        </div>
+                        <p className="text-[11px] text-amber-800/70">
+                            {refinerReport.summary}
+                        </p>
+                        <ul className="space-y-1">
+                            {refinerReport.issues.slice(0, 3).map((issue) => (
+                                <li key={issue.code} className="flex items-start gap-2">
+                                    <span className="text-amber-500">•</span>
+                                    <span>{issue.message}</span>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                ) : (
+                    <p className="text-[11px] text-amber-800/70">
+                        Refiner insights appear here after the job finishes or when the page is published.
+                    </p>
+                )}
             </div>
             <div className={cn(
                 "grid gap-6 p-6",
@@ -806,7 +832,7 @@ export default function BuilderPage() {
                             <a href="mailto:support@entrestate.com">Request Access</a>
                         </Button>
                         <Button asChild variant="outline" className="h-12 px-6 rounded-full border-white/10 bg-white/5">
-                            <a href="/dashboard">Go to Dashboard</a>
+                            <a href="/account">Go to Account</a>
                         </Button>
                     </div>
                 </div>

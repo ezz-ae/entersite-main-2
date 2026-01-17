@@ -13,7 +13,7 @@ import { useCampaignAttribution } from '@/hooks/useCampaignAttribution';
 
 export function BookingViewingBlock({
   headline = "Schedule a Viewing",
-  subtext = "Select a date and time to visit the property with one of our area specialists.",
+  subtext = "Select a date and time to visit the property with one of this area specialists.",
   tenantId = "public",
   projectName = "Viewing Request",
   siteId,

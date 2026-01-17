@@ -64,8 +64,12 @@ request_admin "$BASE_URL/api/health"
 request_admin "$BASE_URL/api/health/monetization"
 request_admin "$BASE_URL/api/health/env" "true"
 request_admin "$BASE_URL/api/health/billing" "true"
+request_admin "$BASE_URL/api/billing/summary"
+request_admin "$BASE_URL/api/billing/history"
+request_admin "$BASE_URL/api/reports/summary"
 
 # Public inventory search
+request_public "GET" "$BASE_URL/api/projects/meta"
 request_public "GET" "$BASE_URL/api/projects/search?limit=12"
 
 # Public project detail (optional)

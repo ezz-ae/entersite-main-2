@@ -9,6 +9,7 @@ export const revalidate = 0;
 
 const querySchema = z.object({
   limit: z.coerce.number().int().min(1).max(100).default(20),
+  campaignId: z.string().optional(),
 });
 
 export async function GET(req: NextRequest) {
@@ -16,15 +17,22 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const parsed = querySchema.parse({
       limit: searchParams.get('limit') || undefined,
+      campaignId: searchParams.get('campaignId') || undefined,
     });
 
     const { tenantId } = await requireRole(req, ALL_ROLES);
 
     const db = getAdminDb();
-    const snapshot = await db
+    let query = db
       .collection('tenants')
       .doc(tenantId)
-      .collection('leads')
+      .collection('leads') as FirebaseFirestore.Query;
+
+    if (parsed.campaignId) {
+      query = query.where('campaignId', '==', parsed.campaignId);
+    }
+
+    const snapshot = await query
       .orderBy('createdAt', 'desc')
       .limit(parsed.limit)
       .get();

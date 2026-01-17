@@ -2,23 +2,31 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useAuth } from '@/hooks/use-auth';
 import { Loader2 } from 'lucide-react';
 
-export function LoginSignupForm() {
-  const [isLogin, setIsLogin] = useState(true);
+type LoginSignupFormProps = {
+  mode?: 'login' | 'signup' | 'both';
+  redirectTo?: string;
+};
+
+export function LoginSignupForm({ mode = 'both', redirectTo }: LoginSignupFormProps) {
+  const [isLogin, setIsLogin] = useState(mode !== 'signup');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const router = useRouter();
   const { signIn, signUp, loading, error } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (isLogin) {
-      await signIn(email, password);
-    } else {
-      await signUp(email, password);
+    const ok = isLogin
+      ? await signIn(email, password)
+      : await signUp(email, password);
+    if (ok && redirectTo) {
+      router.push(redirectTo);
     }
   };
 
@@ -27,14 +35,16 @@ export function LoginSignupForm() {
       <div className="w-full max-w-md p-8 space-y-8 bg-zinc-900 rounded-lg shadow-lg">
         <div>
           <h2 className="text-center text-3xl font-extrabold text-white">
-            {isLogin ? 'Sign in to your account' : 'Create a new account'}
+            {isLogin ? 'Sign in to continue' : 'Create a new account'}
           </h2>
-          <p className="mt-2 text-center text-sm text-zinc-400">
-            Or{' '}
-            <button onClick={() => setIsLogin(!isLogin)} className="font-medium text-blue-500 hover:text-blue-400">
-              {isLogin ? 'create an account' : 'sign in to your account'}
-            </button>
-          </p>
+          {mode === 'both' && (
+            <p className="mt-2 text-center text-sm text-zinc-400">
+              Or{' '}
+              <button onClick={() => setIsLogin(!isLogin)} className="font-medium text-blue-500 hover:text-blue-400">
+                {isLogin ? 'create an account' : 'sign in to your account'}
+              </button>
+            </p>
+          )}
         </div>
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="rounded-md shadow-sm -space-y-px">

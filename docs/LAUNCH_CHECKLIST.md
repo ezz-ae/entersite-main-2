@@ -1,48 +1,46 @@
-# Entrestate OS: Launch & Deployment Guide
+# Launch Checklist (V1)
 
-## 1. Environment Synchronization
-Copy `.env.example` to `.env.local` and populate all nodes.
-- **AI Node:** Gemini API key is mandatory for site generation.
-- **Delivery Nodes:** SendGrid and Twilio are required for messaging.
-- **Payment Node:** PayPal and Ziina must be in 'live' mode for production revenue.
+This is the checklist you run before you point `entrestate.com` at production.
 
-## 2. Infrastructure Deployment (Vercel)
-The OS is optimized for Vercel Edge functions.
-```bash
-# 1. Install Vercel CLI
-npm i -g vercel
+## A) Build sanity
+- `npm install`
+- `npm run lint`
+- `npm run smoke`
+- `npm run build`
 
-# 2. Deploy Production
-vercel --prod
-```
+## B) Environment keys (Vercel)
+Set these in Vercel (Production):
+- Firebase client config (`NEXT_PUBLIC_*` vars)
+- Firebase admin credentials (server‑only)
+- PayPal (client id, secret, webhook id)
+- Email/SMS provider keys (only if you enable Sender in V1)
+- Cron secret (if you enable scheduled jobs)
 
-## 3. Data Migration & Ingestion
-Synchronize the master project database before opening to agents.
-```bash
-# 1. Ingest Master Inventory (3,750+ Projects)
-ts-node --esm scripts/ingest-entrestate.ts
+## C) Firebase (production)
+- Firestore enabled
+- Deploy security rules + indexes
+  - `firebase deploy --only firestore:rules`
+  - `firebase deploy --only firestore:indexes`
 
-# 2. Backfill Site Metadata (For existing users)
-ts-node scripts/migrations/backfill-site-metadata.ts
-```
+## D) Payments
+- PayPal subscription plan created for **$18 / month**
+- PayPal one‑time product ready for **$226**
+- Webhook points to your production URL
+- Test both:
+  - Subscription checkout
+  - One‑time checkout
 
-## 4. Worker Deployment (AI Refiner)
-The Refiner requires a background worker to process heavy design tasks.
-Deploy the worker to **Cloud Run** or keep it running on an always-on instance:
-```bash
-GOOGLE_APPLICATION_CREDENTIALS=service-account.json \
-TS_NODE_PROJECT=tsconfig.json \
-npx ts-node scripts/workers/refiner-worker.ts
-```
+## E) Domains
+- `entrestate.com` points to Vercel
+- Optional marketing subdomains point to the same Vercel project
 
-## 5. System Status Check
-Visit `/init` (The Control Room) after deployment to verify:
-- [ ] Firebase Connection: **Active**
-- [ ] Master Node Sync: **Online**
-- [ ] AI Latency: **< 1.5s**
-- [ ] Payment Webhooks: **Healthy**
+## F) Data
+If you plan to refresh the inventory dataset:
+- Run the ingestion script locally with a service account, or host it as a secured cron.
 
-## 6. Post-Launch Operational Commands
-- **Scale Ads:** `npm run ads:optimize` (Cron triggered)
-- **Scrub Leads:** `npm run leads:verify` (Daily verification)
-- **Check ROI Hub:** `npm run market:sync` (Weekly inventory update)
+## G) Final manual QA (15 minutes)
+- Sign up, subscribe, and see “active” state
+- Create a landing page and publish it
+- Submit a lead (form + WhatsApp)
+- See the lead in dashboard
+- Cancel subscription (ensure access remains until end of period)

@@ -136,7 +136,8 @@ const renderBlock = (block: BlockType, context?: SiteBlockContext) => {
         siteId: context?.siteId,
       }
     : {};
-  return <Component {...block.data} {...leadProps} />;
+  const chatProps = block.type === 'chat-agent' ? { siteId: context?.siteId } : {};
+  return <Component {...block.data} {...leadProps} {...chatProps} />;
 };
 
 const AddBlockPopover = ({ onSelectBlock, currentBlocks, variant = 'default' }: { onSelectBlock: (blockType: string, data?: any) => void, currentBlocks: string[], variant?: 'default' | 'mini' }) => {
@@ -210,7 +211,7 @@ const AddBlockPopover = ({ onSelectBlock, currentBlocks, variant = 'default' }: 
                            <div className="bg-white dark:bg-white/10 p-1.5 rounded-lg shadow-sm">
                                <Sparkles className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />
                            </div>
-                           <span className="text-sm font-semibold text-indigo-900 dark:text-indigo-100">AI Recommendations</span>
+                           <span className="text-sm font-semibold text-indigo-900 dark:text-indigo-100">Recommendations</span>
                       </div>
                       <Button 
                         size="sm" 
@@ -252,10 +253,10 @@ const AddBlockPopover = ({ onSelectBlock, currentBlocks, variant = 'default' }: 
                   ) : !loading && (
                       <div className="text-center py-4">
                           <p className="text-xs text-muted-foreground mb-2">
-                              Let AI analyze your page and suggest the perfect next block.
+                              Let Smart analyze your page and suggest the perfect next block.
                           </p>
                           <Button size="sm" onClick={handleSuggest} className="bg-white text-indigo-600 hover:bg-white/90 shadow-sm border border-indigo-100">
-                              Generate Suggestions
+                              Create Suggestions
                           </Button>
                       </div>
                   )}

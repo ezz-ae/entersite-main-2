@@ -4,16 +4,24 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Progress } from '@/components/ui/progress';
+import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import {
+  BillingHistoryEvent,
+  BillingSettingsUpdate,
   BillingSku,
   BillingSummary,
   cancelSubscription,
+  fetchBillingHistory,
   fetchBillingSummary,
   startCheckout,
+  updateBillingSettings,
 } from '@/lib/billing';
+import { Loader2 } from 'lucide-react';
 
 const PLAN_CARDS = [
   {
@@ -34,7 +42,7 @@ const PLAN_CARDS = [
 ];
 
 const USAGE_ITEMS = [
-  { key: 'ai_conversations', label: 'AI conversations', cadence: 'Monthly' },
+  { key: 'ai_conversations', label: 'Smart conversations', cadence: 'Monthly' },
   { key: 'leads', label: 'Leads stored', cadence: 'Total' },
   { key: 'landing_pages', label: 'Landing pages', cadence: 'Total' },
   { key: 'campaigns', label: 'Campaigns', cadence: 'Monthly' },
@@ -45,7 +53,7 @@ const USAGE_ITEMS = [
 
 const UPGRADE_MESSAGES: Record<string, string> = {
   leads: "You're getting leads. Upgrade to keep them flowing.",
-  ai_conversations: 'Your AI agent is working. Increase conversations to keep it live.',
+  ai_conversations: 'Your Smart agent is working. Increase conversations to keep it live.',
   landing_pages: 'Your pages are converting. Unlock more launches.',
   campaigns: 'Campaigns are active. Upgrade to launch more.',
   email_sends: 'Email is working. Upgrade to keep it sending.',
@@ -75,6 +83,12 @@ export function BillingManager() {
   const [loading, setLoading] = useState(true);
   const [actionSku, setActionSku] = useState<BillingSku | null>(null);
   const [canceling, setCanceling] = useState(false);
+  const [history, setHistory] = useState<BillingHistoryEvent[]>([]);
+  const [historyLoading, setHistoryLoading] = useState(true);
+  const [vatValue, setVatValue] = useState('');
+  const [monthlyCapValue, setMonthlyCapValue] = useState('');
+  const [pauseCap, setPauseCap] = useState(false);
+  const [savingSettings, setSavingSettings] = useState(false);
 
   const loadSummary = useCallback(async () => {
     try {
@@ -95,6 +109,64 @@ export function BillingManager() {
   useEffect(() => {
     loadSummary();
   }, [loadSummary]);
+
+  useEffect(() => {
+    if (!summary) return;
+    setVatValue(summary.subscription.vatNumber ?? '');
+    setMonthlyCapValue(
+      summary.subscription.monthlySpendCap !== null && summary.subscription.monthlySpendCap !== undefined
+        ? String(summary.subscription.monthlySpendCap)
+        : '',
+    );
+    setPauseCap(Boolean(summary.subscription.pauseWhenCapReached));
+  }, [summary]);
+
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        const data = await fetchBillingHistory();
+        if (mounted) {
+          setHistory(data.history);
+        }
+      } catch (error) {
+        console.error('Failed to load billing history', error);
+      } finally {
+        if (mounted) {
+          setHistoryLoading(false);
+        }
+      }
+    })();
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  const handleSaveSettings = async () => {
+    if (!summary) return;
+    setSavingSettings(true);
+    try {
+      const payload: BillingSettingsUpdate = {
+        vatNumber: vatValue || null,
+        monthlySpendCap: monthlyCapValue ? Number(monthlyCapValue) : null,
+        pauseWhenCapReached: pauseCap,
+      };
+      await updateBillingSettings(payload);
+      toast({
+        title: 'Settings updated',
+        description: 'Billing controls synced successfully.',
+      });
+      await loadSummary();
+    } catch (error: any) {
+      toast({
+        title: 'Failed to save settings',
+        description: error?.message || 'Please try again.',
+        variant: 'destructive',
+      });
+    } finally {
+      setSavingSettings(false);
+    }
+  };
 
   const handleCheckout = async (sku: BillingSku) => {
     if (!summary?.providers?.paypal && !summary?.providers?.ziina) {
@@ -294,6 +366,102 @@ export function BillingManager() {
             >
               {actionSku === upgradePlan.id ? 'Starting…' : 'Upgrade now'}
             </Button>
+          )}
+        </CardContent>
+      </Card>
+
+      <Card className="border border-white/10 bg-zinc-950/40">
+        <CardHeader>
+          <CardTitle>Spend controls</CardTitle>
+          <CardDescription>
+            Set monthly spend limits, pause when the cap is reached, and add VAT details for invoicing.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid gap-4 md:grid-cols-2">
+            <div>
+              <Label className="text-xs uppercase tracking-[0.3em] text-muted-foreground mb-1">
+                VAT number
+              </Label>
+              <Input
+                value={vatValue}
+                onChange={(event) => setVatValue(event.target.value)}
+                placeholder="VAT ID"
+              />
+            </div>
+            <div>
+              <Label className="text-xs uppercase tracking-[0.3em] text-muted-foreground mb-1">
+                Monthly spend cap (AED)
+              </Label>
+              <Input
+                type="number"
+                min={0}
+                value={monthlyCapValue}
+                onChange={(event) => setMonthlyCapValue(event.target.value)}
+                placeholder="Leave empty for unlimited"
+              />
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            <Switch checked={pauseCap} onCheckedChange={setPauseCap} />
+            <div>
+              <p className="text-sm font-semibold text-white">Pause when cap is reached</p>
+              <p className="text-xs text-muted-foreground">
+                Automatically halt purchases and publishes when the monthly limit is exceeded.
+              </p>
+            </div>
+          </div>
+          <div className="text-sm text-muted-foreground">
+            Spent this month:{' '}
+            <span className="font-semibold text-white">
+              {(summary.subscription.monthlySpendUsed ?? 0).toFixed(2)} AED
+            </span>
+            {summary.subscription.monthlySpendCap
+              ? ` of ${summary.subscription.monthlySpendCap.toLocaleString()} AED`
+              : ' (no cap set)'}
+          </div>
+          <Button
+            onClick={handleSaveSettings}
+            disabled={savingSettings}
+            className="h-11 rounded-full bg-white text-black font-bold"
+          >
+            {savingSettings ? 'Saving...' : 'Save billing controls'}
+          </Button>
+        </CardContent>
+      </Card>
+
+      <Card className="border border-white/5">
+        <CardHeader>
+          <CardTitle>Invoice history</CardTitle>
+          <CardDescription>Recent billing events and charges for your tenant.</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          {historyLoading ? (
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <Loader2 className="h-4 w-4 animate-spin" />
+              Loading history…
+            </div>
+          ) : !history.length ? (
+            <p className="text-sm text-muted-foreground">No billing history available yet.</p>
+          ) : (
+            <div className="space-y-3">
+              {history.slice(0, 5).map((entry) => (
+                <div key={entry.id} className="rounded-xl border border-white/5 bg-zinc-900/40 p-3">
+                  <div className="flex items-center justify-between text-sm text-muted-foreground">
+                    <span className="font-semibold text-white">{entry.type.replace(/_/g, ' ')}</span>
+                    <span>{new Date(entry.createdAt).toLocaleDateString()}</span>
+                  </div>
+                  {entry.cost !== undefined && (
+                    <p className="text-base text-white mt-1">
+                      {entry.cost.toLocaleString()} AED
+                    </p>
+                  )}
+                  {typeof entry.metadata?.message === 'string' && entry.metadata.message.length > 0 && (
+                    <p className="text-xs text-muted-foreground mt-1">{entry.metadata.message}</p>
+                  )}
+                </div>
+              ))}
+            </div>
           )}
         </CardContent>
       </Card>

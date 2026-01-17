@@ -11,14 +11,16 @@ interface ChatAgentBlockProps {
   agentName?: string;
   placeholder?: string;
   theme?: 'dark' | 'light' | 'glass';
+  siteId?: string;
 }
 
 export function ChatAgentBlock({
-  headline = "Speak to our Market Expert",
+  headline = "Speak to this Market Expert",
   subtext = "Get instant answers about floor plans, pricing, and availability.",
   agentName = "Creek Market Expert",
   placeholder = "Ask anything about this project...",
-  theme = 'glass'
+  theme = 'glass',
+  siteId,
 }: ChatAgentBlockProps) {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -41,6 +43,7 @@ export function ChatAgentBlock({
           message: userText,
           history: messages.slice(-6),
           context: `Agent: ${agentName}. Focus: ${headline}. ${subtext}`,
+          siteId,
         }),
       });
       const data = await response.json();

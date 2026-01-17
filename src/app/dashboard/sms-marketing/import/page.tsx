@@ -10,7 +10,7 @@ export default function ImportContactsPage() {
   return (
     <div className="space-y-8 animate-in fade-in duration-700">
       <div>
-        <Link href="/dashboard/sms-marketing" className="flex items-center gap-2 text-zinc-500 hover:text-white transition-colors">
+        <Link href="/sender/new" className="flex items-center gap-2 text-zinc-500 hover:text-white transition-colors">
           <ArrowLeft className="h-4 w-4" />
           Back to SMS Marketing
         </Link>
